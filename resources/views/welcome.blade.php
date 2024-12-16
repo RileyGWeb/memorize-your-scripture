@@ -14,6 +14,6 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased dark:bg-black dark:text-white/50">
-        <img src="{{ asset('storage/images/sunrise.webp') }}" alt="Sunrise" class="absolute inset-0 w-full h-full object-cover object-center" />
+        <img src="{{ asset('images/sunrise.webp') }}" alt="Sunrise" class="absolute inset-0 w-full h-full object-cover object-center" />
     </body>
 </html>
