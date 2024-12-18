@@ -14,7 +14,20 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Poppins', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                text: '#292D32',
+                textLight: 'rgba(41, 45, 50, 0.5)',
+                stroke: 'rgba(41, 45, 50, 0.1)',
+                bg: '#F6F0F0',
+                lightBlue: '#60E3D5',
+                blue: '#05A0BF',
+                darkBlue: '#0567A6',
+            },
+            fontSize: {
+                base: '12px',
+                lg: '16px',
             },
         },
     },
