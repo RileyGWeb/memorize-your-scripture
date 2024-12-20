@@ -6,6 +6,10 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::get('/memorization-tool', function () {
+    return view('memorization-tool');
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
