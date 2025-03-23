@@ -15,9 +15,14 @@ Route::get('/memorization-tool/fetch-verse', [MemorizationToolController::class,
 Route::get('/memorization-tool/display', [MemorizationToolController::class, 'displayVerse'])
     ->name('memorization-tool.display');
 
+// 4) Save the memory verse
+Route::post('/memorization-tool/save', [MemorizationToolController::class, 'saveMemory'])
+    ->name('memorization-tool.save');
+
+
 Route::get('/', function () {
     return view('home');
-});
+})->name('home');
 
 // Route::get('/memorization-tool', function () {
 //     return view('memorization-tool');

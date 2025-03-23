@@ -91,4 +91,32 @@ class MemorizationToolController extends Controller
         $verseStr = implode(',', $parts);
         return "$book $chapter:$verseStr";
     }
+
+    public function saveMemory(Request $request)
+    {
+        $validated = $request->validate([
+            'book'           => 'required|string',
+            'chapter'        => 'required|integer',
+            'verses'         => 'required|array',
+            'difficulty'     => 'required|in:easy,normal,strict',
+            'accuracy_score' => 'required|numeric',
+        ]);
+
+        // Create in memory_bank
+        $record = \App\Models\MemoryBank::create([
+            'user_id'        => auth()->id(),
+            'book'           => $validated['book'],
+            'chapter'        => $validated['chapter'],
+            'verses'         => json_encode($validated['verses']),
+            'difficulty'     => $validated['difficulty'],
+            'accuracy_score' => $validated['accuracy_score'],
+            'memorized_at'   => now(), // Mark as memorized immediately
+        ]);
+
+        return response()->json([
+            'message' => 'Saved to memory bank.',
+            'record'  => $record,
+        ]);
+    }
+
 }

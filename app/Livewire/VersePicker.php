@@ -63,11 +63,6 @@ class VersePicker extends Component
                 'verseRanges' => $verseRanges,
             ]);
     
-            // If user is logged in, also save to DB
-            if (auth()->check()) {
-                $this->saveVerseSelectionToDatabase($book, $chapter, $verseRanges);
-            }
-    
         } catch (\Exception $e) {
             $this->errorMessage = $e->getMessage();
         }
