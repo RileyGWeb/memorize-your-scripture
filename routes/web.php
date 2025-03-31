@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MemorizationToolController;
+use App\Http\Controllers\MemoryBankController;
 
 // 1) Always present a fresh verse picker
 Route::get('/memorization-tool', [MemorizationToolController::class, 'showPicker'])
@@ -19,6 +20,13 @@ Route::get('/memorization-tool/display', [MemorizationToolController::class, 'di
 Route::post('/memorization-tool/save', [MemorizationToolController::class, 'saveMemory'])
     ->name('memorization-tool.save');
 
+
+// The memory bank
+Route::get('/bank', [MemoryBankController::class, 'index'])->name('memory-bank.index');
+
+// This method gets a verse based on only provided parameters, the other fetch method relies on a verse selection existing in a session variable
+Route::get('/bank/fetch-verse', [MemoryBankController::class, 'fetchVerseText'])
+     ->name('memory-bank.fetch-verse');
 
 Route::get('/', function () {
     return view('home');

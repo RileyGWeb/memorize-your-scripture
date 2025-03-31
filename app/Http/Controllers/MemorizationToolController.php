@@ -62,15 +62,31 @@ class MemorizationToolController extends Controller
     {
         $verseData = session('fetchedVerseText');
         if (!$verseData) {
-            // If there's no verse data, go back to the picker
             return redirect()->route('memorization-tool.picker');
         }
-
-        // Render a Blade view that shows the verse
+    
+        $raw = strip_tags($verseData['data'][0]['content']);
+    
+        // parse out 3 versions now:
+        $parsed = $this->parseAndStripVerseNumbers($raw);
+    
+        // This has 'displayFull', 'displayHidden', 'correctText'
+        $displayFull   = $parsed['displayFull'];
+        $displayHidden = $parsed['displayHidden'];
+        $correctText   = $parsed['correctText'];
+    
+        // For lined paper approach
+        $numLines = ceil(strlen($correctText)/35);
+    
         return view('memorization-tool-display', [
-            'verseData' => $verseData,
+            'displayFull'   => $displayFull,
+            'displayHidden' => $displayHidden,
+            'correctText'   => $correctText,
+            'reference'     => $this->formatReference(session('verseSelection')),
+            'numLines'      => $numLines,
+            'lineHeightPx'  => 24,
         ]);
-    }
+    }    
 
     /**
      * Utility method: turn ['book'=>'John','chapter'=>3,'verseRanges'=>[[16,18],[22,22]]] 
@@ -119,4 +135,55 @@ class MemorizationToolController extends Controller
         ]);
     }
 
+    protected function parseAndStripVerseNumbers(string $rawText): array
+    {
+        $lines = preg_split('/\r?\n/', $rawText);
+        
+        $displayFullLines   = [];
+        $displayHiddenLines = [];
+        $correctLines       = [];
+    
+        foreach ($lines as $line) {
+            $trimmed = ltrim($line);
+    
+            // Check if line has leading digits
+            if (preg_match('/^(\d+)(.*)$/', $trimmed, $matches)) {
+                $verseNum = $matches[1]; // e.g. "16"
+                $rest     = $matches[2]; // e.g. " For God so loved..."
+    
+                // full display
+                $displayFullLines[]   = "<sup>{$verseNum}</sup>{$rest}";
+                // hidden display: keep the verse num, but replace the rest with underscores
+                // $displayHiddenLines[] = "<sup>{$verseNum}</sup>" . $this->underscore($rest);
+                $displayHiddenLines[] = "<sup>{$verseNum}</sup>";
+                // correct text (no verse num)
+                $correctLines[]       = $rest;
+            } else {
+                // no leading digits
+                $displayFullLines[]   = $line;
+                $displayHiddenLines[] = $this->underscore($line); // entire line replaced
+                $correctLines[]       = $line;
+            }
+        }
+    
+        $displayFull   = implode("\n", $displayFullLines);
+        $displayHidden = implode("\n", $displayHiddenLines);
+        $correctText   = implode("\n", $correctLines);
+    
+        return [
+            'displayFull'   => $displayFull,   // e.g. "<sup>16</sup> For God so loved..."
+            'displayHidden' => $displayHidden, // e.g. "<sup>16</sup>________"
+            'correctText'   => $correctText,   // e.g. " For God so loved..."
+        ];
+    }
+    
+    /**
+     * Replaces all non-whitespace characters with underscores (or spaces).
+     */
+    protected function underscore(string $text): string
+    {
+        // Example: convert each letter/punctuation to '_', keep spaces/newlines
+        // Adjust the regex to match your exact "hidden" style (maybe just letters).
+        return preg_replace('/[^\s]/', '_', $text);
+    }
 }

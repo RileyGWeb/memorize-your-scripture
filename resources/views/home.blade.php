@@ -1,6 +1,10 @@
 <x-layouts.app>
     <x-content-card>
-        <x-content-card-title title="Welcome!" subtitle="We'rew glad you're here." :streak=true />
+        <x-content-card-title 
+            title="Welcome{{ auth()->check() ? ', ' . auth()->user()->name : '' }}!" 
+            subtitle="We're glad you're here." 
+            :streak=true 
+        />
 
         <x-divider />
 
@@ -16,7 +20,7 @@
 
         <x-divider />
 
-        <x-content-card-button href="what" text="Your memory bank" icon="bank" iconSize="md" />
+        <x-content-card-button href="/bank" text="Your memory bank" icon="bank" iconSize="md" />
 
         <x-divider />
 
