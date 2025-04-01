@@ -70,25 +70,25 @@
 
                 <!-- Stats row appears only when verse is hidden -->
                 <template x-if="hidden">
-                    <div class="flex items-center justify-center gap-4 mt-4">
+                    <div class="flex items-center justify-center">
                         
                         <!-- Accuracy Circle -->
-                        <div class="relative w-16 h-16 flex items-center justify-center">
+                        <div class="relative w-20 h-20 flex items-center justify-center border-r border-stroke">
                             <!-- We'll use an SVG ring for the circular progress -->
-                            <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 100 100">
+                            <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
                                 <!-- Background circle -->
                                 <circle
                                     class="text-gray-300"
                                     cx="50" cy="50" r="40"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="10"
+                                    stroke-width="3"
                                 />
                                 <!-- Progress circle -->
                                 <circle
                                     cx="50" cy="50" r="40"
                                     fill="none"
-                                    stroke-width="10"
+                                    stroke-width="3"
                                     :stroke="progressColor"
                                     stroke-linecap="round"
                                     :stroke-dasharray="circumference"
@@ -97,16 +97,17 @@
                             </svg>
                             
                             <!-- Display accuracy inside the circle -->
-                            <div class="absolute flex items-center justify-center w-12 h-12 font-bold text-sm"
+                            <div class="absolute flex items-center justify-center w-12 h-12 text-sm"
                                 :class="progressColorBackground">
                                 <span x-text="accuracy.toFixed(0) + '%'"></span>
                             </div>
                         </div>
 
                         <!-- Character Counter -->
-                        <div class="w-16 h-16 flex items-center justify-center bg-white border border-gray-300 rounded">
-                            <!-- e.g. "12 / 67" -->
-                            <span class="font-bold text-base" x-text="typedChars + ' / ' + totalChars"></span>
+                        <div class="w-20 h-20 flex items-center justify-center flex flex-col -space-y-3">
+                            <span x-text="typedChars" class="relative -left-3"></span>
+                            <span>/</span>
+                            <span x-text="totalChars" class="relative left-4"></span>
                         </div>
                     </div>
                 </template>
@@ -347,14 +348,14 @@
             },
             get progressColor() {
             // threshold-based color from red to green
-            if (this.accuracy < 60) return '#ef4444';   // or 'red'
-            if (this.accuracy < 90) return '#facc15';   // or 'yellow'
+            if (this.accuracy < 40) return '#ef4444';   // or 'red'
+            if (this.accuracy <= 80) return '#facc15';   // or 'yellow'
             return '#22c55e';                           // or 'green'
             },
             get progressColorBackground() {
             // if you want a BG color class behind the ring text
-            if (this.accuracy < 60) return 'text-red-600';
-            if (this.accuracy < 90) return 'text-yellow-600';
+            if (this.accuracy < 40) return 'text-red-600';
+            if (this.accuracy <= 80) return 'text-yellow-600';
             return 'text-green-600';
             }
         }
