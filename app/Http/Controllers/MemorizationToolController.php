@@ -35,7 +35,7 @@ class MemorizationToolController extends Controller
 
         // Scripture API call
         $apiKey = config('services.bible.api_key'); 
-        $bibleId = '06125adad2d5898a-01'; // for instance, KJV or another ID
+        $bibleId = '9879dbb7cfe39e4d-01'; // for instance, KJV or another ID
 
         $response = Http::withHeaders([
             'api-key' => $apiKey,
@@ -142,41 +142,59 @@ class MemorizationToolController extends Controller
         $displayFullLines   = [];
         $displayHiddenLines = [];
         $correctLines       = [];
-    
+        
         foreach ($lines as $line) {
-            $trimmed = ltrim($line);
-    
-            // Check if line has leading digits
-            if (preg_match('/^(\d+)(.*)$/', $trimmed, $matches)) {
-                $verseNum = $matches[1]; // e.g. "16"
-                $rest     = $matches[2]; // e.g. " For God so loved..."
-    
-                // full display
-                $displayFullLines[]   = "<sup>{$verseNum}</sup>{$rest}";
-                // hidden display: keep the verse num, but replace the rest with underscores
-                // $displayHiddenLines[] = "<sup>{$verseNum}</sup>" . $this->underscore($rest);
-                $displayHiddenLines[] = "<sup>{$verseNum}</sup>";
-                // correct text (no verse num)
-                $correctLines[]       = $rest;
-            } else {
-                // no leading digits
-                $displayFullLines[]   = $line;
-                $displayHiddenLines[] = $this->underscore($line); // entire line replaced
-                $correctLines[]       = $line;
+            // First, wrap all numbers with <sup> tags
+            $lineFull = preg_replace_callback('/\d+/', function($matches) {
+                return '<sup>' . $matches[0] . '</sup>';
+            }, $line);
+            
+            $displayFullLines[] = $lineFull;
+            // Correct text: remove all <sup> tags
+            $correctLines[] = strip_tags($lineFull);
+            
+            // For the hidden display, we want to keep the <sup> tags intact
+            // but replace every character outside them with underscores.
+            // We split the line on <sup> tags:
+            $parts = preg_split('/(<sup>.*?<\/sup>)/', $lineFull, -1, PREG_SPLIT_DELIM_CAPTURE);
+            $hiddenParts = [];
+            foreach ($parts as $part) {
+                if (preg_match('/^<sup>.*?<\/sup>$/', $part)) {
+                    // This part is a <sup> tag, so keep it as is.
+                    $hiddenParts[] = $part;
+                } else {
+                    // Replace every non-whitespace character with an underscore.
+                    $hiddenParts[] = preg_replace('/[^\s]/', '_', $part);
+                }
             }
+            $displayHiddenLines[] = implode('', $hiddenParts);
         }
-    
+        
         $displayFull   = implode("\n", $displayFullLines);
         $displayHidden = implode("\n", $displayHiddenLines);
         $correctText   = implode("\n", $correctLines);
-    
+        
         return [
-            'displayFull'   => $displayFull,   // e.g. "<sup>16</sup> For God so loved..."
-            'displayHidden' => $displayHidden, // e.g. "<sup>16</sup>________"
-            'correctText'   => $correctText,   // e.g. " For God so loved..."
+            'displayFull'   => $displayFull,   // The full text with all <sup> numbers intact.
+            'displayHidden' => $displayHidden, // The same text, but with non-<sup> characters replaced by underscores.
+            'correctText'   => $correctText,   // The text without any verse numbers.
         ];
     }
-    
+      
+    protected function parseVerseSegments(string $rawText): array
+    {
+        // This regex finds a sequence of digits (the verse number) followed by whitespace and then captures until the next verse number or end of string.
+        preg_match_all('/(\d+)\s+(.*?)(?=(\d+\s)|$)/s', $rawText, $matches, PREG_SET_ORDER);
+        $segments = [];
+        foreach ($matches as $match) {
+            $segments[] = [
+                'verse' => $match[1],          // e.g. "8"
+                'text'  => trim($match[2]),     // e.g. "Be sober and self-controlled. Be watchful. ..."
+            ];
+        }
+        return $segments;
+    }
+        
     /**
      * Replaces all non-whitespace characters with underscores (or spaces).
      */

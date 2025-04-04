@@ -10,12 +10,12 @@
             x-data="memoryBank({
                 items: @js($items),
             })"
-            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+            class="grid grid-cols-2"
         >
             <!-- Grid of Memorized Items -->
             <template x-for="(item, index) in items" :key="item.id">
                 <div
-                    class="p-4 border border-gray-200 rounded bg-white shadow cursor-pointer hover:bg-gray-50 transition"
+                    class="p-4 border cursor-pointer hover:bg-gray-50 transition"
                     @click="showModal(item)"
                 >
                     <!-- Book, Chapter, Verses, Difficulty, Date -->

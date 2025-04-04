@@ -13,16 +13,8 @@
         </div>
         <div class="flex flex-col grow items-center p-2">
             <p class="font-bold">Chapter & Verse(s):</p>
-            <p>
-                @if ($chapter) {{ $chapter . ':'}} @endif
-                @foreach($verseRanges as $i => $range)
-                    @if($range[0] === $range[1])
-                        {{ $range[0] }}
-                    @else
-                        {{ $range[0] }}-{{ $range[1] }}
-                    @endif
-                    @if(!$loop->last),@endif
-                @endforeach
+            <p> {{-- unformatted because it was adding a space after the : --}}
+                @if ($chapter){{ $chapter . ':'}}@endif@foreach($verseRanges as $i => $range)@if($range[0] === $range[1]){{ $range[0] }}@else{{ $range[0] }}-{{ $range[1] }}@endif@if(!$loop->last),@endif@endforeach
             </p>
         </div>
     </div>

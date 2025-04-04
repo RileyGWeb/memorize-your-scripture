@@ -115,76 +115,83 @@
 
             </form>
         </div>
-        
-
     </x-content-card>
 
     <x-content-card>
-        <div class="flex border-b border-stroke">
+        <x-content-card-button href="/memorization-tool" text="Change verse" icon="arrow-back" iconSize="md" />
+    </x-content-card>
 
-            <div class="font-semibold grow px-4 py-2">
-                <span x-text="reference"></span>
+    <x-content-card>
+        <div :class="{ 'rounded-xl shadow-xl shadow-green-400': showCongrats }">
+            
+            <div class="flex border-b border-stroke">
+                <div class="font-semibold grow px-4 py-2">
+                    <span x-text="reference"></span>
+                </div>
+                <div class="px-4 py-2 border-l border-stroke flex items-center font-semibold">
+                    <template x-if="!hidden">
+                        <button @click="hideVerse()">Hide It!</button>
+                    </template>
+                    <template x-if="hidden">
+                        <button variant="outline" @click="showVerse()">Show It!</button>
+                    </template>
+                </div>
             </div>
-            <div class="px-4 py-2 border-l border-stroke flex items-center font-semibold">
+
+
+            <!-- Main container: if not hidden, show normal text; if hidden, show lined paper + borderless textarea -->
+            <div class="relative p-4 pb-6">
+
+                <!-- Show normal text if not hidden -->
                 <template x-if="!hidden">
-                    <button @click="hideVerse()">Hide It!</button>
+                    <div class="leading-[1.5] text-lg whitespace-pre-wrap flex">
+                        <!-- Use x-html so we can render <sup> tags -->
+                        <div x-html="displayFull"></div>
+                    </div>
                 </template>
+
+                <!-- Show lined paper if hidden -->
                 <template x-if="hidden">
-                    <button variant="outline" @click="showVerse()">Show It!</button>
+                    <div :class="flashClass" @transitionend="clearFlash()" class="relative">
+                        <div class="leading-[1.5] text-lg whitespace-pre-wrap flex absolute">
+                            <div x-html="displayHidden"></div>
+                        </div>
+                        <!-- A container for the repeated lines (hr). 
+                                We'll explicitly set its height to match how many lines the text needs, 
+                                times the lineHeight (in px). -->
+                        <div class="relative w-full" 
+                                style="height: {{ $numLines * $lineHeightPx }}px;">
+                            
+                            <!-- Each line is a div with an absolutely positioned <hr> in the middle -->
+                            @for($i = 0; $i < $numLines; $i++)
+                                <div style="height: {{ $lineHeightPx }}px; position: relative;">
+                                    <hr class="lined-hr"
+                                        style="position:absolute; left:0; right:0; bottom:0;"/>
+                                </div>
+                            @endfor
+                            
+                            <!-- The text area sits absolutely on top, covering all lines. -->
+                            <textarea
+                                x-ref="typingArea"
+                                rows="{{ $numLines }}"
+                                class="absolute inset-0 w-full h-full text-lg 
+                                        leading-[1.5] bg-transparent outline-none 
+                                        resize-none no-border p-0 indent-2 overflow-hidden"
+                                x-model="typedText"
+                                @input="checkAccuracy"
+                            ></textarea>
+                        </div>
+                    </div>
                 </template>
             </div>
+
         </div>
+    </x-content-card>
 
-
-        <!-- Main container: if not hidden, show normal text; if hidden, show lined paper + borderless textarea -->
-        <div class="relative p-4 pb-6">
-
-            <!-- Show normal text if not hidden -->
-            <template x-if="!hidden">
-                <div class="leading-[1.5] text-lg whitespace-pre-wrap flex">
-                    <!-- Use x-html so we can render <sup> tags -->
-                    <div x-html="displayFull"></div>
-                </div>
-            </template>
-
-            <!-- Show lined paper if hidden -->
-            <template x-if="hidden">
-                <div :class="flashClass" @transitionend="clearFlash()" class="relative">
-                    <div class="leading-[1.5] text-lg whitespace-pre-wrap flex absolute">
-                        <div x-html="displayHidden"></div>
-                    </div>
-                    <!-- A container for the repeated lines (hr). 
-                            We'll explicitly set its height to match how many lines the text needs, 
-                            times the lineHeight (in px). -->
-                    <div class="relative w-full" 
-                            style="height: {{ $numLines * $lineHeightPx }}px;">
-                        
-                        <!-- Each line is a div with an absolutely positioned <hr> in the middle -->
-                        @for($i = 0; $i < $numLines; $i++)
-                            <div style="height: {{ $lineHeightPx }}px; position: relative;">
-                                <hr class="lined-hr"
-                                    style="position:absolute; left:0; right:0; bottom:0;"/>
-                            </div>
-                        @endfor
-                        
-                        <!-- The text area sits absolutely on top, covering all lines. -->
-                        <textarea
-                            x-ref="typingArea"
-                            rows="{{ $numLines }}"
-                            class="absolute inset-0 w-full h-full text-lg 
-                                    leading-[1.5] bg-transparent outline-none 
-                                    resize-none no-border py-0 px-3 overflow-hidden"
-                            x-model="typedText"
-                            @input="checkAccuracy"
-                        ></textarea>
-                    </div>
-                </div>
-            </template>
-        </div>
-
+    <x-content-card>
         <!-- Congrats if done -->
         <template x-if="showCongrats">
-            <div class="p-4 border border-green-400 bg-green-50 rounded text-center">
+            <div class="p-4 rounded-xl text-center">
                 <h2 class="text-xl font-semibold text-green-700 mb-2">Congrats!</h2>
                 <p class="text-green-700 mb-3">
                     You successfully memorized <span x-text="reference"></span>!
