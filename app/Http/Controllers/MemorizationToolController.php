@@ -47,32 +47,17 @@ class MemorizationToolController extends Controller
         $raw = $verseData['data'][0]['content'];
         $raw = preg_replace('/(\d)([A-Z])/', '$1 $2', $raw);
         $segments = $this->parseVerseSegments($raw);
-        $plainText = implode("\n", array_map(function($seg) {
-            return $seg['text'];
-        }, $segments));
-        $numLines = ceil(strlen($plainText) / 35);
+        foreach ($segments as &$seg) {
+            $seg['numLines'] = ceil(strlen($seg['text']) / 35);
+        }
+        unset($seg);
         $lineHeightPx = 24;
         return view('memorization-tool-display', [
             'segments'     => $segments,
             'reference'    => $this->formatReference(session('verseSelection')),
-            'numLines'     => $numLines,
             'lineHeightPx' => $lineHeightPx,
         ]);
     }
-    
-    protected function parseVerseSegments(string $rawText): array
-    {
-        preg_match_all('/<span\s+[^>]*class=["\']v["\'][^>]*>(\d+)<\/span>(.*?)(?=<span\s+[^>]*class=["\']v["\'][^>]*>|$)/s', $rawText, $matches, PREG_SET_ORDER);
-        $segments = [];
-        foreach ($matches as $match) {
-            $segments[] = [
-                'verse' => $match[1],
-                'text'  => trim(strip_tags($match[2])),
-            ];
-        }
-        return $segments;
-    }
-    
 
     protected function formatReference(array $selection)
     {
@@ -91,24 +76,37 @@ class MemorizationToolController extends Controller
     public function saveMemory(Request $request)
     {
         $validated = $request->validate([
-            'book' => 'required|string',
-            'chapter' => 'required|integer',
-            'verses' => 'required|array',
-            'difficulty' => 'required|in:easy,normal,strict',
+            'book'           => 'required|string',
+            'chapter'        => 'required|integer',
+            'verses'         => 'required|array',
+            'difficulty'     => 'required|in:easy,normal,strict',
             'accuracy_score' => 'required|numeric',
         ]);
         $record = \App\Models\MemoryBank::create([
-            'user_id' => auth()->id(),
-            'book' => $validated['book'],
-            'chapter' => $validated['chapter'],
-            'verses' => json_encode($validated['verses']),
-            'difficulty' => $validated['difficulty'],
+            'user_id'        => auth()->id(),
+            'book'           => $validated['book'],
+            'chapter'        => $validated['chapter'],
+            'verses'         => json_encode($validated['verses']),
+            'difficulty'     => $validated['difficulty'],
             'accuracy_score' => $validated['accuracy_score'],
-            'memorized_at' => now(),
+            'memorized_at'   => now(),
         ]);
         return response()->json([
             'message' => 'Saved to memory bank.',
-            'record' => $record,
+            'record'  => $record,
         ]);
+    }
+
+    protected function parseVerseSegments(string $rawText): array
+    {
+        preg_match_all('/<span\s+[^>]*class=["\']v["\'][^>]*>(\d+)<\/span>(.*?)(?=<span\s+[^>]*class=["\']v["\'][^>]*>|$)/s', $rawText, $matches, PREG_SET_ORDER);
+        $segments = [];
+        foreach ($matches as $match) {
+            $segments[] = [
+                'verse' => $match[1],
+                'text'  => trim(strip_tags($match[2])),
+            ];
+        }
+        return $segments;
     }
 }

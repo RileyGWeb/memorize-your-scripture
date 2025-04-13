@@ -2,14 +2,17 @@
     <div x-data="memTool({
             segments: @js($segments),
             reference: @js($reference),
-            numLines: @js($numLines),
             lineHeightPx: @js($lineHeightPx)
         })" x-init="init()">
         <x-content-card>
-            <x-content-card-title title="Verse Memorization" subtitle="When you've got it down, hide it and try to type it from memory." />
+            <template x-if="hidden">
+                <x-content-card-title title="Verse Memorization" subtitle="Type the verse(s) from memory. If you can't, show it again! But remember, you'll have to start over." />
+            </template>
+            <template x-if="!hidden">
+                <x-content-card-title title="Verse Memorization" subtitle="When you've got it down, hide it and try to type it from memory." />
+            </template>
             <x-divider />
-            <div class="flex h-20">
-
+            <div class="flex items-center justify-center h-20">
                 <div class="flex items-center justify-center h-full w-full">
                     <form class="flex w-full h-full">
                         <div class="relative h-full" :class="{ 'w-full': hidden && difficulty === 'easy' }" x-show="(!hidden) || (difficulty === 'easy')">
@@ -43,7 +46,7 @@
                                 <circle cx="50" cy="50" r="40" fill="none" stroke-width="3" :stroke="progressColor" stroke-linecap="round" :stroke-dasharray="circumference" :stroke-dashoffset="strokeOffset" />
                             </svg>
                             <div class="absolute flex items-center justify-center w-12 h-12 text-sm" :class="progressColorBackground">
-                                <span x-text="accuracy.toFixed(0) + '%'"></span>
+                                <span x-text="overallAccuracy.toFixed(0) + '%'"></span>
                             </div>
                         </div>
                         <div class="w-20 h-20 flex items-center justify-center flex flex-col -space-y-3">
@@ -53,7 +56,6 @@
                         </div>
                     </div>
                 </template>
-
             </div>
         </x-content-card>
         <x-content-card>
@@ -86,13 +88,13 @@
                             <div class="mb-2">
                                 <sup x-text="seg.verse"></sup>
                             </div>
-                            <div class="relative w-full" :style="'height:' + (lineHeightPx * numLines) + 'px;'">
-                                <template x-for="i in numLines" :key="i">
+                            <div class="relative w-full" :style="'height:' + (lineHeightPx * seg.numLines) + 'px;'">
+                                <template x-for="i in seg.numLines" :key="i">
                                     <div :style="'height:' + lineHeightPx + 'px; position:relative;'">
                                         <hr class="lined-hr" style="position:absolute; left:0; right:0; bottom:0;" />
                                     </div>
                                 </template>
-                                <textarea x-model="segmentStates[index].typedText" @input="checkAccuracy(index)" :rows="numLines" class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none no-border p-0 indent-2 overflow-hidden"></textarea>
+                                <textarea x-model="segmentStates[index].typedText" @input="checkAccuracy(index)" :rows="seg.numLines" class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none no-border p-0 indent-2 overflow-hidden"></textarea>
                             </div>
                         </div>
                     </template>
@@ -115,8 +117,7 @@
         </x-content-card>
     </div>
     <script>
-
-            function memTool({ segments, reference, numLines, lineHeightPx }) {
+        function memTool({ segments, reference, numLines, lineHeightPx }) {
             return {
                 segments,
                 reference,
@@ -131,87 +132,90 @@
                 radius: 40,
                 circumference: 0,
                 init() {
-                this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
-                this.circumference = 2 * Math.PI * this.radius;
-                this.totalChars = this.segments.reduce((sum, seg) => sum + seg.text.length, 0);
+                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+                    this.circumference = 2 * Math.PI * this.radius;
+                    this.totalChars = this.segments.reduce((sum, seg) => sum + seg.text.length, 0);
                 },
                 hideVerse() {
-                this.hidden = true;
+                    // Clear any typed text and reset the state before hiding
+                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+                    this.hidden = true;
                 },
                 showVerse() {
-                this.hidden = false;
+                    // Clear any typed text and reset the state before showing the verse again
+                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+                    this.hidden = false;
                 },
                 buildDisplayFull() {
-                return this.segments
-                    .map(seg => `<p class="m-2 text-xl font-light"><sup>${seg.verse}</sup> ${seg.text}</p>`)
-                    .join("");
+                    return this.segments
+                        .map(seg => `<p class="m-2 text-xl font-light"><sup>${seg.verse}</sup> ${seg.text}</p>`)
+                        .join("");
                 },
                 checkAccuracy(index) {
-                let typed = this.segmentStates[index].typedText;
-                let correct = this.segments[index].text;
-                let len = Math.min(typed.length, correct.length);
-                let matched = 0;
-                for (let i = 0; i < len; i++) {
-                    if (typed[i].toLowerCase() === correct[i].toLowerCase()) {
-                    matched++;
+                    let typed = this.segmentStates[index].typedText;
+                    let correct = this.segments[index].text;
+                    let len = Math.min(typed.length, correct.length);
+                    let matched = 0;
+                    for (let i = 0; i < len; i++) {
+                        if (typed[i].toLowerCase() === correct[i].toLowerCase()) {
+                            matched++;
+                        }
                     }
-                }
-                let acc = (matched / correct.length) * 100;
-                this.segmentStates[index].accuracy = acc;
-                this.checkAllSegments();
+                    let acc = (matched / correct.length) * 100;
+                    this.segmentStates[index].accuracy = acc;
+                    this.checkAllSegments();
                 },
                 checkAllSegments() {
-                this.showCongrats = this.segmentStates.every((state, i) => {
-                    let correct = this.segments[i].text;
-                    return state.typedText.length >= correct.length && state.accuracy >= this.requiredAccuracy();
-                });
+                    this.showCongrats = this.segmentStates.every((state, i) => {
+                        let correct = this.segments[i].text;
+                        return state.accuracy >= this.requiredAccuracy();
+                    });
                 },
                 requiredAccuracy() {
-                if (this.difficulty === 'easy') return 80;
-                if (this.difficulty === 'normal') return 95;
-                if (this.difficulty === 'strict') return 100;
-                return 80;
+                    if (this.difficulty === 'easy') return 80;
+                    if (this.difficulty === 'normal') return 95;
+                    if (this.difficulty === 'strict') return 100;
+                    return 80;
                 },
                 resetAll() {
-                this.hidden = false;
-                this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
-                this.showCongrats = false;
+                    this.hidden = false;
+                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+                    this.showCongrats = false;
                 },
                 get overallAccuracy() {
-                if (this.segmentStates.length === 0) return 0;
-                let sum = 0;
-                for (let i = 0; i < this.segmentStates.length; i++) {
-                    sum += this.segmentStates[i].accuracy;
-                }
-                return sum / this.segmentStates.length;
+                    if (this.segmentStates.length === 0) return 0;
+                    let sum = 0;
+                    for (let i = 0; i < this.segmentStates.length; i++) {
+                        sum += this.segmentStates[i].accuracy;
+                    }
+                    return sum / this.segmentStates.length;
                 },
                 get strokeOffset() {
-                const progress = this.overallAccuracy / 100;
-                return this.circumference - (progress * this.circumference);
+                    const progress = this.overallAccuracy / 100;
+                    return this.circumference - (progress * this.circumference);
                 },
                 get progressColor() {
-                let acc = this.overallAccuracy;
-                if (acc < 40) return '#ef4444';
-                if (acc <= 80) return '#facc15';
-                return '#22c55e';
+                    let acc = this.overallAccuracy;
+                    if (acc < 40) return '#ef4444';
+                    if (acc <= 80) return '#facc15';
+                    return '#22c55e';
                 },
                 get progressColorBackground() {
-                let acc = this.overallAccuracy;
-                if (acc < 40) return 'text-red-600';
-                if (acc <= 80) return 'text-yellow-600';
-                return 'text-green-600';
+                    let acc = this.overallAccuracy;
+                    if (acc < 40) return 'text-red-600';
+                    if (acc <= 80) return 'text-yellow-600';
+                    return 'text-green-600';
                 },
                 get typedChars() {
-                return this.segmentStates.reduce((sum, state) => sum + state.typedText.length, 0);
+                    return this.segmentStates.reduce((sum, state) => sum + state.typedText.length, 0);
                 }
             }
-            }
-
-
-
+        }
         document.addEventListener('alpine:init', () => {
             Alpine.data('memTool', memTool);
         });
+
+
     </script>
     <style>
         .flash-green {
