@@ -15,21 +15,21 @@
             <div class="flex items-center justify-center h-20">
                 <div class="flex items-center justify-center h-full w-full">
                     <form class="flex w-full h-full">
-                        <div class="relative h-full" :class="{ 'w-full': hidden && difficulty === 'easy' }" x-show="(!hidden) || (difficulty === 'easy')">
+                        <div class="relative h-full w-full" :class="{ 'w-full': hidden && difficulty === 'easy' }" x-show="(!hidden) || (difficulty === 'easy')">
                             <input x-model="difficulty" class="peer hidden" id="easy" type="radio" checked value="easy" />
                             <label for="easy" class="flex h-full justify-center cursor-pointer flex-col px-4 py-2.5 border-r border-stroke peer-checked:bg-darkBlue text-text peer-checked:text-white">
                                 <span class="font-bold">Easy</span>
                                 <span class="text-base">80% accuracy<br>required</span>
                             </label>
                         </div>
-                        <div class="relative h-full" :class="{ 'w-full': hidden && difficulty === 'normal' }" x-show="(!hidden) || (difficulty === 'normal')">
+                        <div class="relative h-full w-full" :class="{ 'w-full': hidden && difficulty === 'normal' }" x-show="(!hidden) || (difficulty === 'normal')">
                             <input x-model="difficulty" class="peer hidden" id="normal" type="radio" value="normal" />
                             <label for="normal" class="flex h-full justify-center cursor-pointer flex-col px-4 py-2.5 border-r border-stroke peer-checked:bg-darkBlue text-text peer-checked:text-white">
                                 <span class="font-bold">Normal</span>
                                 <span class="text-base">95% accuracy<br>required</span>
                             </label>
                         </div>
-                        <div class="relative h-full" :class="{ 'w-full': hidden && difficulty === 'strict' }" x-show="(!hidden) || (difficulty === 'strict')">
+                        <div class="relative h-full w-full" :class="{ 'w-full': hidden && difficulty === 'strict' }" x-show="(!hidden) || (difficulty === 'strict')">
                             <input x-model="difficulty" class="peer hidden" id="strict" type="radio" value="strict" />
                             <label for="strict" class="flex h-full justify-center cursor-pointer flex-col px-4 py-2.5 peer-checked:bg-darkBlue text-text peer-checked:text-white">
                                 <span class="font-bold">Strict</span>
@@ -59,7 +59,7 @@
             </div>
         </x-content-card>
         <x-content-card>
-            <x-content-card-button href="/memorization-tool" text="Change verse" icon="arrow-back" iconSize="md" />
+            <x-content-card-button href="/memorization-tool" text="Change verse" icon="arrow-narrow-left" iconSize="lg" />
         </x-content-card>
         <x-content-card>
             <div :class="{ 'rounded-xl shadow-xl shadow-green-400': showCongrats }">
@@ -67,12 +67,12 @@
                     <div class="font-semibold grow px-4 py-2">
                         <span x-text="reference"></span>
                     </div>
-                    <div class="px-4 py-2 border-l border-stroke flex items-center font-semibold">
+                    <div class="border-l border-stroke flex items-center font-semibold">
                         <template x-if="!hidden">
-                            <button @click="hideVerse()">Hide It!</button>
+                            <button @click="hideVerse()" class="px-4 py-2">Hide It!</button>
                         </template>
                         <template x-if="hidden">
-                            <button @click="showVerse()">Show It!</button>
+                            <button @click="showVerse()" class="px-4 py-2">Show It!</button>
                         </template>
                     </div>
                 </div>
@@ -83,9 +83,9 @@
                 </template>
                 <template x-if="hidden">
                     <template x-for="(seg, index) in segments" :key="index">
-                        <div class="mb-4 relative border p-4">
+                        <div class="relative border p-4">
                             <div class="absolute top-2 right-2 text-xs" x-text="segmentStates[index].accuracy.toFixed(0) + '%'"></div>
-                            <div class="mb-2">
+                            <div class="mb-2 absolute">
                                 <sup x-text="seg.verse"></sup>
                             </div>
                             <div class="relative w-full" :style="'height:' + (lineHeightPx * seg.numLines) + 'px;'">
@@ -94,7 +94,7 @@
                                         <hr class="lined-hr" style="position:absolute; left:0; right:0; bottom:0;" />
                                     </div>
                                 </template>
-                                <textarea x-model="segmentStates[index].typedText" @input="checkAccuracy(index)" :rows="seg.numLines" class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none no-border p-0 indent-2 overflow-hidden"></textarea>
+                                <textarea x-model="segmentStates[index].typedText" @input="checkAccuracy(index)" :rows="seg.numLines" class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none no-border p-0 indent-3 overflow-hidden"></textarea>
                             </div>
                         </div>
                     </template>
@@ -103,12 +103,30 @@
         </x-content-card>
         <x-content-card>
             <template x-if="showCongrats">
-                <div class="p-4 rounded-xl text-center">
-                    <h2 class="text-xl font-semibold text-green-700 mb-2">Congrats!</h2>
-                    <p class="text-green-700 mb-3">
-                        You successfully memorized <span x-text="reference"></span>!
-                    </p>
-                    <x-button @click="resetAll()">Try Another</x-button>
+                <div class="p-4 rounded-xl text-center border-2 border-[#5ECE0B]">
+                    <h2 class="text-xl font-semibold mb-2 flex items-center justify-center w-full gap-1">
+                        <img src="{{ asset('images/icons/svg/badge-check.svg') }}" />
+                        <span>Congrats!</span>
+                    </h2>
+                    <div class="flex flex-col my-3">
+                        @auth
+                            <span class="text-sm">Added to your bank:</span>
+                        @else
+                            <span class="text-sm">Memorized:</span>
+                        @endauth
+                        <span class="text-xl font-bold" x-text="reference"></span>
+                    </div>
+                    @auth
+
+                    @else
+                    <div class="flex flex-col my-3">
+                        <span class="text-sm">Sign up or register to have your memorized verses saved to your memory bank!</span>
+                    </div>
+                    @endif
+                    <div class="flex gap-2 w-full items-center justify-center">
+                        <x-button @click="resetAll()">Do Another</x-button>
+                        <x-button href="/">Back Home</x-button>
+                    </div>
                 </div>
             </template>
             <div x-ref="dummyText" class="text-lg leading-[1.5]" style="visibility:hidden; position:absolute; top:-9999px; width:100%;">

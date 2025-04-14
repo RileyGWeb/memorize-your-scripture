@@ -25,6 +25,6 @@
     </div>
     @endif
     @if($book && $chapter && count($verseRanges) > 0)
-        <x-content-card-button :href="route('memorization-tool.fetch')" text="Next" icon="arrow" />
+        <x-content-card-button :href="route('memorization-tool.fetch')" text="Next" icon="arrow-narrow-right" />
     @endif
 </div>
