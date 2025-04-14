@@ -2,7 +2,8 @@
     <div x-data="memTool({
             segments: @js($segments),
             reference: @js($reference),
-            lineHeightPx: @js($lineHeightPx)
+            lineHeightPx: @js($lineHeightPx),
+            bibleTranslation: @js($bibleTranslation)
         })" x-init="init()">
         <x-content-card>
             <template x-if="hidden">
@@ -135,100 +136,127 @@
         </x-content-card>
     </div>
     <script>
-        function memTool({ segments, reference, numLines, lineHeightPx }) {
-            return {
-                segments,
-                reference,
-                numLines,
-                lineHeightPx,
-                difficulty: 'easy',
-                hidden: false,
-                segmentStates: [],
-                showCongrats: false,
-                flashClass: '',
-                totalChars: 0,
-                radius: 40,
-                circumference: 0,
-                init() {
-                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
-                    this.circumference = 2 * Math.PI * this.radius;
-                    this.totalChars = this.segments.reduce((sum, seg) => sum + seg.text.length, 0);
-                },
-                hideVerse() {
-                    // Clear any typed text and reset the state before hiding
-                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
-                    this.hidden = true;
-                },
-                showVerse() {
-                    // Clear any typed text and reset the state before showing the verse again
-                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
-                    this.hidden = false;
-                },
-                buildDisplayFull() {
-                    return this.segments
-                        .map(seg => `<p class="m-2 text-xl font-light"><sup>${seg.verse}</sup> ${seg.text}</p>`)
-                        .join("");
-                },
-                checkAccuracy(index) {
-                    let typed = this.segmentStates[index].typedText;
-                    let correct = this.segments[index].text;
-                    let len = Math.min(typed.length, correct.length);
-                    let matched = 0;
-                    for (let i = 0; i < len; i++) {
-                        if (typed[i].toLowerCase() === correct[i].toLowerCase()) {
-                            matched++;
-                        }
-                    }
-                    let acc = (matched / correct.length) * 100;
-                    this.segmentStates[index].accuracy = acc;
-                    this.checkAllSegments();
-                },
-                checkAllSegments() {
-                    this.showCongrats = this.segmentStates.every((state, i) => {
-                        let correct = this.segments[i].text;
-                        return state.accuracy >= this.requiredAccuracy();
-                    });
-                },
-                requiredAccuracy() {
-                    if (this.difficulty === 'easy') return 80;
-                    if (this.difficulty === 'normal') return 95;
-                    if (this.difficulty === 'strict') return 100;
-                    return 80;
-                },
-                resetAll() {
-                    this.hidden = false;
-                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
-                    this.showCongrats = false;
-                },
-                get overallAccuracy() {
-                    if (this.segmentStates.length === 0) return 0;
-                    let sum = 0;
-                    for (let i = 0; i < this.segmentStates.length; i++) {
-                        sum += this.segmentStates[i].accuracy;
-                    }
-                    return sum / this.segmentStates.length;
-                },
-                get strokeOffset() {
-                    const progress = this.overallAccuracy / 100;
-                    return this.circumference - (progress * this.circumference);
-                },
-                get progressColor() {
-                    let acc = this.overallAccuracy;
-                    if (acc < 40) return '#ef4444';
-                    if (acc <= 80) return '#facc15';
-                    return '#22c55e';
-                },
-                get progressColorBackground() {
-                    let acc = this.overallAccuracy;
-                    if (acc < 40) return 'text-red-600';
-                    if (acc <= 80) return 'text-yellow-600';
-                    return 'text-green-600';
-                },
-                get typedChars() {
-                    return this.segmentStates.reduce((sum, state) => sum + state.typedText.length, 0);
+function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
+    return {
+        segments,
+        reference,
+        lineHeightPx,
+        bibleTranslation,  // new property for the bible translation (e.g., "NIV")
+        difficulty: 'easy',
+        hidden: false,
+        segmentStates: [],
+        showCongrats: false,
+        flashClass: '',
+        totalChars: 0,
+        radius: 40,
+        circumference: 0,
+        saved: false,
+        init() {
+            this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+            this.circumference = 2 * Math.PI * this.radius;
+            this.totalChars = this.segments.reduce((sum, seg) => sum + seg.text.length, 0);
+        },
+        hideVerse() {
+            this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+            this.saved = false;
+            this.hidden = true;
+        },
+        showVerse() {
+            this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+            this.saved = false;
+            this.hidden = false;
+        },
+        buildDisplayFull() {
+            return this.segments
+                .map(seg => `<p class="m-2 text-xl font-light"><sup>${seg.verse}</sup> ${seg.text}</p>`)
+                .join("");
+        },
+        checkAccuracy(index) {
+            let typed = this.segmentStates[index].typedText;
+            let correct = this.segments[index].text;
+            let len = Math.min(typed.length, correct.length);
+            let matched = 0;
+            for (let i = 0; i < len; i++) {
+                if (typed[i].toLowerCase() === correct[i].toLowerCase()) {
+                    matched++;
                 }
             }
+            let acc = (matched / correct.length) * 100;
+            this.segmentStates[index].accuracy = acc;
+            this.checkAllSegments();
+        },
+        checkAllSegments() {
+            this.showCongrats = this.segmentStates.every((state, i) => {
+                let correct = this.segments[i].text;
+                return state.typedText.length >= correct.length && state.accuracy >= this.requiredAccuracy();
+            });
+            if (this.showCongrats && !this.saved) {
+                this.saved = true;
+                fetch("{{ route('memorization-tool.save') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({
+                        book: this.reference.split(" ")[0],
+                        chapter: parseInt(this.reference.split(" ")[1].split(":")[0]),
+                        verses: this.segments.map(seg => seg.verse),
+                        difficulty: this.difficulty,
+                        accuracy_score: this.overallAccuracy,
+                        bible_translation: this.bibleTranslation,
+                        user_text: this.userTypedText
+                    })
+                })
+                .then(response => response.json())
+                .then(data => console.log('Memory saved:', data))
+                .catch(err => console.error(err));
+            }
+        },
+        requiredAccuracy() {
+            if (this.difficulty === 'easy') return 80;
+            if (this.difficulty === 'normal') return 95;
+            if (this.difficulty === 'strict') return 100;
+            return 80;
+        },
+        resetAll() {
+            this.hidden = false;
+            this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+            this.showCongrats = false;
+            this.saved = false;
+        },
+        get overallAccuracy() {
+            if (this.segmentStates.length === 0) return 0;
+            let sum = 0;
+            for (let i = 0; i < this.segmentStates.length; i++) {
+                sum += this.segmentStates[i].accuracy;
+            }
+            return sum / this.segmentStates.length;
+        },
+        get strokeOffset() {
+            const progress = this.overallAccuracy / 100;
+            return this.circumference - (progress * this.circumference);
+        },
+        get progressColor() {
+            let acc = this.overallAccuracy;
+            if (acc < 40) return '#ef4444';
+            if (acc <= 80) return '#facc15';
+            return '#22c55e';
+        },
+        get progressColorBackground() {
+            let acc = this.overallAccuracy;
+            if (acc < 40) return 'text-red-600';
+            if (acc <= 80) return 'text-yellow-600';
+            return 'text-green-600';
+        },
+        get typedChars() {
+            return this.segmentStates.reduce((sum, state) => sum + state.typedText.length, 0);
+        },
+        get userTypedText() {
+            return this.segmentStates.map(state => state.typedText).join("\n");
         }
+    }
+}
         document.addEventListener('alpine:init', () => {
             Alpine.data('memTool', memTool);
         });

@@ -52,13 +52,15 @@ class MemorizationToolController extends Controller
         }
         unset($seg);
         $lineHeightPx = 24;
+        $bibleTranslation = "KJV"; // Define your default translation here (or pull from config)
         return view('memorization-tool-display', [
-            'segments'     => $segments,
-            'reference'    => $this->formatReference(session('verseSelection')),
-            'lineHeightPx' => $lineHeightPx,
+            'segments'          => $segments,
+            'reference'         => $this->formatReference(session('verseSelection')),
+            'lineHeightPx'      => $lineHeightPx,
+            'bibleTranslation'  => $bibleTranslation,
         ]);
     }
-
+    
     protected function formatReference(array $selection)
     {
         $book = $selection['book'];
@@ -76,26 +78,49 @@ class MemorizationToolController extends Controller
     public function saveMemory(Request $request)
     {
         $validated = $request->validate([
-            'book'           => 'required|string',
-            'chapter'        => 'required|integer',
-            'verses'         => 'required|array',
-            'difficulty'     => 'required|in:easy,normal,strict',
-            'accuracy_score' => 'required|numeric',
+            'book'              => 'required|string',
+            'chapter'           => 'required|integer',
+            'verses'            => 'required|array',
+            'difficulty'        => 'required|in:easy,normal,strict',
+            'accuracy_score'    => 'required|numeric',
+            'bible_translation' => 'required|string',
+            'user_text'         => 'required|string',
         ]);
-        $record = \App\Models\MemoryBank::create([
-            'user_id'        => auth()->id(),
-            'book'           => $validated['book'],
-            'chapter'        => $validated['chapter'],
-            'verses'         => json_encode($validated['verses']),
-            'difficulty'     => $validated['difficulty'],
-            'accuracy_score' => $validated['accuracy_score'],
-            'memorized_at'   => now(),
-        ]);
+    
+        // Try to find an existing memory entry for this user with the same book, chapter, verses, difficulty, and bible_translation.
+        $existing = \App\Models\MemoryBank::where('user_id', auth()->id())
+            ->where('book', $validated['book'])
+            ->where('chapter', $validated['chapter'])
+            ->where('verses', json_encode($validated['verses']))
+            ->where('difficulty', $validated['difficulty'])
+            ->where('bible_translation', $validated['bible_translation'])
+            ->first();
+    
+        if ($existing) {
+            $existing->accuracy_score = $validated['accuracy_score'];
+            $existing->memorized_at = now();
+            $existing->user_text = $validated['user_text'];
+            $existing->save();
+            $record = $existing;
+        } else {
+            $record = \App\Models\MemoryBank::create([
+                'user_id'           => auth()->id(),
+                'book'              => $validated['book'],
+                'chapter'           => $validated['chapter'],
+                'verses'            => json_encode($validated['verses']),
+                'difficulty'        => $validated['difficulty'],
+                'accuracy_score'    => $validated['accuracy_score'],
+                'bible_translation' => $validated['bible_translation'],
+                'user_text'         => $validated['user_text'],
+                'memorized_at'      => now(),
+            ]);
+        }
+    
         return response()->json([
             'message' => 'Saved to memory bank.',
             'record'  => $record,
         ]);
-    }
+    }    
 
     protected function parseVerseSegments(string $rawText): array
     {

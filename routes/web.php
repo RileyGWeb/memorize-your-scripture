@@ -20,6 +20,8 @@ Route::get('/memorization-tool/display', [MemorizationToolController::class, 'di
 Route::post('/memorization-tool/save', [MemorizationToolController::class, 'saveMemory'])
     ->name('memorization-tool.save');
 
+Route::get('/bank/search-verses', [MemoryBankController::class, 'searchVerses'])
+     ->name('memory-bank.search-verses');
 
 // The memory bank
 Route::get('/bank', [MemoryBankController::class, 'index'])->name('memory-bank.index');

@@ -90,4 +90,33 @@ class MemoryBankController extends Controller
             'verse_text' => strip_tags($fullText), // or keep HTML if you want
         ]);
     }
+
+    public function searchVerses(Request $request)
+    {
+        $query = $request->input('q');
+
+        // Replace the stub logic below with your real verse search logic.
+        // For example, you may query your Scripture API or search a verses table.
+        // Here, we return a simple static response if a query is provided.
+        if ($query) {
+            // Example response: these items should have the same structure as those
+            // originally passed to the memory bank (i.e. with keys like book, chapter, verses, etc.)
+            $items = [
+                [
+                    'id' => 101,
+                    'book' => 'John',
+                    'chapter' => 3,
+                    'verses' => [16],
+                    'difficulty' => 'Easy',
+                    'memorized_at' => now()->toDateTimeString(),
+                    'verse_text' => 'For God so loved the world, that he gave his only Son...',
+                ],
+                // Add additional items as necessary...
+            ];
+        } else {
+            $items = [];
+        }
+
+        return response()->json(['items' => $items]);
+    }
 }

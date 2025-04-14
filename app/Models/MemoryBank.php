@@ -16,5 +16,7 @@ class MemoryBank extends Model
         'difficulty',
         'accuracy_score',
         'memorized_at',
+        'user_text',
+        'bible_translation',
     ];
 }
