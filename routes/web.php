@@ -4,6 +4,22 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MemorizationToolController;
 use App\Http\Controllers\MemoryBankController;
 
+// -- Site Routes --
+// about page
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+// privacy policy page
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+// contact page
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+
+// -- Application Routes --
+
 // 1) Always present a fresh verse picker
 Route::get('/memorization-tool', [MemorizationToolController::class, 'showPicker'])
     ->name('memorization-tool.picker');

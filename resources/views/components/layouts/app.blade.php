@@ -13,9 +13,19 @@
     <body class="font-sans antialiased bg-no-repeat bg-center bg-cover min-h-screen" 
           style="background-image: url({{ asset('images/sunrise.webp') }});">
         <x-header />
-        <main class="pb-4 pt-20 px-2 gap-2 flex flex-col items-center w-full max-w-sm mx-auto">
+        <main class="pb-4 pt-24 px-2 gap-2 flex flex-col items-center w-full max-w-sm mx-auto">
             {{ $slot }}
         </main>
+
+        <footer class="fixed bottom-0 left-0 w-full bg-white shadow-md py-2 px-4 flex justify-between items-center">
+            <div class="text-sm text-gray-600">
+                <a href="{{ route('about') }}" class="hover:underline">About</a>
+                <span class="mx-2">|</span>
+                <a href="{{ route('privacy-policy') }}" class="hover:underline">Privacy Policy</a>
+                <span class="mx-2">|</span>
+                <span>&copy; Riley G. Dev 2025</span>
+            </div>
+        </footer>
         @stack('modals')
         <div x-show="loginModal" 
              class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" 

@@ -17,42 +17,50 @@ class MemorizationToolController extends Controller
     public function fetchVerse(Request $request)
     {
         $selection = session('verseSelection');
-        if (!$selection) {
+        if (! $selection) {
             return redirect()->route('memorization-tool.picker')
                              ->with('error', 'No verse selection found in session.');
         }
+
         $reference = $this->formatReference($selection);
-        $apiKey = config('services.bible.api_key');
-        $bibleId = '9879dbb7cfe39e4d-01';
+        $apiKey    = config('services.bible.api_key');
+        $bibleId   = $request->cookie('bibleId', '9879dbb7cfe39e4d-01');
+// dd($bibleId);
         $response = Http::withHeaders([
             'api-key' => $apiKey,
         ])->get("https://api.scripture.api.bible/v1/bibles/{$bibleId}/passages", [
             'reference' => $reference,
         ]);
+
         if ($response->failed()) {
             return redirect()->route('memorization-tool.picker')
                              ->with('error', 'Failed to fetch verse data.');
         }
-        $data = $response->json();
-        session()->put('fetchedVerseText', $data);
+
+        session()->put('fetchedVerseText', $response->json());
+
         return redirect()->route('memorization-tool.display');
     }
 
     public function displayVerse(Request $request)
     {
         $verseData = session('fetchedVerseText');
-        if (!$verseData) {
+        if (! $verseData) {
             return redirect()->route('memorization-tool.picker');
         }
+
         $raw = $verseData['data'][0]['content'];
         $raw = preg_replace('/(\d)([A-Z])/', '$1 $2', $raw);
         $segments = $this->parseVerseSegments($raw);
+
         foreach ($segments as &$seg) {
             $seg['numLines'] = ceil(strlen($seg['text']) / 35);
         }
         unset($seg);
-        $lineHeightPx = 24;
-        $bibleTranslation = "KJV"; // Define your default translation here (or pull from config)
+
+        $lineHeightPx      = 24;
+        $bibleTranslation  = $request->cookie('bibleId', '9879dbb7cfe39e4d-01');
+
         return view('memorization-tool-display', [
             'segments'          => $segments,
             'reference'         => $this->formatReference(session('verseSelection')),
@@ -60,17 +68,19 @@ class MemorizationToolController extends Controller
             'bibleTranslation'  => $bibleTranslation,
         ]);
     }
-    
+
     protected function formatReference(array $selection)
     {
-        $book = $selection['book'];
-        $chapter = $selection['chapter'];
-        $ranges = $selection['verseRanges'];
-        $parts = [];
+        $book     = $selection['book'];
+        $chapter  = $selection['chapter'];
+        $ranges   = $selection['verseRanges'];
+        $parts    = [];
+
         foreach ($ranges as $range) {
             [$start, $end] = $range;
             $parts[] = ($start === $end) ? $start : "$start-$end";
         }
+
         $verseStr = implode(',', $parts);
         return "$book $chapter:$verseStr";
     }
@@ -86,8 +96,7 @@ class MemorizationToolController extends Controller
             'bible_translation' => 'required|string',
             'user_text'         => 'required|string',
         ]);
-    
-        // Try to find an existing memory entry for this user with the same book, chapter, verses, difficulty, and bible_translation.
+
         $existing = \App\Models\MemoryBank::where('user_id', auth()->id())
             ->where('book', $validated['book'])
             ->where('chapter', $validated['chapter'])
@@ -95,11 +104,11 @@ class MemorizationToolController extends Controller
             ->where('difficulty', $validated['difficulty'])
             ->where('bible_translation', $validated['bible_translation'])
             ->first();
-    
+
         if ($existing) {
-            $existing->accuracy_score = $validated['accuracy_score'];
-            $existing->memorized_at = now();
-            $existing->user_text = $validated['user_text'];
+            $existing->accuracy_score    = $validated['accuracy_score'];
+            $existing->memorized_at      = now();
+            $existing->user_text         = $validated['user_text'];
             $existing->save();
             $record = $existing;
         } else {
@@ -115,16 +124,22 @@ class MemorizationToolController extends Controller
                 'memorized_at'      => now(),
             ]);
         }
-    
+
         return response()->json([
             'message' => 'Saved to memory bank.',
             'record'  => $record,
         ]);
-    }    
+    }
 
     protected function parseVerseSegments(string $rawText): array
     {
-        preg_match_all('/<span\s+[^>]*class=["\']v["\'][^>]*>(\d+)<\/span>(.*?)(?=<span\s+[^>]*class=["\']v["\'][^>]*>|$)/s', $rawText, $matches, PREG_SET_ORDER);
+        preg_match_all(
+            '/<span\s+[^>]*class=["\']v["\'][^>]*>(\d+)<\/span>(.*?)(?=<span\s+[^>]*class=["\']v["\'][^>]*>|$)/s',
+            $rawText,
+            $matches,
+            PREG_SET_ORDER
+        );
+
         $segments = [];
         foreach ($matches as $match) {
             $segments[] = [
@@ -132,6 +147,7 @@ class MemorizationToolController extends Controller
                 'text'  => trim(strip_tags($match[2])),
             ];
         }
+
         return $segments;
     }
 }

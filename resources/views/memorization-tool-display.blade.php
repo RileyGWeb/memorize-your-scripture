@@ -3,7 +3,6 @@
             segments: @js($segments),
             reference: @js($reference),
             lineHeightPx: @js($lineHeightPx),
-            bibleTranslation: @js($bibleTranslation)
         })" x-init="init()">
         <x-content-card>
             <template x-if="hidden">
@@ -254,7 +253,11 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
         },
         get userTypedText() {
             return this.segmentStates.map(state => state.typedText).join("\n");
-        }
+        },
+
+        get bibleTranslation() {
+            return Alpine.store('bible').selectedId;
+        },
     }
 }
         document.addEventListener('alpine:init', () => {

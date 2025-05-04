@@ -10,11 +10,9 @@
 
         <!-- Wrap the search field and the grid in one container with x-data -->
         <div class="w-full">
-            
-            <!-- Search Input (now inside the x-data scope) -->
-
             <!-- Grid displaying items -->
             <x-content-card>
+                @auth
                 <div class="px-2 border-b border-border">
                     <input type="text" x-model="search" placeholder="Search..." class="w-full p-2 bg-transparent border-none focus:outline-none focus:ring-0" />
                 </div>
@@ -24,7 +22,7 @@
                             class="p-4 cursor-pointer hover:bg-gray-50 transition"
                             :class="{
                                 'border-r': index % 2 === 0,
-                                'border-b': index < items.length - 2
+                                'border-b': index < items.length - 1
                             }"
                             @click="showModal(item)">
                             <!-- Book, Chapter, Verses, Difficulty, Date -->
@@ -38,6 +36,12 @@
                         </div>
                     </template>
                 </div>
+                @else
+                <div class="p-4">
+                    <p class="text-center text-gray-500">Whoops, you're not logged in!</p>
+                    <p class="text-center text-gray-500">Sign up or register, and your memorized verses will show up here.</p>
+                </div>
+                @endauth
             </x-content-card>
         </div>
 

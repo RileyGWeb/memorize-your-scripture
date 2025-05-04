@@ -22,74 +22,67 @@ class MemoryBankController extends Controller
 
     public function fetchVerseText(Request $request)
     {
-        // Validate the query params from the request
+        // 1) Accept a bible_translation parameter (falling back to your default)
         $validated = $request->validate([
-            'book' => 'required|string',
-            'chapter' => 'required|integer',
-            'verses' => 'required|array', // e.g. ["16","17","18"] or a single verse
+            'book'               => 'required|string',
+            'chapter'            => 'required|integer',
+            'verses'             => 'required|array',
+            'bible_translation'  => 'nullable|string',
         ]);
-
-        // Format a reference string like "John 3:16-18"
-        $book = $validated['book'];
-        $chapter = $validated['chapter'];
-        $versesArray = $validated['verses']; // array of ints or strings
-        // Convert it to a string "16-18" or "16,17"
-        // We'll do a naive approach for continuous vs. non-continuous:
+    
+        // 2) Pick up the translation from the request or config default
+        $bibleId = $validated['bible_translation']
+            ?: config('bible.default');  // e.g. set this in config/bible.php
+    
+        // 3) Build the reference string exactly as before
+        $book        = $validated['book'];
+        $chapter     = $validated['chapter'];
+        $versesArray = $validated['verses'];
+    
         sort($versesArray, SORT_NUMERIC);
         $first = reset($versesArray);
         $last  = end($versesArray);
-
+    
         $reference = "$book $chapter";
         if (count($versesArray) === 1) {
             $reference .= ":$first";
         } else {
-            // Check if it's continuous
             $continuous = true;
             for ($i = 0; $i < count($versesArray) - 1; $i++) {
-                if ($versesArray[$i+1] != ($versesArray[$i] + 1)) {
+                if ($versesArray[$i+1] !== $versesArray[$i] + 1) {
                     $continuous = false;
                     break;
                 }
             }
-            if ($continuous) {
-                $reference .= ":$first-$last";
-            } else {
-                $reference .= ':'.implode(',', $versesArray);
-            }
+            $reference .= $continuous
+                ? ":{$first}-{$last}"
+                : ':' . implode(',', $versesArray);
         }
-
-        // Call scripture.api.bible with your API key
+    
+        // 4) Fetch from scripture.api.bible
         $apiKey = config('services.bible.api_key');
-        $bibleId = '06125adad2d5898a-01'; // For example, KJV ID
-
         $response = Http::withHeaders([
             'api-key' => $apiKey,
         ])->get("https://api.scripture.api.bible/v1/bibles/{$bibleId}/passages", [
             'reference' => $reference,
         ]);
-
+    
         if ($response->failed()) {
-            return response()->json([
-                'error' => 'Failed to fetch verse text.',
-            ], 500);
+            return response()->json(['error' => 'Failed to fetch verse text.'], 500);
         }
-
-        $data = $response->json(); // Something like ['data' => [...]]
-        
-        // Usually, $data['data'] might be an array of passages,
-        // but let's just return the 'content' from the first item or combine them
+    
+        $data     = $response->json();
         $fullText = '';
-        if (isset($data['data']) && is_array($data['data'])) {
-            foreach ($data['data'] as $passage) {
-                $fullText .= $passage['content'] ?? '';
-            }
+        foreach ($data['data'] as $passage) {
+            $fullText .= ($passage['content'] ?? '');
         }
-
+    
         return response()->json([
-            'reference' => $reference,
-            'verse_text' => strip_tags($fullText), // or keep HTML if you want
+            'reference'         => $reference,
+            'verse_text'        => strip_tags($fullText),
+            'bible_translation' => $bibleId,      // so your modal can show which version
         ]);
-    }
+    }    
 
     public function searchVerses(Request $request)
     {
