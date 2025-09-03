@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class MemorizationToolController extends Controller
 {
@@ -33,8 +34,23 @@ class MemorizationToolController extends Controller
         ]);
 
         if ($response->failed()) {
+            \Log::error('Bible API call failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'reference' => $reference,
+                'bibleId' => $bibleId,
+                'hasApiKey' => !empty($apiKey)
+            ]);
+            
+            $errorMessage = 'Failed to fetch verse data.';
+            if ($response->status() === 401) {
+                $errorMessage = 'Invalid Bible API key. Please check your configuration.';
+            } elseif ($response->status() === 404) {
+                $errorMessage = 'Verse not found. Please check your reference.';
+            }
+            
             return redirect()->route('memorization-tool.picker')
-                             ->with('error', 'Failed to fetch verse data.');
+                             ->with('error', $errorMessage);
         }
 
         session()->put('fetchedVerseText', $response->json());

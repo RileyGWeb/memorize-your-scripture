@@ -23,7 +23,7 @@
                 <span class="mx-2">|</span>
                 <a href="{{ route('privacy-policy') }}" class="hover:underline">Privacy Policy</a>
                 <span class="mx-2">|</span>
-                <span>&copy; Riley G. Dev 2025</span>
+                <span>&copy; Riley G. Dev {{ date('Y') }}</span>
             </div>
         </footer>
         @stack('modals')
