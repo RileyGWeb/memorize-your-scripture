@@ -5,4 +5,4 @@
 ### Check off items as you complete them.
 ### Do not stop iterating until all tests are complete!
 
-[ ] Can you create a streak feature to encourage daily logins? Replace the 44 days placeholder with the real number. If the user has a 0 day streak, don't display it. 
+[ ] Can you create a streak feature to encourage daily logins? Replace the 44 days placeholder with the real number. If the user has a 0 day streak, don't display it. IF the user is not logged in at all, also don't display it.

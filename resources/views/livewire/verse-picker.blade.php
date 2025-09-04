@@ -21,7 +21,19 @@
 
     @if($errorMessage)
     <div class="p-2">
-        <p class="text-red-500 mt-2">{{ $errorMessage }}</p>
+        @if($suggestedBook)
+            <p class="text-red-500 mt-2">
+                {{ substr($errorMessage, 0, strpos($errorMessage, 'Did you mean')) }}Did you mean 
+                <button 
+                    wire:click="applySuggestion" 
+                    class="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors duration-200 px-1 py-0.5 rounded hover:bg-blue-50"
+                >
+                    '{{ $suggestedBook }}'
+                </button>?
+            </p>
+        @else
+            <p class="text-red-500 mt-2">{{ $errorMessage }}</p>
+        @endif
     </div>
     @endif
     @if($book && $chapter && count($verseRanges) > 0)

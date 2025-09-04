@@ -11,9 +11,6 @@
         <livewire:memorize-later />
     </x-content-card>
 
-    <!-- Memorize Later List -->
-    <livewire:memorize-later-list />
-
     <x-content-card>
         <x-content-card-button href="what" text="How to get started" icon="question-mark-circle" iconSize="md" />
 
@@ -30,6 +27,9 @@
         <x-content-card-button href="what" text="Get quizzed" icon="academic-cap" iconSize="lg" />
         
     </x-content-card>
+
+    <!-- Memorize Later List -->
+    <livewire:memorize-later-list />
 
     <!-- Daily Quiz -->
     <livewire:daily-quiz />

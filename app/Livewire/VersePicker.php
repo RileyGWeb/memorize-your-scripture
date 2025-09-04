@@ -11,6 +11,7 @@ class VersePicker extends Component
     public $chapter = '';
     public $verseRanges = [];
     public $errorMessage = '';
+    public $suggestedBook = '';
     private array $booksOfTheBible = [
         // Old Testament
         'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
@@ -39,6 +40,7 @@ class VersePicker extends Component
     public function updatedInput($value)
     {
         $this->errorMessage = '';
+        $this->suggestedBook = '';
         $this->book = '';
         $this->chapter = '';
         $this->verseRanges = [];
@@ -65,6 +67,12 @@ class VersePicker extends Component
     
         } catch (\Exception $e) {
             $this->errorMessage = $e->getMessage();
+            $this->suggestedBook = '';
+            
+            // Check if this is a "Did you mean?" error and extract the suggested book
+            if (preg_match("/Unrecognized book '.*?'. Did you mean '(.*?)'\?/", $e->getMessage(), $matches)) {
+                $this->suggestedBook = $matches[1];
+            }
         }
     }
     
@@ -174,6 +182,29 @@ class VersePicker extends Component
         }
 
         return null; 
+    }
+
+    public function applySuggestion()
+    {
+        if ($this->suggestedBook) {
+            // Replace the incorrect book name with the suggested one in the input
+            $currentInput = $this->input;
+            
+            // Extract the original book name and replace it with the suggestion
+            if (preg_match('/^(.+?)\s+(\d+:.+)$/', $currentInput, $matches)) {
+                $this->input = $this->suggestedBook . ' ' . $matches[2];
+            } else {
+                // Fallback: just replace with the suggested book if pattern doesn't match
+                $this->input = $this->suggestedBook;
+            }
+            
+            // Clear error and suggestion states
+            $this->errorMessage = '';
+            $this->suggestedBook = '';
+            
+            // Trigger the input update to re-parse
+            $this->updatedInput($this->input);
+        }
     }
 
     public function render()

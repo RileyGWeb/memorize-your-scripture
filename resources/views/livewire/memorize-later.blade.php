@@ -24,7 +24,7 @@
 
     <!-- Expanded Form -->
     @if($isExpanded)
-        <div class="p-4 border-t-2 border-gray-200"
+        <div class="p-4 border-t border-stroke"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 transform scale-95"
              x-transition:enter-end="opacity-100 transform scale-100">
@@ -41,7 +41,7 @@
                         <input wire:model="verse" 
                                type="text" 
                                placeholder="John 3:16-18"
-                               class="w-full py-3 pl-4 pr-12 bg-bg border-2 border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800"
+                               class="w-full py-3 pl-4 pr-12 bg-bg border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800"
                                required>
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,31 +49,26 @@
                             </svg>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500">Examples: "John 3:16", "Psalms 23:1-6", "1 John 4:7"</p>
                     @error('verse') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
-
-                <!-- Divider -->
-                <div class="border-t border-gray-200"></div>
 
                 <!-- Note Input Section -->
                 <div class="space-y-3">
                     <div>
-                        <h3 class="font-bold text-lg text-gray-800">Make a quick note</h3>
-                        <p class="text-gray-600 text-sm">Memorizing something more than just a verse? Jot it down below...</p>
+                        <h3 class="font-bold text-lg text-gray-800">Note (optional)</h3>
                     </div>
                     
                     <textarea wire:model="note" 
-                              placeholder="What are you thinking?... (optional)"
+                              placeholder="Why do you like this verse? (optional)"
                               rows="4"
-                              class="w-full p-4 bg-bg border-2 border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 text-gray-800"></textarea>
+                              class="w-full p-4 bg-bg border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 text-gray-800"></textarea>
                     @error('note') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Save Button -->
                 <div class="flex justify-center pt-2">
                     <button type="submit" 
-                            class="bg-gray-800 hover:bg-gray-900 active:bg-black text-white font-bold py-4 px-8 rounded-lg transition-all duration-200 focus:ring-4 focus:ring-gray-300 focus:outline-none shadow-lg hover:shadow-xl">
+                            class="bg-gray-800 hover:bg-gray-900 active:bg-black text-white font-bold py-2 px-8 rounded-lg transition-all duration-200 focus:ring-4 focus:ring-gray-300 focus:outline-none shadow-lg hover:shadow-xl">
                         Save Verse
                     </button>
                 </div>

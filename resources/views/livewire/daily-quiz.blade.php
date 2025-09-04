@@ -82,7 +82,7 @@
         @else
             <x-divider />
             <div class="px-4 py-6 text-center">
-                <p class="text-text text-base mb-4">You haven't memorized any verses yet!</p>
+                <p class="text-text text-base mb-4">You haven't memorized any verses yet! Once you do, you can get quizzed on them here to make sure they stay in your brain.</p>
                 <a href="/memorization-tool" class="inline-flex items-center text-text hover:text-textLight font-bold transition-colors">
                     Start memorizing verses
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
