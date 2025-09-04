@@ -64,4 +64,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the memorized verses for the user.
+     */
+    public function memoryBank()
+    {
+        return $this->hasMany(MemoryBank::class);
+    }
+
+    /**
+     * Get the memorize later items for the user.
+     */
+    public function memorizeLater()
+    {
+        return $this->hasMany(MemorizeLater::class);
+    }
 }

@@ -50,6 +50,11 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+// Daily Quiz route
+Route::get('/daily-quiz', function () {
+    return view('daily-quiz');
+})->name('daily-quiz');
+
 // Route::get('/memorization-tool', function () {
 //     return view('memorization-tool');
 // });

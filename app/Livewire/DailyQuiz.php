@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Livewire;
+
+use Livewire\Component;
+use App\Models\MemoryBank;
+use Illuminate\Support\Facades\Auth;
+
+class DailyQuiz extends Component
+{
+    public $numberOfQuestions = 10;
+    public $quizType = '';
+    public $showQuizOptions = false;
+
+    public function toggleQuizOptions()
+    {
+        $this->showQuizOptions = !$this->showQuizOptions;
+    }
+
+    public function increaseNumber()
+    {
+        if ($this->numberOfQuestions < 50) {
+            $this->numberOfQuestions++;
+        }
+    }
+
+    public function decreaseNumber()
+    {
+        if ($this->numberOfQuestions > 1) {
+            $this->numberOfQuestions--;
+        }
+    }
+
+    public function startQuiz($type)
+    {
+        if (!Auth::check()) {
+            session()->flash('error', 'Please log in to take a quiz.');
+            return;
+        }
+
+        $verses = $this->getVersesForQuizType($type);
+        
+        if ($verses->isEmpty()) {
+            session()->flash('error', 'You need to memorize some verses first before taking a quiz.');
+            return;
+        }
+
+        // Store quiz data in session
+        session()->put('dailyQuiz', [
+            'type' => $type,
+            'numberOfQuestions' => $this->numberOfQuestions,
+            'verses' => $verses->toArray(),
+            'currentIndex' => 0,
+            'startTime' => now(),
+        ]);
+
+        return redirect()->route('daily-quiz');
+    }
+
+    protected function getVersesForQuizType($type)
+    {
+        $query = MemoryBank::where('user_id', Auth::id());
+
+        switch ($type) {
+            case 'random':
+                return $query->inRandomOrder()
+                    ->limit($this->numberOfQuestions)
+                    ->get();
+
+            case 'recent':
+                return $query->orderBy('memorized_at', 'desc')
+                    ->whereNotNull('memorized_at')
+                    ->limit($this->numberOfQuestions)
+                    ->get();
+
+            case 'longest':
+                return $query->get()
+                    ->sortByDesc(function ($verse) {
+                        return $this->calculateVerseLength($verse);
+                    })
+                    ->take($this->numberOfQuestions);
+
+            case 'shortest':
+                return $query->get()
+                    ->sortBy(function ($verse) {
+                        return $this->calculateVerseLength($verse);
+                    })
+                    ->take($this->numberOfQuestions);
+
+            default:
+                return collect();
+        }
+    }
+
+    public function calculateVerseLength($verse)
+    {
+        // Calculate total number of verses in the range
+        $verseRanges = $verse->verses;
+        if (!is_array($verseRanges)) {
+            $verseRanges = json_decode($verse->verses, true);
+        }
+        
+        if (!is_array($verseRanges)) {
+            return 1;
+        }
+
+        $totalVerses = 0;
+        foreach ($verseRanges as $range) {
+            if (is_array($range) && count($range) === 2) {
+                $totalVerses += ($range[1] - $range[0] + 1);
+            }
+        }
+
+        return $totalVerses;
+    }
+
+    public function getMemoryBankCount()
+    {
+        if (!Auth::check()) {
+            return 0;
+        }
+
+        return MemoryBank::where('user_id', Auth::id())->count();
+    }
+
+    public function render()
+    {
+        return view('livewire.daily-quiz');
+    }
+}

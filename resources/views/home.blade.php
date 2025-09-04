@@ -14,6 +14,9 @@
     <!-- Memorize Later List -->
     <livewire:memorize-later-list />
 
+    <!-- Daily Quiz -->
+    <livewire:daily-quiz />
+
     <x-content-card>
         <x-content-card-button href="what" text="How to get started" icon="question-mark-circle" iconSize="md" />
 
