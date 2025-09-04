@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Login;
 use App\Listeners\UpdateLoginStreak;
 
@@ -23,5 +24,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(Login::class, UpdateLoginStreak::class);
+        
+        // Prohibit destructive commands on production
+        DB::prohibitDestructiveCommands(
+            $this->app->isProduction()
+        );
     }
 }
