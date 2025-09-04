@@ -13,7 +13,8 @@ class DailyQuiz extends Component
 
     public function increaseNumber()
     {
-        if ($this->numberOfQuestions < 50) {
+        $maxQuestions = min(50, $this->getMemoryBankCount());
+        if ($this->numberOfQuestions < $maxQuestions) {
             $this->numberOfQuestions++;
         }
     }

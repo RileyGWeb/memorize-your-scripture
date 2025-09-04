@@ -1,4 +1,4 @@
-<div>
+<div class="{{ ($verses->count() > 0 || auth()->check()) ? '' : 'hidden' }}">
     @if($verses->count() > 0)
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div class="mb-4">

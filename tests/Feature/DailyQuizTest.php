@@ -16,6 +16,9 @@ class DailyQuizTest extends TestCase
     public function test_daily_quiz_component_renders()
     {
         $user = User::factory()->create();
+        
+        // Create some memory bank entries so quiz options show
+        MemoryBank::factory()->count(5)->create(['user_id' => $user->id]);
 
         $this->actingAs($user);
 
@@ -25,12 +28,16 @@ class DailyQuizTest extends TestCase
             ->assertSee('randoms')
             ->assertSee('most recent')
             ->assertSee('longest')
-            ->assertSee('shortest');
+            ->assertSee('shortest')
+            ->assertSee('Total verses memorized: 5');
     }
 
     public function test_user_can_change_number_of_questions()
     {
         $user = User::factory()->create();
+        
+        // Create enough memory bank entries to allow increasing
+        MemoryBank::factory()->count(15)->create(['user_id' => $user->id]);
 
         $this->actingAs($user);
 
