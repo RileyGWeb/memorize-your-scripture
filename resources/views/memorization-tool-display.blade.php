@@ -3,7 +3,7 @@
             segments: @js($segments),
             reference: @js($reference),
             lineHeightPx: @js($lineHeightPx),
-        })" x-init="init()">
+        })" x-init="init()" class="space-y-4">
         <x-content-card>
             <template x-if="hidden">
                 <x-content-card-title title="Verse Memorization" subtitle="Type the verse(s) from memory. If you can't, show it again! But remember, you'll have to start over." />
@@ -115,6 +115,9 @@
                             <span class="text-sm">Memorized:</span>
                         @endauth
                         <span class="text-xl font-bold" x-text="reference"></span>
+                        <span class="text-sm text-gray-600 mt-1">
+                            Difficulty: <span class="font-semibold capitalize" x-text="getDifficultyDisplayName(difficulty)"></span>
+                        </span>
                     </div>
                     @auth
 
@@ -125,10 +128,57 @@
                     @endif
                     <div class="flex gap-2 w-full items-center justify-center">
                         <x-button @click="resetAll()">Do Another</x-button>
+                        <template x-if="shouldShowIncreaseDifficultyButton()">
+                            <x-button @click="openDifficultyModal()" class="bg-blue-600 hover:bg-blue-700">Increase Difficulty</x-button>
+                        </template>
                         <x-button href="/">Back Home</x-button>
                     </div>
                 </div>
             </template>
+            
+            <!-- Difficulty Selection Modal -->
+            <template x-if="showDifficultyModal">
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="closeDifficultyModal()">
+                    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4" @click.stop>
+                        <h3 class="text-lg font-semibold mb-4 text-center">Choose Difficulty</h3>
+                        <div class="space-y-3">
+                            <template x-for="difficultyOption in ['easy', 'normal', 'strict']" :key="difficultyOption">
+                                <div class="border rounded-lg p-3 flex items-center justify-between"
+                                     :class="{
+                                         'bg-gray-100 cursor-not-allowed': !canSelectDifficulty(difficultyOption),
+                                         'bg-green-50 border-green-200': isDifficultyCompleted(difficultyOption),
+                                         'hover:bg-blue-50 cursor-pointer border-blue-200': canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption),
+                                         'border-gray-200': !canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption)
+                                     }"
+                                     @click="canSelectDifficulty(difficultyOption) ? selectDifficulty(difficultyOption) : null">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="font-medium capitalize" x-text="getDifficultyDisplayName(difficultyOption)"></span>
+                                        <span class="text-sm text-gray-600">
+                                            (<span x-text="difficultyOption === 'easy' ? '80%' : difficultyOption === 'normal' ? '95%' : '100%'"></span> accuracy required)
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <template x-if="isDifficultyCompleted(difficultyOption)">
+                                            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </template>
+                                        <template x-if="!canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption)">
+                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="mt-6 flex justify-center">
+                            <x-button @click="closeDifficultyModal()" class="bg-gray-500 hover:bg-gray-600">Cancel</x-button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            
             <div x-ref="dummyText" class="text-lg leading-[1.5]" style="visibility:hidden; position:absolute; top:-9999px; width:100%;">
                 <span x-text="buildDisplayFull()"></span>
             </div>
@@ -145,6 +195,8 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
         hidden: false,
         segmentStates: [],
         showCongrats: false,
+        showDifficultyModal: false,
+        completedDifficulties: [],
         flashClass: '',
         totalChars: 0,
         radius: 40,
@@ -185,9 +237,12 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
             this.checkAllSegments();
         },
         checkAllSegments() {
-            this.showCongrats = this.segmentStates.every((state, i) => {
-                return state.accuracy >= this.requiredAccuracy();
-            });
+            // Once congrats is shown, keep it shown (don't hide when accuracy drops)
+            if (!this.showCongrats) {
+                this.showCongrats = this.segmentStates.every((state, i) => {
+                    return state.accuracy >= this.requiredAccuracy();
+                });
+            }
             if (this.showCongrats && !this.saved) {
                 this.saved = true;
                 fetch("{{ route('memorization-tool.save') }}", {
@@ -256,6 +311,56 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
 
         get bibleTranslation() {
             return Alpine.store('bible').selectedId;
+        },
+        
+        async fetchCompletedDifficulties() {
+            try {
+                const response = await fetch(`/api/completed-difficulties?book=${this.reference.split(" ")[0]}&chapter=${parseInt(this.reference.split(" ")[1].split(":")[0])}&verses=${this.segments.map(seg => seg.verse).join(',')}`);
+                const data = await response.json();
+                this.completedDifficulties = data.difficulties || [];
+            } catch (error) {
+                console.error('Error fetching completed difficulties:', error);
+                this.completedDifficulties = [];
+            }
+        },
+        
+        openDifficultyModal() {
+            this.fetchCompletedDifficulties();
+            this.showDifficultyModal = true;
+        },
+        
+        closeDifficultyModal() {
+            this.showDifficultyModal = false;
+        },
+        
+        selectDifficulty(newDifficulty) {
+            this.difficulty = newDifficulty;
+            this.resetAll();
+            this.closeDifficultyModal();
+        },
+        
+        isDifficultyCompleted(difficulty) {
+            return this.completedDifficulties.includes(difficulty);
+        },
+        
+        canSelectDifficulty(difficulty) {
+            const difficultyOrder = ['easy', 'normal', 'strict'];
+            const currentIndex = difficultyOrder.indexOf(this.difficulty);
+            const targetIndex = difficultyOrder.indexOf(difficulty);
+            return targetIndex > currentIndex;
+        },
+        
+        shouldShowIncreaseDifficultyButton() {
+            return this.difficulty !== 'strict';
+        },
+        
+        getDifficultyDisplayName(difficulty) {
+            const names = {
+                'easy': 'Easy',
+                'normal': 'Normal', 
+                'strict': 'Strict'
+            };
+            return names[difficulty] || difficulty;
         },
     }
 }

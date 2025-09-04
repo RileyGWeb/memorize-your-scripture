@@ -17,23 +17,21 @@ class MemorizeLaterList extends Component
 
     public function selectVerse($verseId)
     {
-        if ($this->showOnMemorizationTool) {
-            $verse = MemorizeLater::find($verseId);
-            if ($verse) {
-                // Store the verse selection in session for the memorization tool
-                $verseRanges = [];
-                foreach ($verse->verses as $verseNum) {
-                    $verseRanges[] = [$verseNum, $verseNum];
-                }
-                
-                session()->put('verseSelection', [
-                    'book' => $verse->book,
-                    'chapter' => $verse->chapter,
-                    'verseRanges' => $verseRanges,
-                ]);
-                
-                return redirect()->route('memorization-tool.fetch');
+        $verse = MemorizeLater::find($verseId);
+        if ($verse) {
+            // Store the verse selection in session for the memorization tool
+            $verseRanges = [];
+            foreach ($verse->verses as $verseNum) {
+                $verseRanges[] = [$verseNum, $verseNum];
             }
+            
+            session()->put('verseSelection', [
+                'book' => $verse->book,
+                'chapter' => $verse->chapter,
+                'verseRanges' => $verseRanges,
+            ]);
+            
+            return redirect('/memorization-tool/display');
         }
     }
 

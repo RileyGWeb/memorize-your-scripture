@@ -1,6 +1,9 @@
 {{-- resources/views/memorization-tool.blade.php --}}
 <x-layouts.app>
     <x-content-card>
+        <x-content-card-button href="/" text="Back to Home" icon="arrow-narrow-left" iconSize="lg" />
+    </x-content-card>
+    <x-content-card>
         <x-content-card-title title="Memorization Tool" />
         <x-divider />
 

@@ -11,6 +11,13 @@ class DailyQuiz extends Component
     public $numberOfQuestions = 10;
     public $quizType = '';
 
+    public function mount()
+    {
+        // Set numberOfQuestions to the minimum of memorized verses or 10
+        $memoryBankCount = $this->getMemoryBankCount();
+        $this->numberOfQuestions = min($memoryBankCount > 0 ? $memoryBankCount : 1, 10);
+    }
+
     public function increaseNumber()
     {
         $maxQuestions = min(50, $this->getMemoryBankCount());

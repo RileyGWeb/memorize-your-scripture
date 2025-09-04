@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\MemoryBank;
 
 class MemorizationToolController extends Controller
 {
@@ -165,5 +166,31 @@ class MemorizationToolController extends Controller
         }
 
         return $segments;
+    }
+    
+    public function getCompletedDifficulties(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json(['difficulties' => []]);
+        }
+        
+        $book = $request->get('book');
+        $chapter = $request->get('chapter');
+        $verses = explode(',', $request->get('verses', ''));
+        
+        $completedDifficulties = MemoryBank::where('user_id', auth()->id())
+            ->where('book', $book)
+            ->where('chapter', $chapter)
+            ->where(function ($query) use ($verses) {
+                foreach ($verses as $verse) {
+                    $query->orWhereJsonContains('verses', (int)$verse);
+                }
+            })
+            ->pluck('difficulty')
+            ->unique()
+            ->values()
+            ->toArray();
+            
+        return response()->json(['difficulties' => $completedDifficulties]);
     }
 }
