@@ -31,8 +31,3 @@ class MemorizeLater extends Model
         return $this->belongsTo(User::class);
     }
 }
-
-class MemorizeLater extends Model
-{
-    //
-}

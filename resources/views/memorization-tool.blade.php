@@ -11,4 +11,7 @@
         {{-- The VersePicker Livewire component --}}
         <livewire:verse-picker />
     </x-content-card>
+
+    <!-- Memorize Later List for verse selection -->
+    <livewire:memorize-later-list :showOnMemorizationTool="true" />
 </x-layouts.app>

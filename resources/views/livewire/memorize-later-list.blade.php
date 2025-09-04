@@ -1,0 +1,78 @@
+<div>
+    @if($verses->count() > 0)
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div class="mb-4">
+                <h3 class="font-bold text-lg text-gray-800">Memorize Later...</h3>
+                <p class="text-gray-600 text-sm">Grab a verse you've added to Memorize Later!</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                @foreach($verses as $verse)
+                    <div class="group cursor-pointer" 
+                         wire:click="{{ $showOnMemorizationTool ? "selectVerse({$verse->id})" : '' }}">
+                        <div class="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg transition-colors duration-200 relative {{ $showOnMemorizationTool ? 'hover:shadow-md' : '' }}">
+                            <!-- Remove button (only show on homepage) -->
+                            @if(!$showOnMemorizationTool)
+                                <button wire:click.stop="removeVerse({{ $verse->id }})" 
+                                        class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            @endif
+
+                            <!-- Verse Reference -->
+                            <div class="font-semibold text-gray-800 text-sm mb-1">
+                                {{ $this->formatVerseReference($verse) }}
+                            </div>
+
+                            <!-- Note Preview -->
+                            @if($verse->note)
+                                <div class="text-xs text-gray-600 mb-2">
+                                    <span class="font-medium">Note - {{ $this->formatDate($verse->added_at) }}</span>
+                                </div>
+                                <div class="text-xs text-gray-700">
+                                    {{ $this->formatNotePreview($verse->note) }}
+                                </div>
+                            @else
+                                <div class="text-xs text-gray-500">
+                                    Added {{ $this->formatDate($verse->added_at) }}
+                                </div>
+                            @endif
+
+                            <!-- Click indicator for memorization tool -->
+                            @if($showOnMemorizationTool)
+                                <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            @if($showOnMemorizationTool && $verses->count() > 0)
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-sm text-blue-800">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Click a verse to start memorizing it!
+                    </p>
+                </div>
+            @endif
+        </div>
+    @elseif(auth()->check())
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <div class="text-gray-400 mb-2">
+                <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+            <h3 class="font-semibold text-gray-700 mb-1">No verses saved yet</h3>
+            <p class="text-gray-500 text-sm">Use "Add to Memorize Later" above to save verses for later!</p>
+        </div>
+    @endif
+</div>

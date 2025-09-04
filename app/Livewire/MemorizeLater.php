@@ -18,6 +18,7 @@ class MemorizeLater extends Component
         if (!$this->isExpanded) {
             $this->reset(['verse', 'note', 'successMessage']);
         } else {
+            // Clear success message when expanding to show fresh form
             $this->successMessage = '';
         }
     }
@@ -60,6 +61,7 @@ class MemorizeLater extends Component
 
             $this->successMessage = 'Verse saved successfully!';
             $this->reset(['verse', 'note']);
+            $this->isExpanded = false; // Close the dropdown
         } catch (\Exception $e) {
             $this->addError('verse', 'Failed to save verse. Please try again.');
         }
