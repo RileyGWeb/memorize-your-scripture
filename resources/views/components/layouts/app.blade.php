@@ -36,18 +36,18 @@
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium">Email</label>
-                        <input id="email" type="email" name="email" required autofocus
+                        <label for="login-email" class="block text-sm font-medium">Email</label>
+                        <input id="login-email" type="email" name="email" required autofocus
                                class="border w-full px-3 py-2 rounded-lg mt-1" />
                     </div>
                     <div class="mb-4">
-                        <label for="password" class="block text-sm font-medium">Password</label>
-                        <input id="password" type="password" name="password" required
+                        <label for="login-password" class="block text-sm font-medium">Password</label>
+                        <input id="login-password" type="password" name="password" required
                                class="border w-full px-3 py-2 rounded-lg mt-1" />
                     </div>
                     <div class="mb-4 flex items-center">
-                        <input type="checkbox" id="remember_me" name="remember" class="mr-1 rounded">
-                        <label for="remember_me" class="text-sm">Remember me</label>
+                        <input type="checkbox" id="login-remember-me" name="remember" class="mr-1 rounded">
+                        <label for="login-remember-me" class="text-sm">Remember me</label>
                     </div>
                     <x-button type="submit">Log In</x-button>
                 </form>
@@ -62,23 +62,23 @@
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
                     <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium">Name</label>
-                        <input id="name" type="text" name="name" required autofocus
+                        <label for="register-name" class="block text-sm font-medium">Name</label>
+                        <input id="register-name" type="text" name="name" required autofocus
                                class="border w-full px-3 py-2 rounded-lg mt-1" />
                     </div>
                     <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium">Email</label>
-                        <input id="email" type="email" name="email" required
+                        <label for="register-email" class="block text-sm font-medium">Email</label>
+                        <input id="register-email" type="email" name="email" required
                                class="border w-full px-3 py-2 rounded-lg mt-1" />
                     </div>
                     <div class="mb-4">
-                        <label for="password" class="block text-sm font-medium">Password</label>
-                        <input id="password" type="password" name="password" required
+                        <label for="register-password" class="block text-sm font-medium">Password</label>
+                        <input id="register-password" type="password" name="password" required
                                class="border w-full px-3 py-2 rounded-lg mt-1" />
                     </div>
                     <div class="mb-4">
-                        <label for="password_confirmation" class="block text-sm font-medium">Confirm Password</label>
-                        <input id="password_confirmation" type="password" name="password_confirmation" required
+                        <label for="register-password-confirmation" class="block text-sm font-medium">Confirm Password</label>
+                        <input id="register-password-confirmation" type="password" name="password_confirmation" required
                                class="border w-full px-3 py-2 rounded-lg mt-1" />
                     </div>
                     <x-button type="submit" variant="outline">Register</x-button>
