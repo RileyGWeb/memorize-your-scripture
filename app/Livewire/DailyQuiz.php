@@ -10,12 +10,6 @@ class DailyQuiz extends Component
 {
     public $numberOfQuestions = 10;
     public $quizType = '';
-    public $showQuizOptions = false;
-
-    public function toggleQuizOptions()
-    {
-        $this->showQuizOptions = !$this->showQuizOptions;
-    }
 
     public function increaseNumber()
     {

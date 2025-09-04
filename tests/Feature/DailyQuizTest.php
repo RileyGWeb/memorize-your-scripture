@@ -28,21 +28,6 @@ class DailyQuizTest extends TestCase
             ->assertSee('shortest');
     }
 
-    public function test_user_can_toggle_quiz_options()
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
-        Livewire::test(DailyQuiz::class)
-            ->assertSet('showQuizOptions', false)
-            ->call('toggleQuizOptions')
-            ->assertSet('showQuizOptions', true)
-            ->assertSee('Change number')
-            ->call('toggleQuizOptions')
-            ->assertSet('showQuizOptions', false);
-    }
-
     public function test_user_can_change_number_of_questions()
     {
         $user = User::factory()->create();
