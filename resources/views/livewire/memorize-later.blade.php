@@ -24,12 +24,12 @@
 
     <!-- Expanded Form -->
     @if($isExpanded)
-        <div class="p-4"
+        <div class="p-4 border-t-2 border-gray-200"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 transform scale-95"
              x-transition:enter-end="opacity-100 transform scale-100">
             
-            <form wire:submit="saveVerse" class="space-y-6">
+            <form wire:submit="saveVerse" class="space-y-4">
                 <!-- Verse Input Section -->
                 <div class="space-y-3">
                     <div>
@@ -41,7 +41,7 @@
                         <input wire:model="verse" 
                                type="text" 
                                placeholder="John 3:16-18"
-                               class="w-full py-3 pl-4 pr-12 bg-white border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800"
+                               class="w-full py-3 pl-4 pr-12 bg-bg border-2 border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800"
                                required>
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,9 +64,9 @@
                     </div>
                     
                     <textarea wire:model="note" 
-                              placeholder="What are you thinking?..."
+                              placeholder="What are you thinking?... (optional)"
                               rows="4"
-                              class="w-full p-4 bg-white border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 text-gray-800"></textarea>
+                              class="w-full p-4 bg-bg border-2 border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all duration-200 text-gray-800"></textarea>
                     @error('note') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
