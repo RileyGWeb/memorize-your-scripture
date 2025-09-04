@@ -26,7 +26,7 @@ class UserStreakTest extends TestCase
         $user->updateLoginStreak();
         
         $this->assertEquals(1, $user->fresh()->login_streak);
-        $this->assertEquals(now()->toDateString(), $user->fresh()->last_login_date);
+        $this->assertEquals(now()->toDateString(), $user->fresh()->last_login_date->toDateString());
     }
 
     public function test_consecutive_daily_logins_increase_streak(): void

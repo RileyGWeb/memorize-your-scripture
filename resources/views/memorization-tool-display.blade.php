@@ -186,8 +186,7 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
         },
         checkAllSegments() {
             this.showCongrats = this.segmentStates.every((state, i) => {
-                let correct = this.segments[i].text;
-                return state.typedText.length >= correct.length && state.accuracy >= this.requiredAccuracy();
+                return state.accuracy >= this.requiredAccuracy();
             });
             if (this.showCongrats && !this.saved) {
                 this.saved = true;

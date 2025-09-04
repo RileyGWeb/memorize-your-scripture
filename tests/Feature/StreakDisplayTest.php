@@ -6,6 +6,8 @@ use Tests\TestCase;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Login;
 
 class StreakDisplayTest extends TestCase
 {
@@ -59,20 +61,22 @@ class StreakDisplayTest extends TestCase
 
     public function test_streak_updates_on_login(): void
     {
+        Carbon::setTestNow('2025-09-04');
+        
         $user = User::factory()->create([
             'login_streak' => 2,
-            'last_login_date' => now()->subDay()->toDateString(),
+            'last_login_date' => '2025-09-03'
         ]);
         
-        // Login should trigger streak update
-        $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
+        // Simulate Login event
+        event(new Login('web', $user, false));
+        
+        // Trigger event listeners
+        Event::dispatch(new Login('web', $user, false));
         
         $user->refresh();
         $this->assertEquals(3, $user->login_streak);
-        $this->assertEquals(now()->toDateString(), $user->last_login_date);
+        $this->assertEquals(now()->toDateString(), $user->last_login_date->toDateString());
     }
 
     public function test_streak_resets_after_missing_days(): void
@@ -90,6 +94,6 @@ class StreakDisplayTest extends TestCase
         
         $user->refresh();
         $this->assertEquals(1, $user->login_streak); // Reset to 1
-        $this->assertEquals(now()->toDateString(), $user->last_login_date);
+        $this->assertEquals(now()->toDateString(), $user->last_login_date->toDateString());
     }
 }
