@@ -96,6 +96,7 @@ class MemorizeLater extends Component
 
     public function saveVerse()
     {
+        dd('test');
         $this->validate([
             'verse' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
