@@ -94,7 +94,7 @@ class DailyQuizTest extends TestCase
         // Check that session has quiz data
         $this->assertNotNull(session('dailyQuiz'));
         $this->assertEquals('random', session('dailyQuiz')['type']);
-        $this->assertEquals(10, session('dailyQuiz')['numberOfQuestions']);
+        $this->assertEquals(5, session('dailyQuiz')['numberOfQuestions']); // Should be 5, not 10, since we only have 5 verses
     }
 
     public function test_user_can_start_recent_quiz()

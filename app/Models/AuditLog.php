@@ -33,14 +33,33 @@ class AuditLog extends Model
      */
     public static function createLog(string $action, Model $model, ?array $oldValues = null, ?array $newValues = null): void
     {
-        static::create([
-            'user_id' => auth()->id(),
-            'action' => strtoupper($action),
-            'table_name' => $model->getTable(),
-            'record_id' => $model->getKey(),
-            'old_values' => $oldValues,
-            'new_values' => $newValues,
-            'performed_at' => now(),
-        ]);
+        try {
+            static::create([
+                'user_id' => auth()->id(),
+                'action' => strtoupper($action),
+                'table_name' => $model->getTable(),
+                'record_id' => $model->getKey(),
+                'old_values' => $oldValues,
+                'new_values' => $newValues,
+                'performed_at' => now(),
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // If there's a foreign key constraint violation (e.g., when user is being deleted),
+            // create the audit log without the user_id
+            if (str_contains($e->getMessage(), 'audit_logs_user_id_foreign')) {
+                static::create([
+                    'user_id' => null,
+                    'action' => strtoupper($action),
+                    'table_name' => $model->getTable(),
+                    'record_id' => $model->getKey(),
+                    'old_values' => $oldValues,
+                    'new_values' => $newValues,
+                    'performed_at' => now(),
+                ]);
+            } else {
+                // Re-throw other exceptions
+                throw $e;
+            }
+        }
     }
 }

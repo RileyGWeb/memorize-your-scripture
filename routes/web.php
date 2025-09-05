@@ -50,10 +50,19 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+// Dismiss new user card route
+Route::post('/dismiss-new-user-card', function () {
+    session(['new_user_card_dismissed' => true]);
+    return response()->json(['success' => true]);
+})->name('dismiss-new-user-card');
+
 // Daily Quiz route
 Route::get('/daily-quiz', function () {
     return view('daily-quiz');
 })->name('daily-quiz');
+
+// Super Admin route
+Route::get('/super-admin', [\App\Http\Controllers\SuperAdminController::class, 'index'])->name('super-admin');
 
 // Route::get('/memorization-tool', function () {
 //     return view('memorization-tool');

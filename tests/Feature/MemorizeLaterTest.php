@@ -313,7 +313,7 @@ class MemorizeLaterTest extends TestCase
         Livewire::actingAs($user)
             ->test(MemorizeLaterList::class, ['showOnMemorizationTool' => true])
             ->call('selectVerse', $verse->id)
-            ->assertRedirect(route('memorization-tool.fetch'));
+            ->assertRedirect('/memorization-tool/display');
 
         // Check that verse selection was stored in session
         $this->assertEquals([

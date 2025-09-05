@@ -1,4 +1,22 @@
 <x-layouts.app>
+    @guest
+        @if(!session('new_user_card_dismissed'))
+            <div id="new-user-card" class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg mb-6 relative">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <strong class="font-semibold">New here?</strong>
+                        <span class="ml-2">Click "memorize scripture" to get started!</span>
+                    </div>
+                    <button id="dismiss-card" class="text-green-600 hover:text-green-800 ml-4">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        @endif
+    @endguest
+
     <x-content-card>
         <x-content-card-title 
             title="Welcome{{ auth()->check() ? ', ' . auth()->user()->name : '' }}!" 
@@ -12,10 +30,6 @@
     </x-content-card>
 
     <x-content-card>
-        <x-content-card-button href="what" text="How to get started" icon="question-mark-circle" iconSize="md" />
-
-        <x-divider />
-
         <x-content-card-button href="/memorization-tool" text="Memorize scripture" icon="arrow-narrow-right" iconSize="lg" />
 
         <x-divider />
@@ -33,4 +47,34 @@
 
     <!-- Daily Quiz -->
     <livewire:daily-quiz />
+
+    @guest
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const dismissButton = document.getElementById('dismiss-card');
+                const newUserCard = document.getElementById('new-user-card');
+                
+                if (dismissButton && newUserCard) {
+                    dismissButton.addEventListener('click', function() {
+                        fetch('{{ route('dismiss-new-user-card') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                newUserCard.style.display = 'none';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                    });
+                }
+            });
+        </script>
+    @endguest
 </x-layouts.app>

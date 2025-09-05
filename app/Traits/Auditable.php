@@ -17,7 +17,8 @@ trait Auditable
             AuditLog::createLog('UPDATE', $model, $model->getOriginal(), $model->getAttributes());
         });
 
-        static::deleted(function (Model $model) {
+        static::deleting(function (Model $model) {
+            // Use 'deleting' instead of 'deleted' to capture the audit log before the model is actually deleted
             AuditLog::createLog('DELETE', $model, $model->getAttributes(), null);
         });
     }
