@@ -53,6 +53,14 @@
                     </div>
                     <x-button type="submit">Log In</x-button>
                 </form>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600">
+                        Don't have an account? 
+                        <button @click="loginModal = false; registerModal = true" class="text-blue-600 hover:text-blue-800 underline">
+                            Register here
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
         <div x-show="registerModal" 
@@ -85,6 +93,14 @@
                     </div>
                     <x-button type="submit" variant="outline">Register</x-button>
                 </form>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-600">
+                        Already have an account? 
+                        <button @click="registerModal = false; loginModal = true" class="text-blue-600 hover:text-blue-800 underline">
+                            Sign in here
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
         @livewireScripts

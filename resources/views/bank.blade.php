@@ -1,5 +1,5 @@
 <x-layouts.app>
-    <div x-data="memoryBank({ items: @js($items) })" class="w-full">
+    <div x-data="memoryBank({ items: @js($items) })" class="w-full space-y-4">
 
         <x-content-card>
             <x-content-card-title title="Your Memory Bank" subtitle="See everything you've memorized. Search by reference (John 3:16) or by verse text (For God so loved the world...)" />

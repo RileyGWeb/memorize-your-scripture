@@ -12,7 +12,7 @@
 
     <!-- Success Message (between cards) -->
     @if($successMessage)
-        <div class="mt-4 p-4 bg-green-50 border-l-4 border-green-400 text-green-800 rounded-lg">
+        <div class="p-4 bg-green-50 text-green-800">
             <div class="flex items-center">
                 <svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
@@ -29,7 +29,7 @@
              x-transition:enter-start="opacity-0 transform scale-95"
              x-transition:enter-end="opacity-100 transform scale-100">
             
-            <form wire:submit="saveVerse" class="">
+            <div class="">
                 <!-- Verse Picker Section -->
                 <div class="">
                     <div class="p-2.5">
@@ -61,23 +61,23 @@
                         @if($errorMessage)
                         <div class="p-2">
                             @if($suggestedBook)
-                                <p class="text-red-500 mt-2">
-                                    {{ substr($errorMessage, 0, strpos($errorMessage, 'Did you mean')) }}Did you mean 
+                                <p class="text-red-500">
+                                    {{ substr($errorMessage, 0, strpos($errorMessage, 'Did you mean')) }}Did you mean: 
                                     <button 
                                         wire:click="applySuggestion" 
                                         type="button"
-                                        class="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors duration-200 px-1 py-0.5 rounded hover:bg-blue-50"
+                                        class="font-bold border border-red-500 p-1 rounded text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors duration-200 px-1 py-0.5 rounded hover:bg-blue-50"
                                     >
-                                        '{{ $suggestedBook }}'
+                                        {{ $suggestedBook }}
                                     </button>?
                                 </p>
                             @else
-                                <p class="text-red-500 mt-2">{{ $errorMessage }}</p>
+                                <p class="text-red-500">{{ $errorMessage }}</p>
                             @endif
                         </div>
                         @endif
                     </div>
-                    @error('verse') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    @error('verse') <p class="text-red-500 text-sm p-2">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Note Input Section -->
@@ -92,13 +92,13 @@
 
                 <!-- Save Button -->
                 <div class="flex justify-center py-2">
-                    <button type="submit" 
+                    <button wire:click="saveVerse"
                             class="bg-gray-800 hover:bg-gray-900 active:bg-black text-white font-bold py-2 px-8 rounded-lg transition-all duration-200 focus:ring-4 focus:ring-gray-300 focus:outline-none shadow-lg hover:shadow-xl"
                             @if(!$book || !$chapter || empty($verseRanges)) disabled @endif>
                         Save Verse
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     @endif
 </div>

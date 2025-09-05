@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\MemorizeLater as MemorizeLaterModel;
+use Illuminate\Support\Facades\Http;
 
 class MemorizeLater extends Component
 {
@@ -90,13 +91,15 @@ class MemorizeLater extends Component
             if (isset($matches[1])) {
                 $originalBook = trim($matches[1]);
                 $this->verse = str_replace($originalBook, $this->suggestedBook, $currentInput);
+                
+                // Manually trigger the parsing to update the component state
+                $this->updatedVerse($this->verse);
             }
         }
     }
 
     public function saveVerse()
     {
-        dd('test');
         $this->validate([
             'verse' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
@@ -115,6 +118,12 @@ class MemorizeLater extends Component
         // Check if user is authenticated
         if (!auth()->check()) {
             $this->addError('verse', 'You must be logged in to save verses.');
+            return;
+        }
+
+        // Validate that the verse exists using Bible API
+        if (!$this->validateVerseExists()) {
+            $this->addError('verse', 'This verse reference does not exist. Please check the book, chapter, and verse numbers.');
             return;
         }
 
@@ -237,6 +246,60 @@ class MemorizeLater extends Component
         }
         
         return $verseRanges;
+    }
+
+    /**
+     * Validate that the verse reference exists using the Bible API
+     */
+    private function validateVerseExists()
+    {
+        try {
+            $apiKey = config('services.bible.api_key');
+            if (!$apiKey) {
+                // If no API key is configured, skip validation
+                return true;
+            }
+
+            $bibleId = config('bible.default_id', '9879dbb7cfe39e4d-02');
+            
+            // Format the reference for API call
+            $reference = $this->formatReferenceForApi();
+            
+            $response = Http::withHeaders([
+                'api-key' => $apiKey,
+            ])->get("https://api.scripture.api.bible/v1/bibles/{$bibleId}/passages", [
+                'reference' => $reference,
+            ]);
+
+            // If the API call succeeds (status 200), the verse exists
+            // If it returns 404, the verse doesn't exist
+            return $response->successful();
+            
+        } catch (\Exception $e) {
+            // If there's an error with the API call, don't block the user
+            \Log::warning('Verse validation failed', [
+                'error' => $e->getMessage(),
+                'reference' => $this->verse
+            ]);
+            return true;
+        }
+    }
+
+    /**
+     * Format the verse reference for Bible API
+     */
+    private function formatReferenceForApi()
+    {
+        $formattedRanges = [];
+        foreach ($this->verseRanges as $range) {
+            if ($range[0] === $range[1]) {
+                $formattedRanges[] = $range[0];
+            } else {
+                $formattedRanges[] = $range[0] . '-' . $range[1];
+            }
+        }
+        
+        return $this->book . ' ' . $this->chapter . ':' . implode(',', $formattedRanges);
     }
 
     public function render()
