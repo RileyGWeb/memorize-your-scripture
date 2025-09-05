@@ -1,11 +1,11 @@
 <x-layouts.app>
     @guest
         @if(!session('new_user_card_dismissed'))
-            <div id="new-user-card" class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg mb-6 relative">
+            <div id="new-user-card" class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg relative">
                 <div class="flex items-center justify-between">
                     <div>
-                        <strong class="font-semibold">New here?</strong>
-                        <span class="ml-2">Click "memorize scripture" to get started!</span>
+                        <p><strong class="font-semibold">New here?</strong></p>
+                        <p>Click "memorize scripture" to get started!</p>
                     </div>
                     <button id="dismiss-card" class="text-green-600 hover:text-green-800 ml-4">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

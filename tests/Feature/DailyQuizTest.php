@@ -67,15 +67,16 @@ class DailyQuizTest extends TestCase
             ->assertSet('numberOfQuestions', 50); // Should not go above 50
     }
 
-    public function test_user_with_no_memory_bank_sees_message()
+    public function test_user_with_no_memory_bank_sees_empty_component()
     {
         $user = User::factory()->create();
 
         $this->actingAs($user);
 
         Livewire::test(DailyQuiz::class)
-            ->assertSee("haven't memorized any verses", false)
-            ->assertSee('Start memorizing verses');
+            ->assertDontSee("Daily Quiz!")
+            ->assertDontSee("haven't memorized any verses", false)
+            ->assertDontSee('Start memorizing verses');
     }
 
     public function test_user_can_start_random_quiz()

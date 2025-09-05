@@ -1,11 +1,10 @@
 <div class="w-full">
+@if($this->getMemoryBankCount() > 0)
     <x-content-card>
         <x-content-card-title 
             title="Daily Quiz!" 
             subtitle="Daily juice to keep those verses in your brain (and heart)." 
         />
-
-        @if($this->getMemoryBankCount() > 0)
             <x-divider />
 
             <!-- Number Selector -->
@@ -79,19 +78,7 @@
                     </button>
                 </div>
             </div>
-        @else
-            <x-divider />
-            <div class="px-4 py-6 text-center">
-                <p class="text-text text-base mb-4">You haven't memorized any verses yet! Once you do, you can get quizzed on them here to make sure they stay in your brain.</p>
-                <a href="/memorization-tool" class="inline-flex items-center text-text hover:text-textLight font-bold transition-colors">
-                    Start memorizing verses
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </a>
-            </div>
-        @endif
-
+        
         @if(session('error'))
             <x-divider />
             <div class="px-4 py-3">
@@ -101,4 +88,5 @@
             </div>
         @endif
     </x-content-card>
+@endif
 </div>
