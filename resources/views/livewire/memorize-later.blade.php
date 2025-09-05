@@ -30,24 +30,53 @@
              x-transition:enter-end="opacity-100 transform scale-100">
             
             <form wire:submit="saveVerse" class="space-y-4">
-                <!-- Verse Input Section -->
+                <!-- Verse Picker Section -->
                 <div class="space-y-3">
                     <div>
                         <h3 class="font-bold text-lg text-gray-800">Add to Memorize Later</h3>
                         <p class="text-gray-600 text-sm">On the go? Don't let those verses escape!</p>
                     </div>
                     
-                    <div class="relative">
-                        <input wire:model="verse" 
-                               type="text" 
-                               placeholder="John 3:16-18"
-                               class="w-full py-3 pl-4 pr-12 bg-bg border border-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800"
-                               required>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
+                    <!-- Verse Picker UI -->
+                    <div class="border border-stroke rounded-lg overflow-hidden">
+                        <div class="flex items-center border-b border-stroke">
+                            <p class="p-2 border-r border-stroke h-full whitespace-nowrap">Type in your verse(s):</p>
+                            <input type="text" wire:model.live="verse" class="text-base bg-transparent border-none text-center w-full focus:ring-0" placeholder="John 3:16-18">
                         </div>
+                        <div class="flex items-center border-b border-stroke">
+                            <div class="flex flex-col items-center p-2 border-r border-stroke h-full">
+                                <p class="flex-shrink">Your Selection</p>
+                            </div>
+                            <div class="flex flex-col grow items-center p-2 border-r border-stroke">
+                                <p class="font-bold">Book:</p>
+                                <p>{{ $book }}</p>
+                            </div>
+                            <div class="flex flex-col grow items-center p-2">
+                                <p class="font-bold">Chapter & Verse(s):</p>
+                                <p> {{-- unformatted because it was adding a space after the : --}}
+                                    @if ($chapter){{ $chapter . ':'}}@endif@foreach($verseRanges as $i => $range)@if($range[0] === $range[1]){{ $range[0] }}@else{{ $range[0] }}-{{ $range[1] }}@endif@if(!$loop->last),@endif@endforeach
+                                </p>
+                            </div>
+                        </div>
+
+                        @if($errorMessage)
+                        <div class="p-2">
+                            @if($suggestedBook)
+                                <p class="text-red-500 mt-2">
+                                    {{ substr($errorMessage, 0, strpos($errorMessage, 'Did you mean')) }}Did you mean 
+                                    <button 
+                                        wire:click="applySuggestion" 
+                                        type="button"
+                                        class="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors duration-200 px-1 py-0.5 rounded hover:bg-blue-50"
+                                    >
+                                        '{{ $suggestedBook }}'
+                                    </button>?
+                                </p>
+                            @else
+                                <p class="text-red-500 mt-2">{{ $errorMessage }}</p>
+                            @endif
+                        </div>
+                        @endif
                     </div>
                     @error('verse') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -68,7 +97,8 @@
                 <!-- Save Button -->
                 <div class="flex justify-center pt-2">
                     <button type="submit" 
-                            class="bg-gray-800 hover:bg-gray-900 active:bg-black text-white font-bold py-2 px-8 rounded-lg transition-all duration-200 focus:ring-4 focus:ring-gray-300 focus:outline-none shadow-lg hover:shadow-xl">
+                            class="bg-gray-800 hover:bg-gray-900 active:bg-black text-white font-bold py-2 px-8 rounded-lg transition-all duration-200 focus:ring-4 focus:ring-gray-300 focus:outline-none shadow-lg hover:shadow-xl"
+                            @if(!$book || !$chapter || empty($verseRanges)) disabled @endif>
                         Save Verse
                     </button>
                 </div>

@@ -11,8 +11,12 @@
             <p class="text-red-500">{{ session('error') }}</p>
         @endif
 
-        {{-- The VersePicker Livewire component --}}
-        <livewire:verse-picker />
+        {{-- The Unified VersePicker Livewire component --}}
+        <livewire:unified-verse-picker 
+            :showNextButton="true" 
+            :nextButtonRoute="route('memorization-tool.fetch')" 
+            placeholder="John 3:16-18" 
+        />
     </x-content-card>
 
     <!-- Memorize Later List for verse selection -->

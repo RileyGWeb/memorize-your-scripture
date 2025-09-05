@@ -3,21 +3,18 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\MemorizeLater as MemorizeLaterModel;
 
-class MemorizeLater extends Component
+class UnifiedVersePicker extends Component
 {
-    public $verse = '';
-    public $note = '';
-    public $isExpanded = false;
-    public $successMessage = '';
-    
-    // Verse picker properties
+    public $input = '';
     public $book = '';
     public $chapter = '';
     public $verseRanges = [];
     public $errorMessage = '';
     public $suggestedBook = '';
+    public $placeholder = 'John 3:16-18';
+    public $showNextButton = false;
+    public $nextButtonRoute = '';
     
     private array $booksOfTheBible = [
         // Old Testament
@@ -39,18 +36,15 @@ class MemorizeLater extends Component
         'Jude', 'Revelation'
     ];
 
-    public function toggleExpanded()
+    public function mount($showNextButton = false, $nextButtonRoute = '', $placeholder = 'John 3:16-18')
     {
-        $this->isExpanded = !$this->isExpanded;
-        if (!$this->isExpanded) {
-            $this->reset(['verse', 'note', 'successMessage', 'book', 'chapter', 'verseRanges', 'errorMessage', 'suggestedBook']);
-        } else {
-            // Clear success message when expanding to show fresh form
-            $this->successMessage = '';
-        }
+        $this->showNextButton = $showNextButton;
+        $this->nextButtonRoute = $nextButtonRoute;
+        $this->placeholder = $placeholder;
+        $this->updatedInput($this->input);
     }
 
-    public function updatedVerse($value)
+    public function updatedInput($value)
     {
         $this->errorMessage = '';
         $this->suggestedBook = '';
@@ -59,6 +53,10 @@ class MemorizeLater extends Component
         $this->verseRanges = [];
     
         if (trim($value) === '') {
+            // No input, clear session if this is for the memorization tool
+            if ($this->showNextButton) {
+                session()->forget('verseSelection');
+            }
             return;
         }
     
@@ -68,6 +66,15 @@ class MemorizeLater extends Component
             $this->book = $book;
             $this->chapter = $chapter;
             $this->verseRanges = $verseRanges;
+    
+            // Save to session only if this is for the memorization tool
+            if ($this->showNextButton) {
+                session()->put('verseSelection', [
+                    'book' => $book,
+                    'chapter' => $chapter,
+                    'verseRanges' => $verseRanges,
+                ]);
+            }
     
         } catch (\Exception $e) {
             $this->errorMessage = $e->getMessage();
@@ -84,70 +91,33 @@ class MemorizeLater extends Component
     {
         if ($this->suggestedBook) {
             // Replace the book name in the input with the suggested one
-            $currentInput = $this->verse;
+            $currentInput = $this->input;
             // Extract the original book name from the error
             preg_match("/^([^0-9]+)/", trim($currentInput), $matches);
             if (isset($matches[1])) {
                 $originalBook = trim($matches[1]);
-                $this->verse = str_replace($originalBook, $this->suggestedBook, $currentInput);
+                $this->input = str_replace($originalBook, $this->suggestedBook, $currentInput);
             }
         }
     }
 
-    public function saveVerse()
+    public function getParsedVerse()
     {
-        $this->validate([
-            'verse' => 'required|string|max:255',
-            'note' => 'nullable|string|max:1000',
-        ], [
-            'verse.required' => 'Please enter a verse reference.',
-            'verse.max' => 'Verse reference is too long.',
-            'note.max' => 'Note is too long (maximum 1000 characters).',
-        ]);
-
-        // Use the parsed verse data from the verse picker
-        if (!$this->book || !$this->chapter || empty($this->verseRanges)) {
-            $this->addError('verse', 'Please enter a valid verse reference (e.g., "John 3:16" or "Psalms 23:1-3")');
-            return;
-        }
-
-        // Check if user is authenticated
-        if (!auth()->check()) {
-            $this->addError('verse', 'You must be logged in to save verses.');
-            return;
-        }
-
-        try {
-            // Convert verse ranges to simple array of verse numbers
+        if ($this->book && $this->chapter && !empty($this->verseRanges)) {
             $verses = [];
             foreach ($this->verseRanges as $range) {
                 for ($i = $range[0]; $i <= $range[1]; $i++) {
                     $verses[] = $i;
                 }
             }
-
-            // Save to database
-            MemorizeLaterModel::create([
-                'user_id' => auth()->id(),
+            
+            return [
                 'book' => $this->book,
                 'chapter' => $this->chapter,
                 'verses' => $verses,
-                'note' => $this->note ?: null,
-                'added_at' => now(),
-            ]);
-
-            $this->successMessage = 'Verse saved successfully!';
-            $this->reset(['verse', 'note', 'book', 'chapter', 'verseRanges', 'errorMessage', 'suggestedBook']);
-            $this->isExpanded = false; // Close the dropdown
-        } catch (\Exception $e) {
-            $this->addError('verse', 'Failed to save verse. Please try again.');
+            ];
         }
-    }
-
-    public function clearSuccess()
-    {
-        $this->successMessage = '';
-        $this->isExpanded = false;
+        return null;
     }
 
     protected function parseInput($input)
@@ -240,6 +210,6 @@ class MemorizeLater extends Component
 
     public function render()
     {
-        return view('livewire.memorize-later');
+        return view('livewire.unified-verse-picker');
     }
 }
