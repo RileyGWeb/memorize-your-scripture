@@ -15,6 +15,9 @@ class SuperAdminController extends Controller
 {
     public function index()
     {
+        // Log the access attempt first
+        $this->logAccessAttempt();
+
         // Check if user is authorized
         if (!$this->isAuthorized()) {
             return redirect('/');
@@ -28,6 +31,9 @@ class SuperAdminController extends Controller
 
     public function getAllUsers()
     {
+        // Log the access attempt first
+        $this->logAccessAttempt('users-api');
+
         // Check if user is authorized
         if (!$this->isAuthorized()) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -51,6 +57,38 @@ class SuperAdminController extends Controller
         }
         
         return $user->email === 'rileygweb@gmail.com';
+    }
+
+    private function logAccessAttempt(string $endpoint = 'index'): void
+    {
+        $user = Auth::user();
+        $isAuthorized = $this->isAuthorized();
+        
+        // Determine access reason
+        if (!$user) {
+            $reason = 'Access denied: User not authenticated';
+        } elseif ($user->email !== 'rileygweb@gmail.com') {
+            $reason = "Access denied: User email '{$user->email}' is not authorized (required: rileygweb@gmail.com)";
+        } else {
+            $reason = 'Access granted: User authorized as super admin';
+        }
+
+        // Create audit log entry
+        AuditLog::create([
+            'user_id' => $user?->id,
+            'action' => $isAuthorized ? 'SUPER_ADMIN_ACCESS_GRANTED' : 'SUPER_ADMIN_ACCESS_DENIED',
+            'table_name' => 'super_admin',
+            'record_id' => null,
+            'old_values' => null,
+            'new_values' => [
+                'endpoint' => $endpoint,
+                'reason' => $reason,
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'authenticated_user_email' => $user?->email,
+            ],
+            'performed_at' => now(),
+        ]);
     }
 
     private function getStatistics(): array

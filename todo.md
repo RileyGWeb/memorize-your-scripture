@@ -343,4 +343,4 @@ Use two commits:
 
 ---
 
-**End of task.** Make the changes, then open a PR with screenshots of DevTools (Manifest & SW panels) and Lighthouse PWA results.
+**End of task.** 
