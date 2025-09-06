@@ -31,7 +31,7 @@ class SuperAdminController extends Controller
             return false;
         }
         
-        return $user->id === 1 && $user->email === 'rileygweb@gmail.com';
+        return $user->id === 23 && $user->email === 'rileygweb@gmail.com';
     }
 
     private function getStatistics(): array

@@ -8,8 +8,10 @@
 
             <div class="grid grid-cols-2 gap-3">
                 @foreach($verses as $verse)
-                    <div class="group cursor-pointer" 
-                         @if($showOnMemorizationTool) wire:click="selectVerse({{ $verse->id }})" @endif>
+                    <div class="group {{ $showOnMemorizationTool ? 'cursor-pointer' : '' }}" 
+                         @if($showOnMemorizationTool)
+                             wire:click="selectVerse({{ $verse->id }})"
+                         @endif>
                         <div class="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg transition-colors duration-200 relative {{ $showOnMemorizationTool ? 'hover:shadow-md' : '' }}">
                             <!-- Remove button (only show on homepage) -->
                             @if(!$showOnMemorizationTool)

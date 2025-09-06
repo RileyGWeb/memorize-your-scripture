@@ -31,7 +31,7 @@ class MemorizeLaterList extends Component
                 'verseRanges' => $verseRanges,
             ]);
             
-            return redirect('/memorization-tool/display');
+            $this->redirect('/memorization-tool/display');
         }
     }
 
