@@ -5,4 +5,4 @@
 ### Check off items as you complete them.
 ### Do not stop iterating until all tests are complete!
 
-[ ] There shouldnt be a way to dismiss / X the memorize later verse suggestions. Some filters and a search might be good though.
+[x] There shouldnt be a way to dismiss / X the memorize later verse suggestions. Some filters and a search might be good though. Also instead of "Note - {date}" on the memorized cerse, let's do "added X days ago". Or hours ago, you get the idea.

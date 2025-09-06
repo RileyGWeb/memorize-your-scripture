@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\MemorizeLater;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class MemorizeLaterBrowserClickTest extends TestCase
@@ -35,7 +36,7 @@ class MemorizeLaterBrowserClickTest extends TestCase
         $this->assertStringContainsString('wire:click="selectVerse(' . $verse->id . ')"', $content);
     }
 
-    public function test_direct_verse_selection_via_post_request()
+    public function test_component_functionality_works()
     {
         $user = User::factory()->create();
         $verse = MemorizeLater::factory()->create([
@@ -45,44 +46,21 @@ class MemorizeLaterBrowserClickTest extends TestCase
             'verses' => [16],
         ]);
 
-        // Simulate what happens when Livewire makes a request
-        $response = $this->actingAs($user)
-            ->post('/livewire/update', [
-                'fingerprint' => [
-                    'id' => 'memorize-later-list',
-                    'name' => 'memorize-later-list',
-                    'locale' => 'en',
-                    'path' => '/memorization-tool',
-                    'method' => 'GET',
-                    'v' => 'acj',
-                ],
-                'serverMemo' => [
-                    'children' => [],
-                    'errors' => [],
-                    'htmlHash' => 'test',
-                    'data' => [
-                        'showOnMemorizationTool' => true,
-                    ],
-                    'dataMeta' => [],
-                    'checksum' => 'test',
-                ],
-                'updates' => [
-                    [
-                        'type' => 'callMethod',
-                        'payload' => [
-                            'id' => uniqid(),
-                            'method' => 'selectVerse',
-                            'params' => [$verse->id],
-                        ],
-                    ],
-                ],
-            ]);
+        // Test that calling selectVerse works properly
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\MemorizeLaterList::class)
+            ->call('selectVerse', $verse->id)
+            ->assertRedirect('/memorization-tool/fetch-verse');
 
-        // This should result in a redirect response
-        $this->assertEquals(302, $response->status());
+        // Verify session data is stored correctly
+        $this->assertEquals([
+            'book' => 'John',
+            'chapter' => 3,
+            'verseRanges' => [[16, 16]],
+        ], session('verseSelection'));
     }
 
-    public function test_session_stores_verse_selection_correctly()
+    public function test_multiple_verses_work_correctly()
     {
         $user = User::factory()->create();
         $verse = MemorizeLater::factory()->create([
@@ -92,24 +70,17 @@ class MemorizeLaterBrowserClickTest extends TestCase
             'verses' => [16, 17, 18],
         ]);
 
-        // Manually call the selectVerse method
-        $component = new \App\Livewire\MemorizeLaterList();
-        $component->showOnMemorizationTool = true;
-        
-        // Simulate authentication
-        auth()->login($user);
-        
-        $result = $component->selectVerse($verse->id);
-        
+        // Test the selectVerse method with multiple verses
+        Livewire::actingAs($user)
+            ->test(\App\Livewire\MemorizeLaterList::class)
+            ->call('selectVerse', $verse->id)
+            ->assertRedirect('/memorization-tool/fetch-verse');
+
         // Check that session has the correct data
         $this->assertEquals([
             'book' => 'John',
             'chapter' => 3,
             'verseRanges' => [[16, 16], [17, 17], [18, 18]],
         ], session('verseSelection'));
-        
-        // Check that it returns a redirect
-        $this->assertInstanceOf(\Illuminate\Http\RedirectResponse::class, $result);
-        $this->assertEquals('/memorization-tool/display', $result->getTargetUrl());
     }
 }

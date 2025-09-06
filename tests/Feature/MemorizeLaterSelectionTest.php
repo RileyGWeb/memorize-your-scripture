@@ -30,8 +30,8 @@ class MemorizeLaterSelectionTest extends TestCase
         $component = Livewire::test(MemorizeLaterList::class)
             ->call('selectVerse', $memorizeLater->id);
 
-        // Should redirect to memorization tool display
-        $component->assertRedirect('/memorization-tool/display');
+        // Should redirect to memorization tool fetch (which then redirects to display)
+        $component->assertRedirect('/memorization-tool/fetch-verse');
         
         // Should have set the verse selection in session
         $this->assertEquals([
@@ -58,8 +58,8 @@ class MemorizeLaterSelectionTest extends TestCase
         $component = Livewire::test(MemorizeLaterList::class)
             ->call('selectVerse', $memorizeLater->id);
 
-        // Should redirect to memorization tool display
-        $component->assertRedirect('/memorization-tool/display');
+        // Should redirect to memorization tool fetch (which then redirects to display)
+        $component->assertRedirect('/memorization-tool/fetch-verse');
         
         // Should have set the verse selection in session with individual verse ranges
         $this->assertEquals([

@@ -8,13 +8,6 @@ use Illuminate\Support\Str;
 
 class MemorizeLaterList extends Component
 {
-    public $showOnMemorizationTool = false;
-
-    public function mount($showOnMemorizationTool = false)
-    {
-        $this->showOnMemorizationTool = $showOnMemorizationTool;
-    }
-
     public function selectVerse($verseId)
     {
         $verse = MemorizeLater::find($verseId);
@@ -31,19 +24,8 @@ class MemorizeLaterList extends Component
                 'verseRanges' => $verseRanges,
             ]);
             
-            $this->redirect('/memorization-tool/display');
-        }
-    }
-
-    public function removeVerse($verseId)
-    {
-        if (auth()->check()) {
-            MemorizeLater::where('id', $verseId)
-                ->where('user_id', auth()->id())
-                ->delete();
-            
-            // Refresh the component
-            $this->dispatch('$refresh');
+            // Redirect to fetch endpoint to get verse text, then display
+            $this->redirect('/memorization-tool/fetch-verse');
         }
     }
 
@@ -64,9 +46,27 @@ class MemorizeLaterList extends Component
         return Str::limit($note, 60, '... click to see more');
     }
 
-    public function formatDate($date)
+    public function formatRelativeDate($date)
     {
-        return $date->format('n/j/y');
+        $now = now();
+        
+        // Check if the date is in the future
+        if ($date->isFuture()) {
+            return 'just now';
+        }
+        
+        // Calculate differences (date is in the past) and floor to get integer values
+        $diffInMinutes = floor($date->diffInMinutes($now));
+        $diffInHours = floor($date->diffInHours($now));
+        $diffInDays = floor($date->diffInDays($now));
+
+        if ($diffInMinutes < 60) {
+            return $diffInMinutes . ' minute' . ($diffInMinutes != 1 ? 's' : '') . ' ago';
+        } elseif ($diffInHours < 24) {
+            return $diffInHours . ' hour' . ($diffInHours != 1 ? 's' : '') . ' ago';
+        } else {
+            return $diffInDays . ' day' . ($diffInDays != 1 ? 's' : '') . ' ago';
+        }
     }
 
     public function render()

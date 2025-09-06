@@ -8,21 +8,8 @@
 
             <div class="grid grid-cols-2 gap-3">
                 @foreach($verses as $verse)
-                    <div class="group {{ $showOnMemorizationTool ? 'cursor-pointer' : '' }}" 
-                         @if($showOnMemorizationTool)
-                             wire:click="selectVerse({{ $verse->id }})"
-                         @endif>
-                        <div class="bg-gray-50 hover:bg-gray-100 p-3 rounded-lg transition-colors duration-200 relative {{ $showOnMemorizationTool ? 'hover:shadow-md' : '' }}">
-                            <!-- Remove button (only show on homepage) -->
-                            @if(!$showOnMemorizationTool)
-                                <button wire:click.stop="removeVerse({{ $verse->id }})" 
-                                        class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            @endif
-
+                    <div class="group cursor-pointer" wire:click="selectVerse({{ $verse->id }})">
+                        <div class="bg-gray-50 hover:bg-gray-100 hover:shadow-md p-3 rounded-lg transition-colors duration-200 relative">
                             <!-- Verse Reference -->
                             <div class="font-semibold text-gray-800 text-sm mb-1">
                                 {{ $this->formatVerseReference($verse) }}
@@ -31,31 +18,29 @@
                             <!-- Note Preview -->
                             @if($verse->note)
                                 <div class="text-xs text-gray-600 mb-2">
-                                    <span class="font-medium">Note - {{ $this->formatDate($verse->added_at) }}</span>
+                                    <span class="font-medium">Note - {{ $this->formatRelativeDate($verse->added_at) }}</span>
                                 </div>
                                 <div class="text-xs text-gray-700">
                                     {{ $this->formatNotePreview($verse->note) }}
                                 </div>
                             @else
                                 <div class="text-xs text-gray-500">
-                                    Added {{ $this->formatDate($verse->added_at) }}
+                                    Added {{ $this->formatRelativeDate($verse->added_at) }}
                                 </div>
                             @endif
 
-                            <!-- Click indicator for memorization tool -->
-                            @if($showOnMemorizationTool)
-                                <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </div>
-                            @endif
+                            <!-- Click indicator - always show -->
+                            <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 @endforeach
             </div>
 
-            @if($showOnMemorizationTool && $verses->count() > 0)
+            @if($verses->count() > 0)
                 <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <p class="text-sm text-blue-800">
                         <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

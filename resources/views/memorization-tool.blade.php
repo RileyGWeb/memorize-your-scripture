@@ -20,5 +20,5 @@
     </x-content-card>
 
     <!-- Memorize Later List for verse selection -->
-    <livewire:memorize-later-list :showOnMemorizationTool="true" />
+    <livewire:memorize-later-list />
 </x-layouts.app>

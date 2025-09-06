@@ -277,25 +277,14 @@ class MemorizeLaterTest extends TestCase
             ->assertSee('Great verse!');
     }
 
-    public function test_user_can_remove_verse_from_list()
+    public function test_remove_verse_functionality_has_been_removed()
     {
-        $user = User::factory()->create();
+        // As per UX improvements (todo.md line 7-9), the removeVerse functionality
+        // has been removed to improve user experience
+        $component = new MemorizeLaterList();
         
-        $verse = MemorizeLater::create([
-            'user_id' => $user->id,
-            'book' => 'John',
-            'chapter' => 3,
-            'verses' => [16],
-            'added_at' => now(),
-        ]);
-
-        Livewire::actingAs($user)
-            ->test(MemorizeLaterList::class)
-            ->call('removeVerse', $verse->id);
-
-        $this->assertDatabaseMissing('memorize_later', [
-            'id' => $verse->id
-        ]);
+        $this->assertFalse(method_exists($component, 'removeVerse'), 
+            'The removeVerse method should be removed from the MemorizeLaterList component');
     }
 
     public function test_user_can_select_verse_for_memorization()
@@ -311,9 +300,9 @@ class MemorizeLaterTest extends TestCase
         ]);
 
         Livewire::actingAs($user)
-            ->test(MemorizeLaterList::class, ['showOnMemorizationTool' => true])
+            ->test(MemorizeLaterList::class)
             ->call('selectVerse', $verse->id)
-            ->assertRedirect('/memorization-tool/display');
+            ->assertRedirect('/memorization-tool/fetch-verse');
 
         // Check that verse selection was stored in session
         $this->assertEquals([

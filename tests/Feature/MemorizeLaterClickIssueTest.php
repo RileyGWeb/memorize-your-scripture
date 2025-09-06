@@ -23,11 +23,11 @@ class MemorizeLaterClickIssueTest extends TestCase
             'verses' => [16],
         ]);
 
-        // Test when showOnMemorizationTool is true (where clicking should work)
+        // Test that clicking verse works and redirects properly
         $component = Livewire::actingAs($user)
-            ->test(MemorizeLaterList::class, ['showOnMemorizationTool' => true])
+            ->test(MemorizeLaterList::class)
             ->call('selectVerse', $verse->id)
-            ->assertRedirect('/memorization-tool/display');
+            ->assertRedirect('/memorization-tool/fetch-verse');
 
         // Check that session has the verse data
         $this->assertEquals([
@@ -37,7 +37,7 @@ class MemorizeLaterClickIssueTest extends TestCase
         ], session('verseSelection'));
     }
 
-    public function test_clicking_verse_on_homepage_does_not_redirect()
+    public function test_clicking_verse_works_from_any_context()
     {
         $user = User::factory()->create();
         $verse = MemorizeLater::factory()->create([
@@ -47,16 +47,21 @@ class MemorizeLaterClickIssueTest extends TestCase
             'verses' => [16],
         ]);
 
-        // Test when showOnMemorizationTool is false (homepage)
-        // The selectVerse method should only work when showOnMemorizationTool is true
+        // Test that selectVerse method always works now
         $component = Livewire::actingAs($user)
-            ->test(MemorizeLaterList::class, ['showOnMemorizationTool' => false]);
+            ->test(MemorizeLaterList::class)
+            ->call('selectVerse', $verse->id)
+            ->assertRedirect('/memorization-tool/fetch-verse');
 
-        // On homepage, there should be no wire:click for selectVerse
-        $component->assertDontSee('wire:click="selectVerse');
+        // Check that session has the verse data
+        $this->assertEquals([
+            'book' => 'John',
+            'chapter' => 3,
+            'verseRanges' => [[16, 16]],
+        ], session('verseSelection'));
     }
 
-    public function test_memorize_later_list_renders_with_conditional_wire_click()
+    public function test_component_always_renders_with_click_functionality()
     {
         $user = User::factory()->create();
         $verse = MemorizeLater::factory()->create([
@@ -66,16 +71,10 @@ class MemorizeLaterClickIssueTest extends TestCase
             'verses' => [16],
         ]);
 
-        // Test that the component renders correctly with showOnMemorizationTool = true
+        // Test that the component always renders with cursor-pointer and wire:click
         $component = Livewire::actingAs($user)
-            ->test(MemorizeLaterList::class, ['showOnMemorizationTool' => true])
+            ->test(MemorizeLaterList::class)
             ->assertSee('John 3:16')
             ->assertSee('Click a verse to start memorizing it!');
-
-        // Test that the component renders correctly with showOnMemorizationTool = false
-        $component = Livewire::actingAs($user)
-            ->test(MemorizeLaterList::class, ['showOnMemorizationTool' => false])
-            ->assertSee('John 3:16')
-            ->assertDontSee('Click a verse to start memorizing it!');
     }
 }
