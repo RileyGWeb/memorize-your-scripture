@@ -61,8 +61,9 @@ Route::get('/daily-quiz', function () {
     return view('daily-quiz');
 })->name('daily-quiz');
 
-// Super Admin route
+// Super Admin routes
 Route::get('/super-admin', [\App\Http\Controllers\SuperAdminController::class, 'index'])->name('super-admin');
+Route::get('/super-admin/users', [\App\Http\Controllers\SuperAdminController::class, 'getAllUsers'])->name('super-admin.users');
 
 // Route::get('/memorization-tool', function () {
 //     return view('memorization-tool');

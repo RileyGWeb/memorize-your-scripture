@@ -10,12 +10,17 @@ class SuperAdminTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function createAdminUser()
+    {
+        return User::firstOrCreate(
+            ['email' => 'rileygweb@gmail.com'],
+            ['name' => 'Riley Goodman']
+        );
+    }
+
     public function test_super_admin_page_accessible_to_authorized_user(): void
     {
-        $user = User::factory()->create([
-            'id' => 1,
-            'email' => 'rileygweb@gmail.com'
-        ]);
+        $user = $this->createAdminUser();
         $this->actingAs($user);
         
         $response = $this->get('/super-admin');
@@ -24,11 +29,10 @@ class SuperAdminTest extends TestCase
         $response->assertSee('Super Admin Panel');
     }
 
-    public function test_super_admin_page_redirects_unauthorized_user_id(): void
+    public function test_super_admin_page_redirects_unauthorized_user_email(): void
     {
         $user = User::factory()->create([
-            'id' => 2,
-            'email' => 'rileygweb@gmail.com'
+            'email' => 'wrong@email.com'
         ]);
         $this->actingAs($user);
         
@@ -40,8 +44,7 @@ class SuperAdminTest extends TestCase
     public function test_super_admin_page_redirects_unauthorized_email(): void
     {
         $user = User::factory()->create([
-            'id' => 1,
-            'email' => 'wrong@email.com'
+            'email' => 'another-wrong@email.com'
         ]);
         $this->actingAs($user);
         
@@ -57,25 +60,19 @@ class SuperAdminTest extends TestCase
         $response->assertRedirect('/');
     }
 
-    public function test_super_admin_page_has_statistics_tab(): void
+    public function test_super_admin_page_has_dashboard_tab(): void
     {
-        $user = User::factory()->create([
-            'id' => 1,
-            'email' => 'rileygweb@gmail.com'
-        ]);
+        $user = $this->createAdminUser();
         $this->actingAs($user);
         
         $response = $this->get('/super-admin');
         
-        $response->assertSee('Statistics');
+        $response->assertSee('Dashboard');
     }
 
     public function test_super_admin_page_has_audit_log_tab(): void
     {
-        $user = User::factory()->create([
-            'id' => 1,
-            'email' => 'rileygweb@gmail.com'
-        ]);
+        $user = $this->createAdminUser();
         $this->actingAs($user);
         
         $response = $this->get('/super-admin');
@@ -87,15 +84,38 @@ class SuperAdminTest extends TestCase
     {
         // Create some test data
         User::factory()->count(5)->create();
-        $adminUser = User::factory()->create([
-            'id' => 1,
-            'email' => 'rileygweb@gmail.com'
-        ]);
+        $adminUser = $this->createAdminUser();
         $this->actingAs($adminUser);
         
         $response = $this->get('/super-admin');
         
         $response->assertSee('Total Users');
         $response->assertSee('6'); // 5 created + 1 admin
+    }
+
+    public function test_super_admin_users_endpoint_accessible_to_authorized_user(): void
+    {
+        $user = $this->createAdminUser();
+        $this->actingAs($user);
+        
+        $response = $this->get('/super-admin/users');
+        
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'users',
+            'total'
+        ]);
+    }
+
+    public function test_super_admin_users_endpoint_redirects_unauthorized_user(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'unauthorized@email.com'
+        ]);
+        $this->actingAs($user);
+        
+        $response = $this->get('/super-admin/users');
+        
+        $response->assertStatus(403);
     }
 }
