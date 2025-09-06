@@ -32,7 +32,7 @@ class MemoryBankFactory extends Factory
             'user_id' => 1, // Default to user ID 1, will be overridden by forUser()
             'book' => $book,
             'chapter' => $chapter,
-            'verses' => [[$startVerse, $endVerse]],
+            'verses' => json_encode([[$startVerse, $endVerse]]),
             'difficulty' => $this->faker->randomElement(['easy', 'normal', 'strict']),
             'accuracy_score' => $this->faker->randomFloat(2, 70, 100),
             'memorized_at' => $this->faker->dateTimeBetween('-6 months', 'now'),

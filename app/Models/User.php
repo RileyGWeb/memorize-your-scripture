@@ -34,6 +34,7 @@ class User extends Authenticatable
         'login_streak',
         'last_login_date',
         'verified_user',
+        'background_image',
     ];
 
     /**

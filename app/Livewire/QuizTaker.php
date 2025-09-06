@@ -4,7 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\MemoryBank;
+use App\Models\AuditLog;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 
 class QuizTaker extends Component
 {
@@ -18,6 +20,8 @@ class QuizTaker extends Component
     public $actualVerseText = '';
     public $isLoading = false;
     public $apiError = '';
+    public $score = 0;
+    public $totalAnswered = 0;
 
     public function mount()
     {
@@ -60,7 +64,17 @@ class QuizTaker extends Component
         try {
             $book = $this->currentVerse['book'];
             $chapter = $this->currentVerse['chapter'];
-            $verses = json_decode($this->currentVerse['verses'], true);
+            $verses = $this->currentVerse['verses'];
+            
+            // Handle both JSON string and array formats
+            if (is_string($verses)) {
+                $verses = json_decode($verses, true);
+            }
+            
+            if (!is_array($verses)) {
+                $this->apiError = 'Invalid verse format';
+                return;
+            }
 
             // Build verse string for API
             $verseString = $this->buildVerseString($verses);
@@ -107,13 +121,22 @@ class QuizTaker extends Component
 
     public function nextQuestion()
     {
+        // Calculate accuracy for this question
+        $accuracy = $this->calculateAccuracy($this->userInput, $this->actualVerseText);
+        
         // Store result
         $this->results[] = [
             'verse' => $this->currentVerse,
             'userInput' => $this->userInput,
             'actualText' => $this->actualVerseText,
-            'accuracy' => $this->calculateAccuracy($this->userInput, $this->actualVerseText),
+            'accuracy' => $accuracy,
         ];
+
+        // Update scoring (consider 80%+ accuracy as correct)
+        $this->totalAnswered++;
+        if ($accuracy >= 80) {
+            $this->score++;
+        }
 
         $this->currentIndex++;
         
@@ -144,18 +167,86 @@ class QuizTaker extends Component
         $totalQuestions = count($this->results);
         $averageAccuracy = $totalQuestions > 0 ? 
             collect($this->results)->avg('accuracy') : 0;
+        $percentageScore = $totalQuestions > 0 ? 
+            ($this->score / $totalQuestions) * 100 : 0;
+        
+        // Calculate grade
+        $grade = $this->calculateGrade($percentageScore);
 
-        // Store completion data
-        session()->put('quizResults', [
+        // Prepare completion data
+        $completionData = [
             'results' => $this->results,
             'totalQuestions' => $totalQuestions,
+            'correctAnswers' => $this->score,
             'averageAccuracy' => round($averageAccuracy, 1),
+            'percentageScore' => round($percentageScore, 1),
+            'grade' => $grade,
             'quizType' => $this->quizData['type'],
             'completedAt' => now(),
-        ]);
+            'startTime' => $this->quizData['startTime'],
+            'duration' => now()->diffInMinutes($this->quizData['startTime'])
+        ];
+
+        // Store completion data in session
+        session()->put('quizResults', $completionData);
+
+        // Log quiz completion to audit log
+        $this->logQuizCompletion($completionData);
 
         // Clear quiz session
         session()->forget('dailyQuiz');
+    }
+
+    public function calculateGrade($percentage)
+    {
+        if ($percentage >= 97) return 'A+';
+        if ($percentage >= 93) return 'A';
+        if ($percentage >= 90) return 'A-';
+        if ($percentage >= 87) return 'B+';
+        if ($percentage >= 83) return 'B';
+        if ($percentage >= 80) return 'B-';
+        if ($percentage >= 77) return 'C+';
+        if ($percentage >= 73) return 'C';
+        if ($percentage >= 70) return 'C-';
+        if ($percentage >= 67) return 'D+';
+        if ($percentage >= 63) return 'D';
+        if ($percentage >= 60) return 'D-';
+        return 'F';
+    }
+
+    protected function logQuizCompletion($data)
+    {
+        if (!Auth::check()) {
+            return;
+        }
+
+        AuditLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'quiz_completed',
+            'table_name' => 'quiz_sessions', // Logical table name for quiz activities
+            'record_id' => Auth::id(), // Use user ID as the record ID
+            'old_values' => null,
+            'new_values' => [
+                'quiz_type' => $data['quizType'],
+                'total_questions' => $data['totalQuestions'],
+                'correct_answers' => $data['correctAnswers'],
+                'percentage_score' => $data['percentageScore'],
+                'grade' => $data['grade'],
+                'average_accuracy' => $data['averageAccuracy'],
+                'duration_minutes' => $data['duration'],
+                'completed_at' => $data['completedAt']->toISOString(),
+                'description' => "Completed {$data['quizType']} quiz with {$data['correctAnswers']}/{$data['totalQuestions']} correct ({$data['percentageScore']}% - Grade: {$data['grade']})",
+            ],
+            'performed_at' => now(),
+        ]);
+    }
+
+    public function getCurrentPercentage()
+    {
+        if ($this->totalAnswered === 0) {
+            return 0;
+        }
+        return round(($this->score / $this->totalAnswered) * 100, 1);
     }
 
     public function restartQuiz()
@@ -170,7 +261,17 @@ class QuizTaker extends Component
 
         $book = $this->currentVerse['book'];
         $chapter = $this->currentVerse['chapter'];
-        $verses = json_decode($this->currentVerse['verses'], true);
+        $verses = $this->currentVerse['verses'];
+        
+        // Handle both JSON string and array formats
+        if (is_string($verses)) {
+            $verses = json_decode($verses, true);
+        }
+        
+        if (!is_array($verses)) {
+            return "{$book} {$chapter}:1";
+        }
+        
         $verseString = $this->buildVerseString($verses);
 
         return "{$book} {$chapter}:{$verseString}";

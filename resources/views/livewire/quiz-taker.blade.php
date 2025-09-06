@@ -4,14 +4,21 @@
         <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-2xl font-bold text-gray-900">Daily Quiz</h1>
-                <div class="text-sm text-gray-600">
-                    Question {{ $currentIndex + 1 }} of {{ count($quizData['verses']) }}
+                <div class="text-right">
+                    <div class="text-lg font-semibold text-gray-900">
+                        {{ $currentIndex + 1 }} of {{ count($quizData['verses']) }}
+                    </div>
+                    @if($totalAnswered > 0)
+                        <div class="text-sm text-gray-600">
+                            Score: {{ $score }}/{{ $totalAnswered }} ({{ $this->getCurrentPercentage() }}%)
+                        </div>
+                    @endif
                 </div>
             </div>
             
             <!-- Progress Bar -->
-            <div class="w-full bg-gray-200 rounded-full h-2 mb-6">
-                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-6">
+                <div class="bg-blue-600 h-3 rounded-full transition-all duration-300" 
                      style="width: {{ (($currentIndex + 1) / count($quizData['verses'])) * 100 }}%"></div>
             </div>
 
@@ -103,10 +110,29 @@
         <!-- Quiz Completed -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8 text-center">
             <div class="mb-6">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
+                @php
+                    $percentage = $totalAnswered > 0 ? ($score / $totalAnswered) * 100 : 0;
+                    $grade = '';
+                    if ($percentage >= 97) $grade = 'A+';
+                    elseif ($percentage >= 93) $grade = 'A';
+                    elseif ($percentage >= 90) $grade = 'A-';
+                    elseif ($percentage >= 87) $grade = 'B+';
+                    elseif ($percentage >= 83) $grade = 'B';
+                    elseif ($percentage >= 80) $grade = 'B-';
+                    elseif ($percentage >= 77) $grade = 'C+';
+                    elseif ($percentage >= 73) $grade = 'C';
+                    elseif ($percentage >= 70) $grade = 'C-';
+                    elseif ($percentage >= 67) $grade = 'D+';
+                    elseif ($percentage >= 63) $grade = 'D';
+                    elseif ($percentage >= 60) $grade = 'D-';
+                    else $grade = 'F';
+                    
+                    $gradeColor = $percentage >= 80 ? 'text-green-600' : ($percentage >= 70 ? 'text-yellow-600' : 'text-red-600');
+                    $bgColor = $percentage >= 80 ? 'bg-green-100' : ($percentage >= 70 ? 'bg-yellow-100' : 'bg-red-100');
+                @endphp
+                
+                <div class="w-24 h-24 {{ $bgColor }} rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl font-bold {{ $gradeColor }}">{{ $grade }}</span>
                 </div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Quiz Complete!</h1>
                 <p class="text-gray-600">Great job working on your scripture memorization</p>
@@ -115,18 +141,32 @@
             @if(!empty($results))
                 <div class="bg-blue-50 p-6 rounded-lg mb-6">
                     <h2 class="text-xl font-semibold text-blue-900 mb-4">Your Results</h2>
-                    <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                         <div>
                             <div class="text-2xl font-bold text-blue-800">{{ count($results) }}</div>
                             <div class="text-blue-600">Questions</div>
                         </div>
                         <div>
-                            <div class="text-2xl font-bold text-blue-800">
-                                {{ collect($results)->avg('accuracy') ? round(collect($results)->avg('accuracy'), 1) : 0 }}%
-                            </div>
-                            <div class="text-blue-600">Average Accuracy</div>
+                            <div class="text-2xl font-bold text-blue-800">{{ $score }}</div>
+                            <div class="text-blue-600">Correct</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-blue-800">{{ round($percentage, 1) }}%</div>
+                            <div class="text-blue-600">Score</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold {{ $gradeColor }}">{{ $grade }}</div>
+                            <div class="text-blue-600">Grade</div>
                         </div>
                     </div>
+                    
+                    @if(collect($results)->avg('accuracy'))
+                        <div class="mt-4 text-center">
+                            <div class="text-sm text-gray-600">
+                                Average Text Accuracy: {{ round(collect($results)->avg('accuracy'), 1) }}%
+                            </div>
+                        </div>
+                    @endif
                 </div>
             @endif
 
