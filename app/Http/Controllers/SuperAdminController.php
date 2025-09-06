@@ -61,7 +61,7 @@ class SuperAdminController extends Controller
             'total_memorize_later' => MemorizeLater::count(),
             'total_audit_logs' => AuditLog::count(),
             'recent_users' => User::latest()->take(3)->get(),
-            'recent_audit_logs' => AuditLog::with('user')->latest()->take(5)->get(),
+            'recent_audit_logs' => AuditLog::with('user')->latest()->take(5)->get(), // Keep for dashboard recent activity
             'active_users_30_days' => User::where('last_login_date', '>=', Carbon::now()->subDays(30))->count(),
             'active_users_7_days' => User::where('last_login_date', '>=', Carbon::now()->subDays(7))->count(),
         ];

@@ -316,85 +316,10 @@
                 <div id="audit-log-tab" class="tab-content hidden p-6">
                     <div class="mb-6">
                         <h2 class="text-2xl font-semibold text-gray-900">Audit Log</h2>
-                        <p class="text-gray-600">Track all system activities and user actions</p>
+                        <p class="text-gray-600">Track all system activities and user actions with advanced filtering and pagination</p>
                     </div>
                     
-                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Table</th>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Record ID</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($statistics['recent_audit_logs'] as $log)
-                                        <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <div class="flex flex-col">
-                                                    <span>{{ $log->created_at->format('M j, Y') }}</span>
-                                                    <span class="text-xs text-gray-500">{{ $log->created_at->format('H:i:s') }}</span>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-8 w-8">
-                                                        <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                                            <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                    <div class="ml-3">
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $log->user ? $log->user->name : 'System' }}
-                                                        </div>
-                                                        @if($log->user)
-                                                            <div class="text-xs text-gray-500">
-                                                                {{ Str::limit($log->user->email, 25) }}
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full 
-                                                    @if($log->action === 'CREATE') bg-green-100 text-green-800
-                                                    @elseif($log->action === 'UPDATE') bg-blue-100 text-blue-800
-                                                    @elseif($log->action === 'DELETE') bg-red-100 text-red-800
-                                                    @else bg-gray-100 text-gray-800
-                                                    @endif
-                                                ">
-                                                    {{ ucfirst(strtolower($log->action)) }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900 bg-gray-50">
-                                                {{ $log->table_name }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono">{{ $log->record_id }}</span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                            <div class="flex items-center justify-between">
-                                <p class="text-sm text-gray-500">
-                                    Showing recent {{ count($statistics['recent_audit_logs']) }} entries
-                                </p>
-                                <div class="text-sm text-gray-500">
-                                    Full audit log pagination coming soon
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @livewire('audit-log-table')
                 </div>
             </div>
         </div>
