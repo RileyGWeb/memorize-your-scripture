@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ loginModal: false, registerModal: false }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ 
+    loginModal: {{ ($errors->any() && old('email') && !old('name')) ? 'true' : 'false' }}, 
+    registerModal: {{ ($errors->any() && old('name')) ? 'true' : 'false' }} 
+}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -35,20 +38,38 @@
             <div class="bg-white p-6 rounded shadow-md relative w-96">
                 <button class="absolute top-2 right-2 text-gray-600" @click="loginModal = false">✕</button>
                 <h2 class="text-xl font-bold mb-4">Sign In</h2>
+                
+                <!-- Error Messages -->
+                @if ($errors->any())
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <ul class="text-sm text-red-600">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div class="mb-4">
                         <label for="login-email" class="block text-sm font-medium">Email</label>
-                        <input id="login-email" type="email" name="email" required autofocus
-                               class="border w-full px-3 py-2 rounded-lg mt-1" />
+                        <input id="login-email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                               class="border w-full px-3 py-2 rounded-lg mt-1 @error('email') border-red-500 @enderror" />
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mb-4">
                         <label for="login-password" class="block text-sm font-medium">Password</label>
                         <input id="login-password" type="password" name="password" required
-                               class="border w-full px-3 py-2 rounded-lg mt-1" />
+                               class="border w-full px-3 py-2 rounded-lg mt-1 @error('password') border-red-500 @enderror" />
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mb-4 flex items-center">
-                        <input type="checkbox" id="login-remember-me" name="remember" class="mr-1 rounded">
+                        <input type="checkbox" id="login-remember-me" name="remember" {{ old('remember') ? 'checked' : '' }} class="mr-1 rounded">
                         <label for="login-remember-me" class="text-sm">Remember me</label>
                     </div>
                     <x-button type="submit">Log In</x-button>
@@ -69,27 +90,51 @@
             <div class="bg-white p-6 rounded shadow-md relative w-96">
                 <button class="absolute top-2 right-2 text-gray-600" @click="registerModal = false">✕</button>
                 <h2 class="text-xl font-bold mb-4">Register</h2>
+                
+                <!-- Error Messages -->
+                @if ($errors->any())
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <ul class="text-sm text-red-600">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
                     <div class="mb-4">
                         <label for="register-name" class="block text-sm font-medium">Name</label>
-                        <input id="register-name" type="text" name="name" required autofocus
-                               class="border w-full px-3 py-2 rounded-lg mt-1" />
+                        <input id="register-name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                               class="border w-full px-3 py-2 rounded-lg mt-1 @error('name') border-red-500 @enderror" />
+                        @error('name')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mb-4">
                         <label for="register-email" class="block text-sm font-medium">Email</label>
-                        <input id="register-email" type="email" name="email" required
-                               class="border w-full px-3 py-2 rounded-lg mt-1" />
+                        <input id="register-email" type="email" name="email" value="{{ old('email') }}" required
+                               class="border w-full px-3 py-2 rounded-lg mt-1 @error('email') border-red-500 @enderror" />
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mb-4">
                         <label for="register-password" class="block text-sm font-medium">Password</label>
                         <input id="register-password" type="password" name="password" required
-                               class="border w-full px-3 py-2 rounded-lg mt-1" />
+                               class="border w-full px-3 py-2 rounded-lg mt-1 @error('password') border-red-500 @enderror" />
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mb-4">
                         <label for="register-password-confirmation" class="block text-sm font-medium">Confirm Password</label>
                         <input id="register-password-confirmation" type="password" name="password_confirmation" required
-                               class="border w-full px-3 py-2 rounded-lg mt-1" />
+                               class="border w-full px-3 py-2 rounded-lg mt-1 @error('password_confirmation') border-red-500 @enderror" />
+                        @error('password_confirmation')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <x-button type="submit" variant="outline">Register</x-button>
                 </form>
