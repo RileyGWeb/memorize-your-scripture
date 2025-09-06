@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Verified;
 use App\Listeners\UpdateLoginStreak;
+use App\Listeners\MarkUserAsVerified;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(Login::class, UpdateLoginStreak::class);
+        Event::listen(Verified::class, MarkUserAsVerified::class);
         
         // Prohibit destructive commands on production
         DB::prohibitDestructiveCommands(

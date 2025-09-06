@@ -128,6 +128,9 @@ class MemorizationToolController extends Controller
             $existing->user_text         = $validated['user_text'];
             $existing->save();
             $record = $existing;
+
+            // Mark user as verified when they memorize a verse (even if updating)
+            auth()->user()->markAsVerified();
         } else {
             $record = \App\Models\MemoryBank::create([
                 'user_id'           => auth()->id(),
@@ -140,6 +143,9 @@ class MemorizationToolController extends Controller
                 'user_text'         => $validated['user_text'],
                 'memorized_at'      => now(),
             ]);
+
+            // Mark user as verified when they memorize their first verse
+            auth()->user()->markAsVerified();
         }
 
         return response()->json([

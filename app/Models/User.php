@@ -33,6 +33,7 @@ class User extends Authenticatable
         'password',
         'login_streak',
         'last_login_date',
+        'verified_user',
     ];
 
     /**
@@ -67,6 +68,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_login_date' => 'date',
+            'verified_user' => 'boolean',
         ];
     }
 
@@ -125,5 +127,17 @@ class User extends Authenticatable
     public function getLoginStreakForDisplay(): ?int
     {
         return $this->login_streak >= 2 ? $this->login_streak : null;
+    }
+
+    /**
+     * Mark the user as verified.
+     * This can be called when they verify email or memorize their first verse.
+     */
+    public function markAsVerified(): void
+    {
+        if (!$this->verified_user) {
+            $this->verified_user = true;
+            $this->save();
+        }
     }
 }
