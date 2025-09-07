@@ -199,7 +199,7 @@ Edit `resources/views/layouts/app.blade.php` (adjust if different):
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#111827">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 ```

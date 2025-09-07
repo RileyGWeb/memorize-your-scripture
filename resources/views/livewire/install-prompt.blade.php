@@ -36,8 +36,11 @@
     let deferredPrompt;
     let installPromptShown = false;
 
+    console.log('InstallPrompt script loaded');
+
     // Listen for the beforeinstallprompt event
     window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstallprompt event fired');
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
         // Save the event so it can be triggered later
@@ -45,8 +48,10 @@
         
         // Check if user has previously dismissed the prompt
         if (!localStorage.getItem('pwa-install-dismissed')) {
+            console.log('Showing install prompt');
             showInstallPrompt();
         } else {
+            console.log('Showing floating button');
             showFloatingButton();
         }
     });
@@ -104,22 +109,26 @@
     }
 
     function showInstallPrompt() {
+        console.log('showInstallPrompt called');
         document.getElementById('install-prompt').classList.remove('hidden');
         installPromptShown = true;
     }
 
     function hideInstallPrompt() {
+        console.log('hideInstallPrompt called');
         document.getElementById('install-prompt').classList.add('hidden');
         installPromptShown = false;
     }
 
     function showFloatingButton() {
+        console.log('showFloatingButton called, deferredPrompt:', !!deferredPrompt);
         if (!installPromptShown && deferredPrompt && !localStorage.getItem('pwa-installed')) {
             document.getElementById('floating-install-button').classList.remove('hidden');
         }
     }
 
     function hideFloatingButton() {
+        console.log('hideFloatingButton called');
         document.getElementById('floating-install-button').classList.add('hidden');
     }
 

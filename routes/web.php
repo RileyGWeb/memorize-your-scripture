@@ -11,6 +11,16 @@ Route::get('/about', function () {
 })->name('about');
 // offline page for PWA
 Route::view('/offline', 'offline')->name('offline');
+// manifest route for PWA
+Route::get('/manifest.webmanifest', function () {
+    $manifestPath = public_path('build/manifest.webmanifest');
+    if (file_exists($manifestPath)) {
+        return response()->file($manifestPath, [
+            'Content-Type' => 'application/manifest+json'
+        ]);
+    }
+    return response()->json(['error' => 'Manifest not found'], 404);
+});
 // privacy policy page
 Route::get('/privacy-policy', function () {
     return view('privacy-policy');

@@ -27,10 +27,10 @@ export default defineConfig({
                 ],
             },
             workbox: {
-                navigateFallback: '/offline',
                 clientsClaim: true,
                 skipWaiting: true,
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+                // Don't use navigateFallback to avoid the precaching issue
                 runtimeCaching: [
                     // Do NOT cache Livewire or auth/session endpoints
                     { urlPattern: /\/livewire\//i, handler: 'NetworkOnly', options: { cacheName: 'livewire' } },
@@ -39,7 +39,7 @@ export default defineConfig({
                     { urlPattern: /\/sanctum\/csrf-cookie/i, handler: 'NetworkOnly', options: { cacheName: 'auth' } },
                     { urlPattern: /\/broadcasting\//i, handler: 'NetworkOnly', options: { cacheName: 'auth' } },
 
-                    // HTML navigations
+                    // HTML navigations - simple network first without offline fallback
                     {
                         urlPattern: ({ request }) => request.mode === 'navigate',
                         handler: 'NetworkFirst',
@@ -77,7 +77,7 @@ export default defineConfig({
                     },
                 ],
             },
-            // Disable SW in dev by default (recommended). If you want it in dev, set enabled: true.
+            // Disable SW in dev to avoid caching issues during development
             devOptions: { enabled: false },
         }),
     ],
