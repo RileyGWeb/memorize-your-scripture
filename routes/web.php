@@ -9,6 +9,8 @@ use App\Http\Controllers\MemoryBankController;
 Route::get('/about', function () {
     return view('about');
 })->name('about');
+// offline page for PWA
+Route::view('/offline', 'offline')->name('offline');
 // privacy policy page
 Route::get('/privacy-policy', function () {
     return view('privacy-policy');

@@ -6,13 +6,13 @@
 ### Do not stop iterating until all tests are complete!
 
 
-[ ] The user's profile page needs work. It looks like it's in dark mode, and is not mobile responsive. Remove the Browser Sessions section. Add one to change the background image.
+[x] The user's profile page needs work. It looks like it's in dark mode, and is not mobile responsive. Remove the Browser Sessions section. Add one to change the background image.
 
-[ ] Create an about page. Just put a placeholder for a picture of myself and some words.
+[x] Create an about page. Just put a placeholder for a picture of myself and some words.
 
-[ ] We need to build out the quiz functoinality. The idea is simply, when someone has memorized some verses, they can use the quiz feature to go through a bunch of them and make sure they remember what the memorized. Using the existing memorization tool is fine, but we want them to be in rapid succession, and if they choose to do 5 verses for example, it should show "X of 5" at the top. Their current score/correct percentage as well. Give them a grade at the end, and record their quiz. Make sure this is part of the audit log, and make sure we have tests for it too.
+[x] We need to build out the quiz functoinality. The idea is simply, when someone has memorized some verses, they can use the quiz feature to go through a bunch of them and make sure they remember what the memorized. Using the existing memorization tool is fine, but we want them to be in rapid succession, and if they choose to do 5 verses for example, it should show "X of 5" at the top. Their current score/correct percentage as well. Give them a grade at the end, and record their quiz. Make sure this is part of the audit log, and make sure we have tests for it too.
 
-[ ] Copilot Task: Convert Our Laravel + Livewire App into a Progressive Web App (PWA)
+[x] Copilot Task: Convert Our Laravel + Livewire App into a Progressive Web App (PWA)
 
 You are an AI coding assistant working in a Laravel 12 + Vite + Livewire 3 project (no Filament). Implement a production‑ready PWA with installability, an offline fallback page, safe caching for assets/pages, and **no caching of Livewire/auth endpoints**.
 
