@@ -4,7 +4,7 @@
             reference: @js($reference),
             lineHeightPx: @js($lineHeightPx),
         })" x-init="init()" class="space-y-4">
-        <x-content-card>
+        <x-content-card class="sticky top-2 z-10 bg-white">
             <template x-if="hidden">
                 <x-content-card-title title="Verse Memorization" subtitle="Type the verse(s) from memory. If you can't, show it again! But remember, you'll have to start over." />
             </template>
@@ -61,7 +61,7 @@
         <x-content-card>
             <x-content-card-button href="/memorization-tool" text="Change verse" icon="arrow-narrow-left" iconSize="lg" />
         </x-content-card>
-        <x-content-card>
+        <x-content-card x-ref="mainContentCard">
             <div :class="{ 'rounded-xl shadow-xl shadow-green-400': showCongrats }">
                 <div class="flex border-b border-stroke">
                     <div class="font-semibold grow px-4 py-2">
@@ -94,7 +94,13 @@
                                         <hr class="lined-hr" style="position:absolute; left:0; right:0; bottom:0;" />
                                     </div>
                                 </template>
-                                <textarea x-model="segmentStates[index].typedText" @input="checkAccuracy(index)" :rows="seg.numLines" class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none no-border p-0 indent-3 overflow-hidden"></textarea>
+                                <textarea 
+                                    x-model="segmentStates[index].typedText" 
+                                    @input="checkAccuracy(index)" 
+                                    @focus="scrollToMainContent()"
+                                    :rows="seg.numLines" 
+                                    class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none no-border p-0 indent-3 overflow-hidden">
+                                </textarea>
                             </div>
                         </div>
                     </template>
@@ -361,6 +367,29 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
                 'strict': 'Strict'
             };
             return names[difficulty] || difficulty;
+        },
+        
+        scrollToMainContent() {
+            // Use nextTick to ensure the DOM is updated before scrolling
+            this.$nextTick(() => {
+                const mainContentCard = this.$refs.mainContentCard;
+                if (mainContentCard) {
+                    // Get the top position of the main content card
+                    const rect = mainContentCard.getBoundingClientRect();
+                    const currentScrollY = window.scrollY;
+                    
+                    // Calculate the target scroll position
+                    // We want the top of the content card to be visible, accounting for the sticky header
+                    const stickyHeaderHeight = 120; // Approximate height of sticky score card + some padding
+                    const targetScrollY = currentScrollY + rect.top - stickyHeaderHeight;
+                    
+                    // Smooth scroll to the target position
+                    window.scrollTo({
+                        top: Math.max(0, targetScrollY),
+                        behavior: 'smooth'
+                    });
+                }
+            });
         },
     }
 }

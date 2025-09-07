@@ -156,6 +156,10 @@
                 </div>
             </div>
         </div>
+        
+        <!-- PWA Install Prompt -->
+        @livewire('install-prompt')
+        
         @livewireScripts
         
         <!-- PWA Update Prompt -->
