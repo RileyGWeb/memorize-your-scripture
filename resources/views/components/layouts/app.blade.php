@@ -30,7 +30,7 @@
 
         <div id="overlay" class="fixed inset-0 bg-black/20 z-5"></div>
 
-        <footer class="fixed bottom-0 left-0 w-full bg-white shadow-md py-2 px-4 flex justify-between items-center">
+        <footer class="fixed bottom-0 left-0 w-full bg-white shadow-md py-2 px-4 flex justify-between items-center z-[51] border-t border-stroke">
             <div class="text-sm text-gray-600">
                 <a href="{{ route('about') }}" class="hover:underline">About</a>
                 <span class="mx-2">|</span>

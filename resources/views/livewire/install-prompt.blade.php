@@ -1,6 +1,6 @@
 <div>
     <!-- Install Prompt -->
-    <div id="install-prompt" class="hidden fixed bottom-4 left-4 right-4 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4 mx-auto max-w-sm">
+    <div id="install-prompt" class="hidden fixed bottom-16 left-4 right-4 z-40 bg-white border border-gray-200 rounded-lg shadow-lg p-4 mx-auto max-w-sm">
         <div class="flex items-start space-x-3">
             <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
