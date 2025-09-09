@@ -30,9 +30,9 @@ class PWATest extends TestCase
     public function test_pwa_icons_exist()
     {
         $this->assertFileExists(public_path('apple-touch-icon.png'));
-        $this->assertFileExists(public_path('icons/pwa-192x192.png'));
-        $this->assertFileExists(public_path('icons/pwa-512x512.png'));
-        $this->assertFileExists(public_path('icons/maskable-512.png'));
+        $this->assertFileExists(public_path('icons/pwa-192x192.jpg'));
+        $this->assertFileExists(public_path('icons/pwa-512x512.jpg'));
+        $this->assertFileExists(public_path('icons/maskable-512.jpg'));
     }
 
     public function test_vite_config_includes_pwa_setup()

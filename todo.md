@@ -86,9 +86,9 @@ export default defineConfig({
         theme_color: '#111827',
         background_color: '#ffffff',
         icons: [
-          { src: '/icons/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/icons/pwa-192x192.jpg', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/pwa-512x512.jpg', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/maskable-512.jpg', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
@@ -256,9 +256,9 @@ Route::view('/offline', 'offline')->name('offline');
 Place these files in `public/`:
 
 * `apple-touch-icon.png` (180×180)
-* `icons/pwa-192x192.png`
-* `icons/pwa-512x512.png`
-* `icons/maskable-512.png` (512×512 with safe padding)
+* `icons/pwa-192x192.jpg`
+* `icons/pwa-512x512.jpg`
+* `icons/maskable-512.jpg` (512×512 with safe padding)
 
 If icons don’t exist, generate placeholders (simple solid color + logo glyph) so Lighthouse passes.
 
@@ -310,9 +310,9 @@ Verification steps (local or staging over HTTPS):
 * `routes/web.php`: add `/offline` route.
 * `resources/views/offline.blade.php`: **new**.
 * `public/apple-touch-icon.png`: **new**.
-* `public/icons/pwa-192x192.png`: **new**.
-* `public/icons/pwa-512x512.png`: **new**.
-* `public/icons/maskable-512.png`: **new**.
+* `public/icons/pwa-192x192.jpg`: **new**.
+* `public/icons/pwa-512x512.jpg`: **new**.
+* `public/icons/maskable-512.jpg`: **new**.
 
 ---
 

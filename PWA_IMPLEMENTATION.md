@@ -78,9 +78,9 @@ We implemented different caching strategies for different types of content:
 - `resources/js/pwa.js` - Service worker registration and lifecycle management
 - `resources/views/offline.blade.php` - Offline fallback page
 - `public/apple-touch-icon.png` - iOS app icon
-- `public/icons/pwa-192x192.png` - Android app icon (small)
-- `public/icons/pwa-512x512.png` - Android app icon (large)
-- `public/icons/maskable-512.png` - Adaptive icon for different devices
+- `public/icons/pwa-192x192.jpg` - Android app icon (small)
+- `public/icons/pwa-512x512.jpg` - Android app icon (large)
+- `public/icons/maskable-512.jpg` - Adaptive icon for different devices
 - `tests/Feature/PWATest.php` - Comprehensive PWA testing
 
 **Modified Files:**
