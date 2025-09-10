@@ -41,18 +41,21 @@
                 <template x-if="hidden">
                     <div class="flex items-center justify-center">
                         <div class="relative w-20 h-20 flex items-center justify-center border-r border-stroke">
-                            <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
-                                <circle class="text-gray-300" cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="3" />
-                                <circle cx="50" cy="50" r="40" fill="none" stroke-width="3" :stroke="progressColor" stroke-linecap="round" :stroke-dasharray="circumference" :stroke-dashoffset="strokeOffset" />
+                            <svg class="w-20 h-20 transform -rotate-90">
+                                <circle cx="40" cy="40" :r="radius" stroke="#e5e7eb" stroke-width="8" fill="transparent" />
+                                <circle cx="40" cy="40" :r="radius" stroke="currentColor" :stroke-dasharray="circumference" :stroke-dashoffset="strokeOffset" stroke-width="8" fill="transparent" stroke-linecap="round" transition="stroke-dashoffset 0.3s ease" :class="progressColorBackground" />
                             </svg>
-                            <div class="absolute flex items-center justify-center w-12 h-12 text-sm" :class="progressColorBackground">
-                                <span x-text="overallAccuracy.toFixed(0) + '%'"></span>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-lg font-semibold" :class="progressColorBackground" x-text="`${Math.round(overallAccuracy)}%`"></span>
                             </div>
                         </div>
-                        <div class="w-20 h-20 flex items-center justify-center flex flex-col -space-y-3">
-                            <span x-text="typedChars" class="relative -left-4 text-center"></span>
-                            <span>/</span>
-                            <span x-text="totalChars" class="relative left-4"></span>
+                        <div class="w-full">
+                            <div class="text-base text-text px-4 py-2">
+                                <span x-text="`${typedChars} / ${totalChars} characters`"></span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3 border-l border-stroke">
+                                <div class="h-3 rounded-full transition-all duration-300" :style="`width: ${(typedChars / totalChars) * 100}%; background-color: ${progressColor};`"></div>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -82,111 +85,33 @@
                     </div>
                 </template>
                 <template x-if="hidden">
-                    <template x-for="(seg, index) in segments" :key="index">
-                        <div class="relative border p-4">
-                            <div class="absolute top-2 right-2 text-xs" x-text="segmentStates[index].accuracy.toFixed(0) + '%'"></div>
-                            <div class="mb-2 absolute">
-                                <sup x-text="seg.verse"></sup>
-                            </div>
-                            <div class="relative w-full" :style="'height:' + (lineHeightPx * seg.numLines) + 'px;'">
-                                <template x-for="i in seg.numLines" :key="i">
-                                    <div :style="'height:' + lineHeightPx + 'px; position:relative;'">
-                                        <hr class="lined-hr" style="position:absolute; left:0; right:0; bottom:0;" />
-                                    </div>
-                                </template>
-                                <textarea 
-                                    x-model="segmentStates[index].typedText" 
-                                    @input="checkAccuracy(index)" 
-                                    @focus="scrollToMainContent()"
-                                    :rows="seg.numLines" 
-                                    class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none no-border p-0 indent-3 overflow-hidden">
-                                </textarea>
-                            </div>
-                        </div>
-                    </template>
-                </template>
-            </div>
-        </x-content-card>
-        <x-content-card>
-            <template x-if="showCongrats">
-                <div class="p-4 rounded-xl text-center border-2 border-[#5ECE0B]">
-                    <h2 class="text-xl font-semibold mb-2 flex items-center justify-center w-full gap-1">
-                        <img src="{{ asset('images/icons/svg/badge-check.svg') }}" />
-                        <span>Congrats!</span>
-                    </h2>
-                    <div class="flex flex-col my-3">
-                        @auth
-                            <span class="text-sm">Added to your bank:</span>
-                        @else
-                            <span class="text-sm">Memorized:</span>
-                        @endauth
-                        <span class="text-xl font-bold" x-text="reference"></span>
-                        <span class="text-sm text-gray-600 mt-1">
-                            Difficulty: <span class="font-semibold capitalize" x-text="getDifficultyDisplayName(difficulty)"></span>
-                        </span>
-                    </div>
-                    @auth
-
-                    @else
-                    <div class="flex flex-col my-3">
-                        <span class="text-sm">Sign up or register to have your memorized verses saved to your memory bank!</span>
-                    </div>
-                    @endif
-                    <div class="flex gap-2 w-full items-center justify-center">
-                        <x-button @click="resetAll()">Do Another</x-button>
-                        <template x-if="shouldShowIncreaseDifficultyButton()">
-                            <x-button @click="openDifficultyModal()" class="bg-blue-600 hover:bg-blue-700">Increase Difficulty</x-button>
-                        </template>
-                        <x-button href="/">Back Home</x-button>
-                    </div>
-                </div>
-            </template>
-            
-            <!-- Difficulty Selection Modal -->
-            <template x-if="showDifficultyModal">
-                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="closeDifficultyModal()">
-                    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4" @click.stop>
-                        <h3 class="text-lg font-semibold mb-4 text-center">Choose Difficulty</h3>
-                        <div class="space-y-3">
-                            <template x-for="difficultyOption in ['easy', 'normal', 'strict']" :key="difficultyOption">
-                                <div class="border rounded-lg p-3 flex items-center justify-between"
-                                     :class="{
-                                         'bg-gray-100 cursor-not-allowed': !canSelectDifficulty(difficultyOption),
-                                         'bg-green-50 border-green-200': isDifficultyCompleted(difficultyOption),
-                                         'hover:bg-blue-50 cursor-pointer border-blue-200': canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption),
-                                         'border-gray-200': !canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption)
-                                     }"
-                                     @click="canSelectDifficulty(difficultyOption) ? selectDifficulty(difficultyOption) : null">
-                                    <div class="flex items-center space-x-3">
-                                        <span class="font-medium capitalize" x-text="getDifficultyDisplayName(difficultyOption)"></span>
-                                        <span class="text-sm text-gray-600">
-                                            (<span x-text="difficultyOption === 'easy' ? '80%' : difficultyOption === 'normal' ? '95%' : '100%'"></span> accuracy required)
-                                        </span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <template x-if="isDifficultyCompleted(difficultyOption)">
-                                            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                            </svg>
-                                        </template>
-                                        <template x-if="!canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption)">
-                                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
-                                            </svg>
-                                        </template>
+                    <div class="p-4">
+                        <template x-for="(segment, index) in segments" :key="index">
+                            <div class="space-y-4">
+                                <div :id="'segment-' + index" class="relative" x-data="{ flashClass: '' }">
+                                    <sup class="text-base font-semibold text-gray-500" x-text="segment.verse"></sup>
+                                    <div class="relative" :style="`height: ${segment.numLines * lineHeightPx}px;`">
+                                        <div x-ref="dummyText" class="text-lg leading-[1.5]" style="visibility:hidden; position:absolute; top:-9999px; width:100%;" x-html="segmentStates[index].typedText.replace(/\\n/g, '<br>')"></div>
+                                        <hr class="lined-hr" style="margin: 0; border: none; border-bottom: 1px solid #ccc; height: 0; position: absolute; top: 24px; width: 100%;" />
+                                        <hr class="lined-hr" style="margin: 0; border: none; border-bottom: 1px solid #ccc; height: 0; position: absolute; top: 48px; width: 100%;" x-show="segment.numLines > 1" />
+                                        <hr class="lined-hr" style="margin: 0; border: none; border-bottom: 1px solid #ccc; height: 0; position: absolute; top: 72px; width: 100%;" x-show="segment.numLines > 2" />
+                                        <hr class="lined-hr" style="margin: 0; border: none; border-bottom: 1px solid #ccc; height: 0; position: absolute; top: 96px; width: 100%;" x-show="segment.numLines > 3" />
+                                        <hr class="lined-hr" style="margin: 0; border: none; border-bottom: 1px solid #ccc; height: 0; position: absolute; top: 120px; width: 100%;" x-show="segment.numLines > 4" />
+                                        <hr class="lined-hr" style="margin: 0; border: none; border-bottom: 1px solid #ccc; height: 0; position: absolute; top: 144px; width: 100%;" x-show="segment.numLines > 5" />
+                                        <hr class="lined-hr" style="margin: 0; border: none; border-bottom: 1px solid #ccc; height: 0; position: absolute; top: 168px; width: 100%;" x-show="segment.numLines > 6" />
+                                        <textarea 
+                                            x-model="segmentStates[index].typedText" 
+                                            @input="checkAccuracy(index)"
+                                            placeholder=""
+                                            class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none"
+                                            style="color: transparent; caret-color: black; border: none; box-shadow: none;">
+                                        </textarea>
                                     </div>
                                 </div>
-                            </template>
-                        </div>
-                        <div class="mt-6 flex justify-center">
-                            <x-button @click="closeDifficultyModal()" class="bg-gray-500 hover:bg-gray-600">Cancel</x-button>
-                        </div>
+                            </div>
+                        </template>
                     </div>
-                </div>
-            </template>
-            
-            <div x-ref="dummyText" class="text-lg leading-[1.5]" style="visibility:hidden; position:absolute; top:-9999px; width:100%;">
-                <span x-text="buildDisplayFull()"></span>
+                </template>
             </div>
         </x-content-card>
     </div>
@@ -196,14 +121,11 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
         segments,
         reference,
         lineHeightPx,
-        bibleTranslation,  // new property for the bible translation (e.g., "NIV")
+        bibleTranslation: bibleTranslation || 'NIV',
         difficulty: 'easy',
         hidden: false,
         segmentStates: [],
         showCongrats: false,
-        showDifficultyModal: false,
-        completedDifficulties: [],
-        flashClass: '',
         totalChars: 0,
         radius: 40,
         circumference: 0,
@@ -231,8 +153,8 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
         checkAccuracy(index) {
             let typed = this.segmentStates[index].typedText;
             let correct = this.segments[index].text;
-            let len = Math.min(typed.length, correct.length);
             let matched = 0;
+            let len = Math.min(typed.length, correct.length);
             for (let i = 0; i < len; i++) {
                 if (typed[i].toLowerCase() === correct[i].toLowerCase()) {
                     matched++;
@@ -240,49 +162,6 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
             }
             let acc = (matched / correct.length) * 100;
             this.segmentStates[index].accuracy = acc;
-            this.checkAllSegments();
-        },
-        checkAllSegments() {
-            // Once congrats is shown, keep it shown (don't hide when accuracy drops)
-            if (!this.showCongrats) {
-                this.showCongrats = this.segmentStates.every((state, i) => {
-                    return state.accuracy >= this.requiredAccuracy();
-                });
-            }
-            if (this.showCongrats && !this.saved) {
-                this.saved = true;
-                fetch("{{ route('memorization-tool.save') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        book: this.reference.split(" ")[0],
-                        chapter: parseInt(this.reference.split(" ")[1].split(":")[0]),
-                        verses: this.segments.map(seg => seg.verse),
-                        difficulty: this.difficulty,
-                        accuracy_score: this.overallAccuracy,
-                        bible_translation: this.bibleTranslation,
-                        user_text: this.userTypedText
-                    })
-                })
-                .then(response => response.json())
-                .then(data => console.log('Memory saved:', data))
-                .catch(err => console.error(err));
-            }
-        },
-        requiredAccuracy() {
-            if (this.difficulty === 'easy') return 80;
-            if (this.difficulty === 'normal') return 95;
-            if (this.difficulty === 'strict') return 100;
-            return 80;
-        },
-        resetAll() {
-            this.hidden = false;
-            this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
-            this.showCongrats = false;
-            this.saved = false;
         },
         get overallAccuracy() {
             if (this.segmentStates.length === 0) return 0;
@@ -310,108 +189,15 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
         },
         get typedChars() {
             return this.segmentStates.reduce((sum, state) => sum + state.typedText.length, 0);
-        },
-        get userTypedText() {
-            return this.segmentStates.map(state => state.typedText).join("\n");
-        },
-
-        get bibleTranslation() {
-            return Alpine.store('bible').selectedId;
-        },
-        
-        async fetchCompletedDifficulties() {
-            try {
-                const response = await fetch(`/api/completed-difficulties?book=${this.reference.split(" ")[0]}&chapter=${parseInt(this.reference.split(" ")[1].split(":")[0])}&verses=${this.segments.map(seg => seg.verse).join(',')}`);
-                const data = await response.json();
-                this.completedDifficulties = data.difficulties || [];
-            } catch (error) {
-                console.error('Error fetching completed difficulties:', error);
-                this.completedDifficulties = [];
-            }
-        },
-        
-        openDifficultyModal() {
-            this.fetchCompletedDifficulties();
-            this.showDifficultyModal = true;
-        },
-        
-        closeDifficultyModal() {
-            this.showDifficultyModal = false;
-        },
-        
-        selectDifficulty(newDifficulty) {
-            this.difficulty = newDifficulty;
-            this.resetAll();
-            this.closeDifficultyModal();
-        },
-        
-        isDifficultyCompleted(difficulty) {
-            return this.completedDifficulties.includes(difficulty);
-        },
-        
-        canSelectDifficulty(difficulty) {
-            const difficultyOrder = ['easy', 'normal', 'strict'];
-            const currentIndex = difficultyOrder.indexOf(this.difficulty);
-            const targetIndex = difficultyOrder.indexOf(difficulty);
-            return targetIndex > currentIndex;
-        },
-        
-        shouldShowIncreaseDifficultyButton() {
-            return this.difficulty !== 'strict';
-        },
-        
-        getDifficultyDisplayName(difficulty) {
-            const names = {
-                'easy': 'Easy',
-                'normal': 'Normal', 
-                'strict': 'Strict'
-            };
-            return names[difficulty] || difficulty;
-        },
-        
-        scrollToMainContent() {
-            // Use nextTick to ensure the DOM is updated before scrolling
-            this.$nextTick(() => {
-                const mainContentCard = this.$refs.mainContentCard;
-                if (mainContentCard) {
-                    // Get the top position of the main content card
-                    const rect = mainContentCard.getBoundingClientRect();
-                    const currentScrollY = window.scrollY;
-                    
-                    // Calculate the target scroll position
-                    // We want the top of the content card to be visible, accounting for the sticky header
-                    const stickyHeaderHeight = 120; // Approximate height of sticky score card + some padding
-                    const targetScrollY = currentScrollY + rect.top - stickyHeaderHeight;
-                    
-                    // Smooth scroll to the target position
-                    window.scrollTo({
-                        top: Math.max(0, targetScrollY),
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        },
+        }
     }
 }
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('memTool', memTool);
-        });
 
-
+document.addEventListener('alpine:init', () => {
+    Alpine.data('memTool', memTool);
+});
     </script>
     <style>
-        .flash-green {
-            background-color: #9ae69a;
-            transition: background-color 0.3s ease;
-        }
-        .flash-red {
-            background-color: #efa1a1;
-            transition: background-color 0.3s ease;
-        }
-        .no-border {
-            border: none !important;
-            box-shadow: none !important;
-        }
         .lined-hr {
             margin: 0;
             border: none;

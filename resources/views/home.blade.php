@@ -38,7 +38,7 @@
 
         <x-divider />
 
-        <x-content-card-button href="what" text="Get quizzed" icon="academic-cap" iconSize="lg" />
+        <x-content-card-button href="/quiz" text="Get quizzed" icon="academic-cap" iconSize="lg" />
         
     </x-content-card>
 

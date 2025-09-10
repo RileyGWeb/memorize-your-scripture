@@ -31,8 +31,40 @@
                         </button>
                     </div>
                 </div>
-                <div class="text-center mt-2">
+                <div class="text-center">
                     <span class="text-textLight text-base">Total verses memorized: {{ $this->getMemoryBankCount() }}</span>
+                </div>
+            </div>
+
+            <x-divider />
+
+            <!-- Difficulty Selection -->
+            <div class="px-4 py-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Choose Difficulty</h3>
+                <div class="flex items-center justify-center">
+                    <div class="flex w-full max-w-md">
+                        <div class="relative flex-1">
+                            <input wire:model.defer="difficulty" class="peer hidden" id="quiz-easy" type="radio" value="easy" />
+                            <label for="quiz-easy" class="flex justify-center cursor-pointer flex-col px-4 py-3 border-r border-stroke peer-checked:bg-darkBlue text-text peer-checked:text-white">
+                                <span class="font-bold text-center">Easy</span>
+                                <span class="text-sm text-center">80% accuracy<br>required</span>
+                            </label>
+                        </div>
+                        <div class="relative flex-1">
+                            <input wire:model.defer="difficulty" class="peer hidden" id="quiz-normal" type="radio" value="normal" />
+                            <label for="quiz-normal" class="flex justify-center cursor-pointer flex-col px-4 py-3 border-r border-stroke peer-checked:bg-darkBlue text-text peer-checked:text-white">
+                                <span class="font-bold text-center">Normal</span>
+                                <span class="text-sm text-center">95% accuracy<br>required</span>
+                            </label>
+                        </div>
+                        <div class="relative flex-1">
+                            <input wire:model.defer="difficulty" class="peer hidden" id="quiz-strict" type="radio" value="strict" />
+                            <label for="quiz-strict" class="flex justify-center cursor-pointer flex-col px-4 py-3 peer-checked:bg-darkBlue text-text peer-checked:text-white">
+                                <span class="font-bold text-center">Strict</span>
+                                <span class="text-sm text-center">100% accuracy<br>required</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -87,6 +119,20 @@
                 </div>
             </div>
         @endif
+    </x-content-card>
+@else
+    <x-content-card>
+        <x-content-card-title 
+            title="Daily Quiz" 
+            subtitle="You need to memorize some verses first!" 
+        />
+        <x-divider />
+        <div class="px-4 py-3 text-center">
+            <p class="text-gray-600 mb-4">You need to memorize at least one verse before you can take a quiz.</p>
+            <a href="/memorization-tool" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                Start Memorizing
+            </a>
+        </div>
     </x-content-card>
 @endif
 </div>

@@ -90,7 +90,7 @@ class DailyQuizTest extends TestCase
 
         Livewire::test(DailyQuiz::class)
             ->call('startQuiz', 'random')
-            ->assertRedirect(route('daily-quiz'));
+            ->assertRedirect(route('daily-quiz', ['quiz_mode' => 1]));
 
         // Check that session has quiz data
         $this->assertNotNull(session('dailyQuiz'));
@@ -111,7 +111,7 @@ class DailyQuizTest extends TestCase
 
         Livewire::test(DailyQuiz::class)
             ->call('startQuiz', 'recent')
-            ->assertRedirect(route('daily-quiz'));
+            ->assertRedirect(route('daily-quiz', ['quiz_mode' => 1]));
 
         $quizData = session('dailyQuiz');
         $this->assertEquals('recent', $quizData['type']);

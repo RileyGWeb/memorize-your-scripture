@@ -10,6 +10,7 @@ class DailyQuiz extends Component
 {
     public $numberOfQuestions = 10;
     public $quizType = '';
+    public $difficulty = 'easy';
 
     public function mount()
     {
@@ -54,9 +55,10 @@ class DailyQuiz extends Component
             'verses' => $verses->toArray(),
             'currentIndex' => 0,
             'startTime' => now(),
+            'difficulty' => $this->difficulty,
         ]);
 
-        return redirect()->route('daily-quiz');
+        return redirect()->route('daily-quiz', ['quiz_mode' => 1]);
     }
 
     protected function getVersesForQuizType($type)

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MemorizationToolController;
+use App\Http\Controllers\MemorizationController;
 use App\Http\Controllers\MemoryBankController;
 
 // -- Site Routes --
@@ -41,7 +42,7 @@ Route::get('/memorization-tool/fetch-verse', [MemorizationToolController::class,
     ->name('memorization-tool.fetch');
 
 // 3) Display the fetched verse
-Route::get('/memorization-tool/display', [MemorizationToolController::class, 'displayVerse'])
+Route::get('/memorization-tool/display', [\App\Http\Controllers\MemorizationController::class, 'show'])
     ->name('memorization-tool.display');
 
 // 4) Save the memory verse
@@ -68,10 +69,17 @@ Route::post('/dismiss-new-user-card', function () {
     return response()->json(['success' => true]);
 })->name('dismiss-new-user-card');
 
-// Daily Quiz route
-Route::get('/daily-quiz', function () {
-    return view('daily-quiz');
-})->name('daily-quiz');
+// Daily Quiz routes
+Route::get('/daily-quiz', [\App\Http\Controllers\MemorizationController::class, 'show'])
+    ->name('daily-quiz');
+Route::post('/daily-quiz/next', [\App\Http\Controllers\MemorizationController::class, 'nextQuizVerse'])
+    ->name('daily-quiz.next');
+Route::get('/daily-quiz/results', [\App\Http\Controllers\MemorizationController::class, 'getQuizResults'])
+    ->name('daily-quiz.results');
+
+// Quiz route (full screen version of daily quiz)
+Route::get('/quiz', [\App\Http\Controllers\MemorizationController::class, 'show'])
+    ->name('quiz');
 
 // Super Admin routes
 Route::get('/super-admin', [\App\Http\Controllers\SuperAdminController::class, 'index'])->name('super-admin');

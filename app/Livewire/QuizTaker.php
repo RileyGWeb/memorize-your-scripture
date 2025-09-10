@@ -22,6 +22,11 @@ class QuizTaker extends Component
     public $apiError = '';
     public $score = 0;
     public $totalAnswered = 0;
+    public $difficulty = 'easy';
+    public $isQuizMode = true;
+    public $segments = [];
+    public $segmentStates = [];
+    public $currentSegmentIndex = 0;
 
     public function mount()
     {
@@ -123,6 +128,8 @@ class QuizTaker extends Component
     {
         // Calculate accuracy for this question
         $accuracy = $this->calculateAccuracy($this->userInput, $this->actualVerseText);
+        $requiredAccuracy = $this->getRequiredAccuracy();
+        $passed = $accuracy >= $requiredAccuracy;
         
         // Store result
         $this->results[] = [
@@ -130,11 +137,14 @@ class QuizTaker extends Component
             'userInput' => $this->userInput,
             'actualText' => $this->actualVerseText,
             'accuracy' => $accuracy,
+            'difficulty' => $this->difficulty,
+            'requiredAccuracy' => $requiredAccuracy,
+            'passed' => $passed,
         ];
 
-        // Update scoring (consider 80%+ accuracy as correct)
+        // Update scoring based on difficulty requirements
         $this->totalAnswered++;
-        if ($accuracy >= 80) {
+        if ($passed) {
             $this->score++;
         }
 
@@ -147,7 +157,26 @@ class QuizTaker extends Component
         $this->loadCurrentVerse();
     }
 
-    protected function calculateAccuracy($userText, $actualText)
+    public function getRequiredAccuracy()
+    {
+        switch ($this->difficulty) {
+            case 'easy':
+                return 80;
+            case 'normal':
+                return 95;
+            case 'strict':
+                return 100;
+            default:
+                return 80;
+        }
+    }
+
+    public function setDifficulty($newDifficulty)
+    {
+        $this->difficulty = $newDifficulty;
+    }
+
+    public function calculateAccuracy($userText, $actualText)
     {
         if (empty($actualText) || empty($userText)) {
             return 0;
@@ -220,6 +249,15 @@ class QuizTaker extends Component
             return;
         }
 
+        // Calculate difficulty stats
+        $difficultyStats = collect($this->results)->groupBy('difficulty')->map(function($group, $difficulty) {
+            return [
+                'total' => $group->count(),
+                'passed' => $group->where('passed', true)->count(),
+                'avgAccuracy' => round($group->avg('accuracy'), 1)
+            ];
+        });
+
         AuditLog::create([
             'user_id' => Auth::id(),
             'action' => 'quiz_completed',
@@ -235,6 +273,7 @@ class QuizTaker extends Component
                 'average_accuracy' => $data['averageAccuracy'],
                 'duration_minutes' => $data['duration'],
                 'completed_at' => $data['completedAt']->toISOString(),
+                'difficulty_stats' => $difficultyStats->toArray(),
                 'description' => "Completed {$data['quizType']} quiz with {$data['correctAnswers']}/{$data['totalQuestions']} correct ({$data['percentageScore']}% - Grade: {$data['grade']})",
             ],
             'performed_at' => now(),

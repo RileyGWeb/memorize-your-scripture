@@ -1,4 +1,4 @@
 {{-- resources/views/daily-quiz.blade.php --}}
 <x-layouts.app>
-    <livewire:quiz-taker />
+    <livewire:daily-quiz />
 </x-layouts.app>
