@@ -40,21 +40,18 @@
                 </div>
                 <template x-if="hidden">
                     <div class="flex items-center justify-center">
-                        <div class="relative w-20 h-20 flex items-center justify-center border-r border-stroke">
-                            <svg class="w-20 h-20 transform -rotate-90">
-                                <circle cx="40" cy="40" :r="radius" stroke="#e5e7eb" stroke-width="8" fill="transparent" />
-                                <circle cx="40" cy="40" :r="radius" stroke="currentColor" :stroke-dasharray="circumference" :stroke-dashoffset="strokeOffset" stroke-width="8" fill="transparent" stroke-linecap="round" transition="stroke-dashoffset 0.3s ease" :class="progressColorBackground" />
+                        <div class="relative flex items-center justify-center border-r border-stroke">
+                            <svg class="w-16 h-16 m-2 transform -rotate-90">
+                                <circle cx="32" cy="32" :r="radius" stroke="#e5e7eb" stroke-width="3" fill="transparent" />
+                                <circle cx="32" cy="32" :r="radius" stroke="currentColor" :stroke-dasharray="circumference" :stroke-dashoffset="strokeOffset" stroke-width="3" fill="transparent" stroke-linecap="round" transition="stroke-dashoffset 0.3s ease" :class="progressColorBackground" />
                             </svg>
                             <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-lg font-semibold" :class="progressColorBackground" x-text="`${Math.round(overallAccuracy)}%`"></span>
+                                <span class="text-sm font-semibold" :class="progressColorBackground" x-text="`${Math.round(overallAccuracy)}%`"></span>
                             </div>
                         </div>
                         <div class="w-full">
                             <div class="text-base text-text px-4 py-2">
                                 <span x-text="`${typedChars} / ${totalChars} characters`"></span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-3 border-l border-stroke">
-                                <div class="h-3 rounded-full transition-all duration-300" :style="`width: ${(typedChars / totalChars) * 100}%; background-color: ${progressColor};`"></div>
                             </div>
                         </div>
                     </div>
@@ -104,7 +101,7 @@
                                             @input="checkAccuracy(index)"
                                             placeholder=""
                                             class="absolute inset-0 w-full h-full text-lg leading-[1.5] bg-transparent outline-none resize-none"
-                                            style="color: transparent; caret-color: black; border: none; box-shadow: none;">
+                                            style="border: none; box-shadow: none;">
                                         </textarea>
                                     </div>
                                 </div>
@@ -127,7 +124,7 @@ function memTool({ segments, reference, lineHeightPx, bibleTranslation }) {
         segmentStates: [],
         showCongrats: false,
         totalChars: 0,
-        radius: 40,
+        radius: 29,
         circumference: 0,
         saved: false,
         init() {
