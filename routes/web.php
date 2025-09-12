@@ -72,6 +72,9 @@ Route::post('/dismiss-new-user-card', function () {
 // Daily Quiz routes
 Route::get('/daily-quiz', [\App\Http\Controllers\MemorizationController::class, 'show'])
     ->name('daily-quiz');
+Route::get('/quiz/setup', function() {
+    return view('quiz-setup');
+})->name('quiz.setup');
 Route::post('/daily-quiz/next', [\App\Http\Controllers\MemorizationController::class, 'nextQuizVerse'])
     ->name('daily-quiz.next');
 Route::get('/daily-quiz/results', [\App\Http\Controllers\MemorizationController::class, 'getQuizResults'])

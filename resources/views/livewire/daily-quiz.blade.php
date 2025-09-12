@@ -38,38 +38,6 @@
 
             <x-divider />
 
-            <!-- Difficulty Selection -->
-            <div class="px-4 py-4">
-                <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Choose Difficulty</h3>
-                <div class="flex items-center justify-center">
-                    <div class="flex w-full max-w-md">
-                        <div class="relative flex-1">
-                            <input wire:model.defer="difficulty" class="peer hidden" id="quiz-easy" type="radio" value="easy" />
-                            <label for="quiz-easy" class="flex justify-center cursor-pointer flex-col px-4 py-3 border-r border-stroke peer-checked:bg-darkBlue text-text peer-checked:text-white">
-                                <span class="font-bold text-center">Easy</span>
-                                <span class="text-sm text-center">80% accuracy<br>required</span>
-                            </label>
-                        </div>
-                        <div class="relative flex-1">
-                            <input wire:model.defer="difficulty" class="peer hidden" id="quiz-normal" type="radio" value="normal" />
-                            <label for="quiz-normal" class="flex justify-center cursor-pointer flex-col px-4 py-3 border-r border-stroke peer-checked:bg-darkBlue text-text peer-checked:text-white">
-                                <span class="font-bold text-center">Normal</span>
-                                <span class="text-sm text-center">95% accuracy<br>required</span>
-                            </label>
-                        </div>
-                        <div class="relative flex-1">
-                            <input wire:model.defer="difficulty" class="peer hidden" id="quiz-strict" type="radio" value="strict" />
-                            <label for="quiz-strict" class="flex justify-center cursor-pointer flex-col px-4 py-3 peer-checked:bg-darkBlue text-text peer-checked:text-white">
-                                <span class="font-bold text-center">Strict</span>
-                                <span class="text-sm text-center">100% accuracy<br>required</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <x-divider />
-
             <!-- Quiz Options Grid -->
             <div class="p-4">
                 <div class="grid grid-cols-2 gap-3">

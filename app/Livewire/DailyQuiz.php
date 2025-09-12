@@ -48,17 +48,14 @@ class DailyQuiz extends Component
             return;
         }
 
-        // Store quiz data in session
-        session()->put('dailyQuiz', [
+        // Store initial quiz setup in session
+        session()->put('quizSetup', [
             'type' => $type,
             'numberOfQuestions' => $this->numberOfQuestions,
             'verses' => $verses->toArray(),
-            'currentIndex' => 0,
-            'startTime' => now(),
-            'difficulty' => $this->difficulty,
         ]);
 
-        return redirect()->route('daily-quiz', ['quiz_mode' => 1]);
+        return redirect()->route('quiz.setup');
     }
 
     protected function getVersesForQuizType($type)
