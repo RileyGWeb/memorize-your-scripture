@@ -1,15 +1,15 @@
 <div class="w-full">
     @if($verses->count() > 0 && auth()->check())
-        <div class="bg-bg rounded-xl shadow-sm border border-gray-200 p-4">
-            <div class="mb-4">
+        <div class="bg-bg rounded-xl shadow-sm border border-gray-200">
+            <div class="mb-4 p-3 pb-0">
                 <h3 class="font-bold text-lg text-gray-800">Memorize Later...</h3>
                 <p class="text-gray-600 text-sm">Grab a verse you've added to Memorize Later!</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-2">
                 @foreach($verses as $verse)
-                    <div class="group cursor-pointer" wire:click="selectVerse({{ $verse->id }})">
-                        <div class="bg-gray-50 hover:bg-gray-100 hover:shadow-md p-3 rounded-lg transition-colors duration-200 relative">
+                    <div class="group cursor-pointer border-r border-b border-stroke last:border-r-0 {{ $loop->index % 2 == 0 ? '' : 'border-r-0' }} {{ $loop->index < 2 ? 'border-t' : '' }}" wire:click="selectVerse({{ $verse->id }})">
+                        <div class="bg-bg hover:bg-gray-100 hover:shadow-md p-3 transition-colors duration-200 relative">
                             <!-- Verse Reference -->
                             <div class="font-semibold text-gray-800 text-sm mb-1">
                                 {{ $this->formatVerseReference($verse) }}
@@ -38,10 +38,17 @@
                         </div>
                     </div>
                 @endforeach
+                
+                @if($verses->count() % 2 == 1)
+                    <!-- Placeholder for odd number of items -->
+                    <div class="border-b border-stroke {{ $verses->count() < 2 ? 'border-t' : '' }}">
+                        <div class="p-3 h-full bg-bg"></div>
+                    </div>
+                @endif
             </div>
 
             @if($verses->count() > 0)
-                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div class="p-3">
                     <p class="text-sm text-blue-800">
                         <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
