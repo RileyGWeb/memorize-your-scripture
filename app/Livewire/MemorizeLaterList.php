@@ -12,10 +12,31 @@ class MemorizeLaterList extends Component
     {
         $verse = MemorizeLater::find($verseId);
         if ($verse) {
-            // Store the verse selection in session for the memorization tool
+            // Convert verses array to proper verse ranges
+            $verses = $verse->verses;
+            sort($verses); // Ensure verses are in order
+            
             $verseRanges = [];
-            foreach ($verse->verses as $verseNum) {
-                $verseRanges[] = [$verseNum, $verseNum];
+            if (count($verses) === 1) {
+                // Single verse
+                $verseRanges[] = [$verses[0], $verses[0]];
+            } else {
+                // Multiple verses - check if they're consecutive
+                $start = $verses[0];
+                $end = $verses[0];
+                
+                for ($i = 1; $i < count($verses); $i++) {
+                    if ($verses[$i] === $end + 1) {
+                        // Consecutive verse, extend the range
+                        $end = $verses[$i];
+                    } else {
+                        // Non-consecutive, close current range and start new one
+                        $verseRanges[] = [$start, $end];
+                        $start = $end = $verses[$i];
+                    }
+                }
+                // Add the final range
+                $verseRanges[] = [$start, $end];
             }
             
             session()->put('verseSelection', [

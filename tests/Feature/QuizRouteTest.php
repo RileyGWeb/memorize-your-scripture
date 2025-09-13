@@ -48,6 +48,6 @@ class QuizRouteTest extends TestCase
         
         $response->assertStatus(200);
         $response->assertSee('Daily Quiz!');
-        $response->assertSee('Change number');
+        $response->assertSee('Total verses:'); // Updated to match new UI text
     }
 }

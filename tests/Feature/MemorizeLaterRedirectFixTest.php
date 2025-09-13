@@ -72,8 +72,8 @@ class MemorizeLaterRedirectFixTest extends TestCase
             ->call('selectVerse', $verse->id)
             ->assertRedirect('/memorization-tool/fetch-verse');
 
-        // Verify the session data includes all verses as individual ranges
-        $expectedRanges = [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6]];
+        // Verify the session data includes all consecutive verses as a single range
+        $expectedRanges = [[1, 6]]; // All consecutive verses grouped into one range
         $this->assertEquals([
             'book' => 'Psalms',
             'chapter' => 23,

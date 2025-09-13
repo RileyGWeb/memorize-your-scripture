@@ -29,7 +29,7 @@ class DailyQuizTest extends TestCase
             ->assertSee('most recent')
             ->assertSee('longest')
             ->assertSee('shortest')
-            ->assertSee('Total verses memorized: 5');
+            ->assertSee('Total verses: 5');
     }
 
     public function test_user_can_change_number_of_questions()
@@ -90,12 +90,12 @@ class DailyQuizTest extends TestCase
 
         Livewire::test(DailyQuiz::class)
             ->call('startQuiz', 'random')
-            ->assertRedirect(route('daily-quiz', ['quiz_mode' => 1]));
+            ->assertRedirect(route('quiz.setup'));
 
         // Check that session has quiz data
-        $this->assertNotNull(session('dailyQuiz'));
-        $this->assertEquals('random', session('dailyQuiz')['type']);
-        $this->assertEquals(5, session('dailyQuiz')['numberOfQuestions']); // Should be 5, not 10, since we only have 5 verses
+        $this->assertNotNull(session('quizSetup'));
+        $this->assertEquals('random', session('quizSetup')['type']);
+        $this->assertEquals(5, session('quizSetup')['numberOfQuestions']); // Should be 5, not 10, since we only have 5 verses
     }
 
     public function test_user_can_start_recent_quiz()
@@ -111,9 +111,9 @@ class DailyQuizTest extends TestCase
 
         Livewire::test(DailyQuiz::class)
             ->call('startQuiz', 'recent')
-            ->assertRedirect(route('daily-quiz', ['quiz_mode' => 1]));
+            ->assertRedirect(route('quiz.setup'));
 
-        $quizData = session('dailyQuiz');
+        $quizData = session('quizSetup');
         $this->assertEquals('recent', $quizData['type']);
     }
 

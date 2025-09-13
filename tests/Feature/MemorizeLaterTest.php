@@ -308,7 +308,7 @@ class MemorizeLaterTest extends TestCase
         $this->assertEquals([
             'book' => 'John',
             'chapter' => 3,
-            'verseRanges' => [[16, 16], [17, 17]],
+            'verseRanges' => [[16, 17]], // Consecutive verses should be grouped
         ], session('verseSelection'));
     }
 }

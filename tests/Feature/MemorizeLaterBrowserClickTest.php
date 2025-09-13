@@ -80,7 +80,7 @@ class MemorizeLaterBrowserClickTest extends TestCase
         $this->assertEquals([
             'book' => 'John',
             'chapter' => 3,
-            'verseRanges' => [[16, 16], [17, 17], [18, 18]],
+            'verseRanges' => [[16, 18]], // Consecutive verses should be grouped
         ], session('verseSelection'));
     }
 }
