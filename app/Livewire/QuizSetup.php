@@ -36,12 +36,27 @@ class QuizSetup extends Component
         }
     }
 
+    public function increaseNumberBy10()
+    {
+        $maxQuestions = min(50, $this->getMemoryBankCount());
+        $newNumber = $this->numberOfQuestions + 10;
+        $this->numberOfQuestions = min($newNumber, $maxQuestions);
+        $this->updateQuizVerses();
+    }
+
     public function decreaseNumber()
     {
         if ($this->numberOfQuestions > 1) {
             $this->numberOfQuestions--;
             $this->updateQuizVerses();
         }
+    }
+
+    public function decreaseNumberBy10()
+    {
+        $newNumber = $this->numberOfQuestions - 10;
+        $this->numberOfQuestions = max($newNumber, 1);
+        $this->updateQuizVerses();
     }
 
     public function startQuiz()
@@ -106,6 +121,10 @@ class QuizSetup extends Component
                     ->limit($this->numberOfQuestions)
                     ->get();
 
+            case 'all':
+                return $query->orderBy('memorized_at', 'desc')
+                    ->get();
+
             default:
                 return $query->inRandomOrder()
                     ->limit($this->numberOfQuestions)
@@ -124,6 +143,8 @@ class QuizSetup extends Component
                 return 'Longest verses';
             case 'shortest':
                 return 'Shortest verses';
+            case 'all':
+                return 'All verses';
             default:
                 return 'Random verses';
         }

@@ -6,79 +6,15 @@
                 title="Daily Quiz!" 
                 subtitle="Daily juice to keep those verses in your brain (and heart)." 
             />
-                <x-divider />
+            <x-divider />
 
-                <!-- Number Selector -->
-                <div class="px-4 py-4">
-                    <div class="flex items-center justify-center space-x-4">
-                        <span class="text-textLight text-base">Change number</span>
-                        <div class="flex items-center space-x-3">
-                            <button 
-                                wire:click="decreaseNumber"
-                                class="w-10 h-10 rounded border border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors"
-                            >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                                </svg>
-                            </button>
-                            <span class="text-2xl font-bold text-text min-w-[3rem] text-center">{{ $numberOfQuestions }}</span>
-                            <button 
-                                wire:click="increaseNumber"
-                                class="w-10 h-10 rounded border border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors"
-                            >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <span class="text-textLight text-base">Total verses memorized: {{ $this->getMemoryBankCount() }}</span>
-                    </div>
-                </div>
-
-                <x-divider />
-
-                <!-- Quiz Options Grid -->
-                <div class="p-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <!-- Random Quiz -->
-                        <button 
-                            wire:click="startQuiz('random')"
-                            class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
-                        >
-                            <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} randoms</h3>
-                            <p class="text-textLight text-base">{{ $numberOfQuestions }} random verses from your bank</p>
-                        </button>
-
-                        <!-- Most Recent Quiz -->
-                        <button 
-                            wire:click="startQuiz('recent')"
-                            class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
-                        >
-                            <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} most recent</h3>
-                            <p class="text-textLight text-base">The last {{ $numberOfQuestions }} verses you memorized</p>
-                        </button>
-
-                        <!-- Longest Quiz -->
-                        <button 
-                            wire:click="startQuiz('longest')"
-                            class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
-                        >
-                            <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} longest</h3>
-                            <p class="text-textLight text-base">The {{ $numberOfQuestions }} longest verses in your bank.</p>
-                        </button>
-
-                        <!-- Shortest Quiz -->
-                        <button 
-                            wire:click="startQuiz('shortest')"
-                            class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
-                        >
-                            <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} shortest</h3>
-                            <p class="text-textLight text-base">The {{ $numberOfQuestions }} shortest verses in your bank.</p>
-                        </button>
-                    </div>
-                </div>
+            <x-quiz-configuration 
+                :numberOfQuestions="$numberOfQuestions"
+                :memoryBankCount="$this->getMemoryBankCount()"
+                :showQuizTypes="true"
+                :showDifficulty="false"
+                :showActionButtons="false"
+            />
             
             @if(session('error'))
                 <x-divider />
@@ -113,24 +49,26 @@
             subtitle="Please log in to access the quiz feature." 
         />
         <x-divider />
-        <div class="px-4 py-3 text-center">
-            <p class="text-gray-600 mb-4">You need to be logged in to take quizzes and track your progress.</p>
-            <div class="space-y-3">
+        <div class="px-4 py-6 text-center">
+            <p class="text-gray-600 mb-6">You need to be logged in to take quizzes and track your progress.</p>
+            <div class="space-y-4">
                 <button 
                     @click="loginModal = true" 
-                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                    class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
                 >
                     Log In
                 </button>
-                <div class="text-textLight">
-                    Don't have an account? 
-                    <button 
-                        @click="registerModal = true" 
-                        class="text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                        Sign up here
-                    </button>
+                <div class="flex items-center">
+                    <div class="flex-1 border-t border-gray-300"></div>
+                    <span class="px-3 text-gray-500 text-sm">or</span>
+                    <div class="flex-1 border-t border-gray-300"></div>
                 </div>
+                <button 
+                    @click="registerModal = true" 
+                    class="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-all duration-200 border border-gray-300"
+                >
+                    Create Account
+                </button>
             </div>
         </div>
     </x-content-card>

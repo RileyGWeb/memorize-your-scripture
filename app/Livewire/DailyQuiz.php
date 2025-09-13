@@ -27,11 +27,24 @@ class DailyQuiz extends Component
         }
     }
 
+    public function increaseNumberBy10()
+    {
+        $maxQuestions = min(50, $this->getMemoryBankCount());
+        $newNumber = $this->numberOfQuestions + 10;
+        $this->numberOfQuestions = min($newNumber, $maxQuestions);
+    }
+
     public function decreaseNumber()
     {
         if ($this->numberOfQuestions > 1) {
             $this->numberOfQuestions--;
         }
+    }
+
+    public function decreaseNumberBy10()
+    {
+        $newNumber = $this->numberOfQuestions - 10;
+        $this->numberOfQuestions = max($newNumber, 1);
     }
 
     public function startQuiz($type)
@@ -87,6 +100,10 @@ class DailyQuiz extends Component
                         return $this->calculateVerseLength($verse);
                     })
                     ->take($this->numberOfQuestions);
+
+            case 'all':
+                return $query->orderBy('memorized_at', 'desc')
+                    ->get();
 
             default:
                 return collect();
