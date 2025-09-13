@@ -32,12 +32,12 @@
             <div class="">
                 <!-- Verse Picker Section -->
                 <div class="">
-                    <div class="p-2.5">
+                    <!-- <div class="p-2.5">
                         <p class="text-gray-600 text-sm text-center">On the go? Don't let those verses escape!</p>
-                    </div>
+                    </div> -->
                     
                     <!-- Verse Picker UI -->
-                    <div class="border border-stroke overflow-hidden">
+                    <div class="border-stroke overflow-hidden">
                         <div class="flex items-center border-b border-stroke">
                             <p class="p-2 border-r border-stroke h-full whitespace-nowrap">Type in your verse(s):</p>
                             <input type="text" wire:model.live="verse" class="text-base bg-transparent border-none text-center w-full focus:ring-0" placeholder="John 3:16-18">
