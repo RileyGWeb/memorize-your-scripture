@@ -97,7 +97,7 @@
         <x-divider />
         <div class="px-4 py-3 text-center">
             <p class="text-gray-600 mb-4">You need to memorize at least one verse before you can take a quiz.</p>
-            <a href="/memorization-tool" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            <a href="/memorization-tool" class="inline-block bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold transition-colors">
                 Start Memorizing
             </a>
         </div>

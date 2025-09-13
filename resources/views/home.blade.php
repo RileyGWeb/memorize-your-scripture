@@ -39,14 +39,15 @@
         <x-divider />
 
         <x-content-card-button href="/quiz" text="Get quizzed" icon="academic-cap" iconSize="lg" />
-        
     </x-content-card>
 
     <!-- Memorize Later List -->
     <livewire:memorize-later-list />
 
     <!-- Daily Quiz -->
-    <livewire:daily-quiz />
+    @auth
+        <livewire:daily-quiz />
+    @endauth
 
     @guest
         <script>
