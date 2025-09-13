@@ -1,4 +1,4 @@
-<div>
+<div class="w-full">
     @if($verses->count() > 0 && auth()->check())
         <div class="bg-bg rounded-xl shadow-sm border border-gray-200 p-4">
             <div class="mb-4">
