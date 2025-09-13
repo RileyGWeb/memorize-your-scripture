@@ -36,10 +36,10 @@ class QuizSetup extends Component
         }
     }
 
-    public function increaseNumberBy10()
+    public function increaseNumberBy5()
     {
         $maxQuestions = min(50, $this->getMemoryBankCount());
-        $newNumber = $this->numberOfQuestions + 10;
+        $newNumber = $this->numberOfQuestions + 5;
         $this->numberOfQuestions = min($newNumber, $maxQuestions);
         $this->updateQuizVerses();
     }
@@ -52,9 +52,9 @@ class QuizSetup extends Component
         }
     }
 
-    public function decreaseNumberBy10()
+    public function decreaseNumberBy5()
     {
-        $newNumber = $this->numberOfQuestions - 10;
+        $newNumber = $this->numberOfQuestions - 5;
         $this->numberOfQuestions = max($newNumber, 1);
         $this->updateQuizVerses();
     }

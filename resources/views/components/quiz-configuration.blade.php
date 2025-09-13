@@ -11,29 +11,31 @@
 ])
 
 <!-- Number Selector -->
-<div class="px-4 py-4">
+<div class="p-0">
     @if($quizTypeLabel)
-        <div class="text-center mb-4">
+        <div class="text-center py-2 border-b border-stroke">
             <h3 class="text-lg font-semibold text-gray-900">{{ $quizTypeLabel }}</h3>
             <p class="text-textLight text-base">You'll be quizzed on {{ $numberOfQuestions }} {{ $numberOfQuestions === 1 ? 'verse' : 'verses' }}</p>
         </div>
     @endif
     
-    <div class="flex items-center justify-center space-x-4">
-        <span class="text-textLight text-base">{{ $showQuizTypes ? 'Change number' : 'Number of verses' }}</span>
-        <div class="flex items-center space-x-2">
-            <!-- -10 Button -->
+    <div class="flex items-center justify-between space-x-4">
+        <div class="text-textLight text-base px-4 w-full text-center w-full">
+            Total verses: {{ $memoryBankCount }}
+        </div>
+        <div class="flex items-center">
+            <!-- -5 Button -->
             <button 
-                wire:click="decreaseNumberBy10"
-                class="w-8 h-8 rounded border border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors text-xs font-medium"
-                title="Decrease by 10"
+                wire:click="decreaseNumberBy5"
+                class="w-10 h-10 border-l border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors text-xs font-medium"
+                title="Decrease by 5"
             >
-                -10
+                -5
             </button>
             <!-- -1 Button -->
             <button 
                 wire:click="decreaseNumber"
-                class="w-10 h-10 rounded border border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors"
+                class="w-10 h-10 border-x border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
@@ -43,24 +45,21 @@
             <!-- +1 Button -->
             <button 
                 wire:click="increaseNumber"
-                class="w-10 h-10 rounded border border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors"
+                class="w-10 h-10 border-l border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
             </button>
-            <!-- +10 Button -->
+            <!-- +5 Button -->
             <button 
-                wire:click="increaseNumberBy10"
-                class="w-8 h-8 rounded border border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors text-xs font-medium"
-                title="Increase by 10"
+                wire:click="increaseNumberBy5"
+                class="w-10 h-10 border-l border-stroke hover:bg-gray-50 flex items-center justify-center text-text transition-colors text-xs font-medium"
+                title="Increase by 5"
             >
-                +10
+                +5
             </button>
         </div>
-    </div>
-    <div class="text-center {{ $quizTypeLabel ? 'mt-2' : '' }}">
-        <span class="text-textLight text-{{ $quizTypeLabel ? 'sm' : 'base' }}">Total verses memorized: {{ $memoryBankCount }}</span>
     </div>
 </div>
 
@@ -68,12 +67,12 @@
     <x-divider />
 
     <!-- Quiz Options Grid -->
-    <div class="p-4">
-        <div class="grid grid-cols-2 gap-3 mb-3">
+    <div class="p-0">
+        <div class="grid grid-cols-2 border-stroke divide-x divide-y">
             <!-- Random Quiz -->
             <button 
                 wire:click="startQuiz('random')"
-                class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
+                class="group bg-bg hover:bg-gray-50 p-4 text-left transition-all"
             >
                 <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} randoms</h3>
                 <p class="text-textLight text-base">{{ $numberOfQuestions }} random verses from your bank</p>
@@ -82,7 +81,7 @@
             <!-- Most Recent Quiz -->
             <button 
                 wire:click="startQuiz('recent')"
-                class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
+                class="group bg-bg hover:bg-gray-50 p-4 text-left transition-all"
             >
                 <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} most recent</h3>
                 <p class="text-textLight text-base">The last {{ $numberOfQuestions }} verses you memorized</p>
@@ -91,7 +90,7 @@
             <!-- Longest Quiz -->
             <button 
                 wire:click="startQuiz('longest')"
-                class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
+                class="group bg-bg hover:bg-gray-50 p-4 text-left transition-all"
             >
                 <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} longest</h3>
                 <p class="text-textLight text-base">The {{ $numberOfQuestions }} longest verses in your bank.</p>
@@ -100,7 +99,7 @@
             <!-- Shortest Quiz -->
             <button 
                 wire:click="startQuiz('shortest')"
-                class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all"
+                class="group bg-bg hover:bg-gray-50 p-4 text-left transition-all"
             >
                 <h3 class="font-bold text-text mb-1">{{ $numberOfQuestions }} shortest</h3>
                 <p class="text-textLight text-base">The {{ $numberOfQuestions }} shortest verses in your bank.</p>
@@ -111,7 +110,7 @@
         <div class="w-full">
             <button 
                 wire:click="startQuiz('all')"
-                class="group bg-white hover:bg-gray-50 border border-stroke rounded-lg p-4 text-left transition-all w-full"
+                class="group bg-bg hover:bg-gray-50 border-t border-stroke p-4 text-left transition-all w-full"
             >
                 <h3 class="font-bold text-text mb-1">All {{ $memoryBankCount }} verses</h3>
                 <p class="text-textLight text-base">Quiz yourself on every verse you've memorized</p>
@@ -124,8 +123,8 @@
     <x-divider />
 
     <!-- Difficulty Selection -->
-    <div class="px-4 py-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Choose Difficulty</h3>
+    <div class="p-0">
+        <h3 class="text-lg font-semibold text-gray-900 py-2 text-center border-b border-stroke">Choose Difficulty</h3>
         <div class="flex items-center justify-center">
             <div class="flex w-full max-w-md">
                 <div class="relative flex-1">
