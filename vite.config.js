@@ -30,6 +30,7 @@ export default defineConfig({
                 clientsClaim: true,
                 skipWaiting: true,
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+                navigateFallback: '/offline',
                 // Don't use navigateFallback to avoid the precaching issue
                 runtimeCaching: [
                     // Do NOT cache Livewire or auth/session endpoints

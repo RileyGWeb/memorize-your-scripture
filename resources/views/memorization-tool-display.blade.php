@@ -50,7 +50,7 @@
         </x-content-card>
         @endif
 
-        <x-content-card class="sticky {{ isset($quizMode) && $quizMode ? 'top-24' : 'top-2' }} z-10 bg-white">
+        <x-content-card class="sticky top-2 z-10 bg-white {{ isset($quizMode) && $quizMode ? 'mt-24' : '' }}">
             <template x-if="hidden">
                 <x-content-card-title title="Verse Memorization" subtitle="Type the verse(s) from memory. If you can't, show it again! But remember, you'll have to start over." />
             </template>
@@ -115,10 +115,10 @@
                     </div>
                     <div class="border-l border-stroke flex items-center font-semibold">
                         <template x-if="!hidden">
-                            <button @click="hideVerse()" class="px-4 py-2">Hide It!</button>
+                            <button @click="hideVerse()" @focus="scrollToMainContent()" class="px-4 py-2">Hide It!</button>
                         </template>
                         <template x-if="hidden">
-                            <button @click="showVerse()" class="px-4 py-2">Show It!</button>
+                            <button @click="showVerse()" @focus="scrollToMainContent()" class="px-4 py-2">Show It!</button>
                         </template>
                     </div>
                 </div>
@@ -207,6 +207,22 @@
                     }
                     let acc = (matched / correct.length) * 100;
                     this.segmentStates[index].accuracy = acc;
+                    
+                    // Check if all segments meet required accuracy
+                    if (this.checkAllSegments()) {
+                        this.showCongrats = true;
+                    }
+                },
+                checkAllSegments() {
+                    return this.segmentStates.every(state => {
+                        return state.accuracy >= this.requiredAccuracy();
+                    });
+                },
+                requiredAccuracy() {
+                    if (this.difficulty === 'easy') return 80;
+                    if (this.difficulty === 'normal') return 95;
+                    if (this.difficulty === 'strict') return 100;
+                    return 95; // default
                 },
                 get overallAccuracy() {
                     if (this.segmentStates.length === 0) return 0;
@@ -234,6 +250,20 @@
                 },
                 get typedChars() {
                     return this.segmentStates.reduce((sum, state) => sum + state.typedText.length, 0);
+                },
+                scrollToMainContent() {
+                    this.$nextTick(() => {
+                        const mainCard = this.$refs.mainContentCard;
+                        if (mainCard) {
+                            const stickyHeaderHeight = document.querySelector('.sticky.top-2')?.getBoundingClientRect().height || 0;
+                            const rect = mainCard.getBoundingClientRect();
+                            const offset = rect.top + window.pageYOffset - stickyHeaderHeight - 16;
+                            window.scrollTo({
+                                top: offset,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
                 }
             }
         }
