@@ -108,7 +108,10 @@
             <x-content-card-button href="/memorization-tool" text="Change verse" icon="arrow-narrow-left" iconSize="lg" />
         </x-content-card>
         <x-content-card x-ref="mainContentCard">
-            <div :class="{ 'rounded-xl shadow-xl shadow-green-400': showCongrats }">
+            <div :class="{ 
+                'rounded-xl shadow-2xl shadow-green-400 ring-4 ring-green-300 ring-opacity-50 bg-green-50 border-green-300 transition-all duration-500': showCongrats,
+                'transition-all duration-300': !showCongrats 
+            }">
                 <div class="flex border-b border-stroke">
                     <div class="font-semibold grow px-4 py-2">
                         <span x-text="reference"></span>
@@ -122,6 +125,24 @@
                         </template>
                     </div>
                 </div>
+                
+                <!-- Congratulations Message -->
+                <template x-if="showCongrats && hidden">
+                    <div class="bg-green-100 border-l-4 border-green-500 p-4 mb-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-green-700 font-medium">
+                                    🎉 Congratulations! You've memorized this verse with <span x-text="`${Math.round(overallAccuracy)}%`"></span> accuracy!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </template>
                 <template x-if="!hidden">
                     <div class="leading-[1.5] text-lg whitespace-pre-wrap flex p-2">
                         <div x-html="buildDisplayFull()"></div>
@@ -198,25 +219,70 @@
                 checkAccuracy(index) {
                     let typed = this.segmentStates[index].typedText;
                     let correct = this.segments[index].text;
+                    
+                    // Handle empty typed text
+                    if (typed.length === 0) {
+                        this.segmentStates[index].accuracy = 0;
+                        return;
+                    }
+                    
                     let matched = 0;
-                    let len = Math.min(typed.length, correct.length);
-                    for (let i = 0; i < len; i++) {
-                        if (typed[i].toLowerCase() === correct[i].toLowerCase()) {
+                    let maxLength = Math.max(typed.length, correct.length);
+                    
+                    // Count correct characters at each position
+                    for (let i = 0; i < maxLength; i++) {
+                        let typedChar = (typed[i] || '').toLowerCase();
+                        let correctChar = (correct[i] || '').toLowerCase();
+                        if (typedChar === correctChar) {
                             matched++;
                         }
                     }
+                    
+                    // Calculate accuracy based on the correct text length
                     let acc = (matched / correct.length) * 100;
-                    this.segmentStates[index].accuracy = acc;
+                    
+                    // If typed text is significantly longer than correct, penalize
+                    if (typed.length > correct.length * 1.1) {
+                        acc = acc * 0.9; // 10% penalty for excessive length
+                    }
+                    
+                    this.segmentStates[index].accuracy = Math.max(0, Math.min(100, acc));
                     
                     // Check if all segments meet required accuracy
                     if (this.checkAllSegments()) {
                         this.showCongrats = true;
+                        
+                        // Add a more visible celebration effect
+                        setTimeout(() => {
+                            // Scroll to the main content to make sure it's visible
+                            this.scrollToMainContent();
+                        }, 100);
+                    } else {
+                        // Reset congrats if accuracy drops below threshold
+                        this.showCongrats = false;
                     }
                 },
                 checkAllSegments() {
-                    return this.segmentStates.every(state => {
-                        return state.accuracy >= this.requiredAccuracy();
-                    });
+                    // Must have at least one segment
+                    if (this.segmentStates.length === 0) return false;
+                    
+                    // Check if all segments have some text typed
+                    const allHaveText = this.segmentStates.every(state => 
+                        state.typedText.trim().length > 0
+                    );
+                    
+                    if (!allHaveText) return false;
+                    
+                    // Check if all segments meet the accuracy threshold
+                    const requiredAcc = this.requiredAccuracy();
+                    const allMeetAccuracy = this.segmentStates.every(state => 
+                        state.accuracy >= requiredAcc
+                    );
+                    
+                    // Also check overall accuracy as a backup
+                    const overallMeetsThreshold = this.overallAccuracy >= requiredAcc;
+                    
+                    return allMeetAccuracy || overallMeetsThreshold;
                 },
                 requiredAccuracy() {
                     if (this.difficulty === 'easy') return 80;
