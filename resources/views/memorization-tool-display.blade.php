@@ -108,10 +108,7 @@
             <x-content-card-button href="/memorization-tool" text="Change verse" icon="arrow-narrow-left" iconSize="lg" />
         </x-content-card>
         <x-content-card x-ref="mainContentCard">
-            <div :class="{ 
-                'rounded-xl shadow-2xl shadow-green-400 ring-4 ring-green-300 ring-opacity-50 bg-green-50 border-green-300 transition-all duration-500': showCongrats,
-                'transition-all duration-300': !showCongrats 
-            }">
+            <div>
                 <div class="flex border-b border-stroke">
                     <div class="font-semibold grow px-4 py-2">
                         <span x-text="reference"></span>
@@ -126,23 +123,6 @@
                     </div>
                 </div>
                 
-                <!-- Congratulations Message -->
-                <template x-if="showCongrats && hidden">
-                    <div class="bg-green-100 border-l-4 border-green-500 p-4 mb-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-green-700 font-medium">
-                                    🎉 Congratulations! You've memorized this verse with <span x-text="`${Math.round(overallAccuracy)}%`"></span> accuracy!
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </template>
                 <template x-if="!hidden">
                     <div class="leading-[1.5] text-lg whitespace-pre-wrap flex p-2">
                         <div x-html="buildDisplayFull()"></div>
@@ -178,6 +158,89 @@
                 </template>
             </div>
         </x-content-card>
+        <x-content-card>
+            <template x-if="showCongrats">
+                <div class="p-4 rounded-xl text-center border-2 border-[#5ECE0B]">
+                    <h2 class="text-xl font-semibold mb-2 flex items-center justify-center w-full gap-1">
+                        <img src="{{ asset('images/icons/svg/badge-check.svg') }}" />
+                        <span>Congrats!</span>
+                    </h2>
+                    <div class="flex flex-col my-3">
+                        @auth
+                            <span class="text-sm">Added to your bank:</span>
+                        @else
+                            <span class="text-sm">Memorized:</span>
+                        @endauth
+                        <span class="text-xl font-bold" x-text="reference"></span>
+                        <span class="text-sm text-gray-600 mt-1">
+                            Difficulty: <span class="font-semibold capitalize" x-text="getDifficultyDisplayName(difficulty)"></span>
+                        </span>
+                    </div>
+                    @auth
+
+                    @else
+                    <div class="flex flex-col my-3">
+                        <span class="text-sm">Sign up or register to have your memorized verses saved to your memory bank!</span>
+                    </div>
+                    @endif
+                    <div class="flex gap-2 w-full items-stretch justify-center flex-col">
+                        <x-button @click="resetAll()">Do Another</x-button>
+                        <template x-if="shouldShowIncreaseDifficultyButton()">
+                            <x-button @click="openDifficultyModal()" class="bg-blue-600 hover:bg-blue-700">Increase Difficulty</x-button>
+                        </template>
+                        <x-button href="/">Back Home</x-button>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Difficulty Selection Modal -->
+            <template x-if="showDifficultyModal">
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="closeDifficultyModal()">
+                    <div class="bg-bg rounded-xl p-6 max-w-md w-full mx-4" @click.stop>
+                        <h3 class="text-lg font-semibold mb-4 text-center">Choose Difficulty</h3>
+                        <div class="space-y-3">
+                            <template x-for="difficultyOption in ['easy', 'normal', 'strict']" :key="difficultyOption">
+                                <button class="w-full rounded-lg p-4 flex items-center justify-between transition-all duration-200"
+                                     :class="{
+                                         'bg-gray-400 cursor-not-allowed text-gray-600': !canSelectDifficulty(difficultyOption),
+                                         'bg-green-600 text-white': isDifficultyCompleted(difficultyOption),
+                                         'bg-gray-700 hover:bg-gray-600 cursor-pointer text-white': canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption),
+                                         'bg-gray-500 text-gray-300': !canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption)
+                                     }"
+                                     @click="canSelectDifficulty(difficultyOption) ? selectDifficulty(difficultyOption) : null"
+                                     :disabled="!canSelectDifficulty(difficultyOption)">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="font-medium capitalize" x-text="getDifficultyDisplayName(difficultyOption)"></span>
+                                        <span class="text-sm opacity-80">
+                                            (<span x-text="difficultyOption === 'easy' ? '80%' : difficultyOption === 'normal' ? '95%' : '100%'"></span> accuracy required)
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <template x-if="isDifficultyCompleted(difficultyOption)">
+                                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </template>
+                                        <template x-if="!canSelectDifficulty(difficultyOption) && !isDifficultyCompleted(difficultyOption)">
+                                            <svg class="w-5 h-5 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </template>
+                                    </div>
+                                </button>
+                            </template>
+                        </div>
+                        <div class="mt-6 flex justify-center">
+                            <x-button @click="closeDifficultyModal()" class="bg-gray-700 hover:bg-gray-600 text-white">Cancel</x-button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            
+            <div x-ref="dummyText" class="text-lg leading-[1.5]" style="visibility:hidden; position:absolute; top:-9999px; width:100%;">
+                <span x-text="buildDisplayFull()"></span>
+            </div>
+        </x-content-card>
     </div>
     <script>
         function memTool({ segments, reference, lineHeightPx, bibleTranslation, quizMode, quizData }) {
@@ -192,6 +255,8 @@
                 hidden: false,
                 segmentStates: [],
                 showCongrats: false,
+                showDifficultyModal: false,
+                completedDifficulties: [],
                 totalChars: 0,
                 radius: 29,
                 circumference: 0,
@@ -252,6 +317,30 @@
                     if (this.checkAllSegments()) {
                         this.showCongrats = true;
                         
+                        // Save to memory bank if not already saved
+                        if (!this.saved) {
+                            this.saved = true;
+                            fetch("{{ route('memorization-tool.save') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                                },
+                                body: JSON.stringify({
+                                    book: this.reference.split(" ")[0],
+                                    chapter: parseInt(this.reference.split(" ")[1].split(":")[0]),
+                                    verses: this.segments.map(seg => seg.verse),
+                                    difficulty: this.difficulty,
+                                    accuracy_score: this.overallAccuracy,
+                                    bible_translation: this.bibleTranslation,
+                                    user_text: this.userTypedText
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => console.log('Memory saved:', data))
+                            .catch(err => console.error(err));
+                        }
+                        
                         // Add a more visible celebration effect
                         setTimeout(() => {
                             // Scroll to the main content to make sure it's visible
@@ -290,6 +379,61 @@
                     if (this.difficulty === 'strict') return 100;
                     return 95; // default
                 },
+                resetAll() {
+                    this.hidden = false;
+                    this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
+                    this.showCongrats = false;
+                    this.saved = false;
+                },
+                async fetchCompletedDifficulties() {
+                    try {
+                        const response = await fetch(`/api/completed-difficulties?book=${this.reference.split(" ")[0]}&chapter=${parseInt(this.reference.split(" ")[1].split(":")[0])}&verses=${this.segments.map(seg => seg.verse).join(',')}`);
+                        const data = await response.json();
+                        this.completedDifficulties = data.difficulties || [];
+                    } catch (error) {
+                        console.error('Error fetching completed difficulties:', error);
+                        this.completedDifficulties = [];
+                    }
+                },
+                
+                openDifficultyModal() {
+                    this.fetchCompletedDifficulties();
+                    this.showDifficultyModal = true;
+                },
+                
+                closeDifficultyModal() {
+                    this.showDifficultyModal = false;
+                },
+                
+                selectDifficulty(newDifficulty) {
+                    this.difficulty = newDifficulty;
+                    this.resetAll();
+                    this.closeDifficultyModal();
+                },
+                
+                isDifficultyCompleted(difficulty) {
+                    return this.completedDifficulties.includes(difficulty);
+                },
+                
+                canSelectDifficulty(difficulty) {
+                    const difficultyOrder = ['easy', 'normal', 'strict'];
+                    const currentIndex = difficultyOrder.indexOf(this.difficulty);
+                    const targetIndex = difficultyOrder.indexOf(difficulty);
+                    return targetIndex > currentIndex;
+                },
+                
+                shouldShowIncreaseDifficultyButton() {
+                    return this.difficulty !== 'strict';
+                },
+                
+                getDifficultyDisplayName(difficulty) {
+                    const names = {
+                        'easy': 'Easy',
+                        'normal': 'Normal', 
+                        'strict': 'Strict'
+                    };
+                    return names[difficulty] || difficulty;
+                },
                 get overallAccuracy() {
                     if (this.segmentStates.length === 0) return 0;
                     let sum = 0;
@@ -316,6 +460,9 @@
                 },
                 get typedChars() {
                     return this.segmentStates.reduce((sum, state) => sum + state.typedText.length, 0);
+                },
+                get userTypedText() {
+                    return this.segmentStates.map(state => state.typedText).join("\n");
                 },
                 scrollToMainContent() {
                     this.$nextTick(() => {

@@ -5,7 +5,7 @@
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center px-4 py-1.5
+    $baseClasses = 'inline-flex items-center px-4 py-1.5 text-center justify-center
                     rounded-md font-semibold text-xs uppercase tracking-widest
                     focus:outline-none focus:ring-2 focus:ring-indigo-500
                     focus:ring-offset-2 disabled:opacity-50
