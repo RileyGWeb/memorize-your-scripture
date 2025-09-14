@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Helpers\BibleHelper;
 
 class VersePicker extends Component
 {
@@ -12,25 +13,6 @@ class VersePicker extends Component
     public $verseRanges = [];
     public $errorMessage = '';
     public $suggestedBook = '';
-    private array $booksOfTheBible = [
-        // Old Testament
-        'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
-        'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel',
-        '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra',
-        'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs',
-        'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
-        'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos',
-        'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk',
-        'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
-    
-        // New Testament
-        'Matthew', 'Mark', 'Luke', 'John', 'Acts',
-        'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
-        'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy',
-        '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James',
-        '1 Peter', '2 Peter', '1 John', '2 John', '3 John',
-        'Jude', 'Revelation'
-    ];    
 
     public function mount()
     {
@@ -102,26 +84,23 @@ class VersePicker extends Component
     
         $chapter = (int)$chapter;
     
-        // **Step 1**: Try an exact (case-insensitive) match
-        $lowerBooks = array_map('strtolower', $this->booksOfTheBible);
-        $rawBookLower = strtolower($rawBook);
-    
-        $bookIndex = array_search($rawBookLower, $lowerBooks);
-        if ($bookIndex === false) {
-            // **Step 2**: Not found. Attempt fuzzy matching.
-            $suggestedBook = $this->findClosestBook($rawBook);
-            if ($suggestedBook) {
-                // We have a possible "did you mean?" suggestion
-                // Instead of directly using it, you might want to throw an exception with the suggestion
-                throw new \Exception("Unrecognized book '$rawBook'. Did you mean '$suggestedBook'?");
+        // Use BibleHelper to validate the book and get the canonical name
+        $book = BibleHelper::findBookByName($rawBook);
+        if (!$book) {
+            // Try to find a suggestion
+            $suggestion = BibleHelper::findClosestBook($rawBook);
+            if ($suggestion) {
+                throw new \Exception("Unrecognized book '$rawBook'. Did you mean '$suggestion'?");
             } else {
-                // No good suggestion
                 throw new \Exception("Unrecognized book '$rawBook'.");
             }
         }
     
-        // Retrieve the canonical/correct form from the array
-        $book = $this->booksOfTheBible[$bookIndex];
+        // Validate that the chapter exists for this book
+        if (!BibleHelper::isValidReference($book, $chapter, 1)) {
+            $maxChapter = BibleHelper::getMaxChapter($book);
+            throw new \Exception("Chapter $chapter does not exist in $book. Maximum chapter is $maxChapter.");
+        }
     
         // parse the verses
         $verseGroups = explode(',', $versesPart);
@@ -137,6 +116,15 @@ class VersePicker extends Component
                 $start = (int)$start;
                 $end   = (int)$end;
                 if ($start > 0 && $end >= $start) {
+                    // Validate that all verses in the range exist
+                    if (!BibleHelper::isValidReference($book, $chapter, $start)) {
+                        $maxVerse = BibleHelper::getMaxVerse($book, $chapter);
+                        throw new \Exception("Verse $start does not exist in $book $chapter. Maximum verse is $maxVerse.");
+                    }
+                    if (!BibleHelper::isValidReference($book, $chapter, $end)) {
+                        $maxVerse = BibleHelper::getMaxVerse($book, $chapter);
+                        throw new \Exception("Verse $end does not exist in $book $chapter. Maximum verse is $maxVerse.");
+                    }
                     $verseRanges[] = [$start, $end];
                 } else {
                     throw new \Exception("Invalid verse range '$group'.");
@@ -146,6 +134,11 @@ class VersePicker extends Component
                 $verseNum = (int)$group;
                 if ($verseNum <= 0) {
                     throw new \Exception("Invalid verse number '$group'.");
+                }
+                // Validate that the verse exists
+                if (!BibleHelper::isValidReference($book, $chapter, $verseNum)) {
+                    $maxVerse = BibleHelper::getMaxVerse($book, $chapter);
+                    throw new \Exception("Verse $verseNum does not exist in $book $chapter. Maximum verse is $maxVerse.");
                 }
                 $verseRanges[] = [$verseNum, $verseNum];
             }
@@ -158,32 +151,6 @@ class VersePicker extends Component
         return [$book, $chapter, $verseRanges];
     }
     
-    
-    protected function findClosestBook($rawBook)
-{
-        $bookLower = strtolower($rawBook);
-
-        // We convert each official book to lowercase, then compare.
-        $lowestDistance = PHP_INT_MAX;
-        $closestMatch = null;
-
-        foreach ($this->booksOfTheBible as $bookName) {
-            $distance = levenshtein($bookLower, strtolower($bookName));
-            if ($distance < $lowestDistance) {
-                $lowestDistance = $distance;
-                $closestMatch = $bookName;
-            }
-        }
-
-        $threshold = 4;
-
-        if ($lowestDistance <= $threshold) {
-            return $closestMatch; 
-        }
-
-        return null; 
-    }
-
     public function applySuggestion()
     {
         if ($this->suggestedBook) {

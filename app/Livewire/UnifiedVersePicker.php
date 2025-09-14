@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Helpers\BibleHelper;
 
 class UnifiedVersePicker extends Component
 {
@@ -15,26 +16,6 @@ class UnifiedVersePicker extends Component
     public $placeholder = 'John 3:16-18';
     public $showNextButton = false;
     public $nextButtonRoute = '';
-    
-    private array $booksOfTheBible = [
-        // Old Testament
-        'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
-        'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel',
-        '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra',
-        'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs',
-        'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
-        'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos',
-        'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk',
-        'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
-    
-        // New Testament
-        'Matthew', 'Mark', 'Luke', 'John', 'Acts',
-        'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
-        'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy',
-        '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James',
-        '1 Peter', '2 Peter', '1 John', '2 John', '3 John',
-        'Jude', 'Revelation'
-    ];
 
     public function mount($showNextButton = false, $nextButtonRoute = '', $placeholder = 'John 3:16-18')
     {
@@ -130,58 +111,35 @@ class UnifiedVersePicker extends Component
             $chapter = (int)$matches[2];
             $versesPart = trim($matches[3]);
             
-            $book = $this->findBook($bookName);
-            if (!$book) {
-                $suggestion = $this->suggestBook($bookName);
-                if ($suggestion) {
-                    throw new \Exception("Unrecognized book '$bookName'. Did you mean '$suggestion'?");
+            // Use BibleHelper for book validation
+            if (!BibleHelper::isValidBook($bookName)) {
+                $suggestions = BibleHelper::getSimilarBooks($bookName, 1);
+                if (!empty($suggestions)) {
+                    throw new \Exception("Unrecognized book '$bookName'. Did you mean '{$suggestions[0]}'?");
                 } else {
                     throw new \Exception("Unrecognized book '$bookName'. Please check the spelling.");
                 }
             }
             
-            $verseRanges = $this->parseVerses($versesPart);
+            // Validate chapter exists
+            if (!BibleHelper::isValidChapter($bookName, $chapter)) {
+                $maxChapter = BibleHelper::getMaxChapter($bookName);
+                throw new \Exception("Chapter $chapter does not exist in $bookName. Maximum chapter is $maxChapter.");
+            }
             
-            return [$book, $chapter, $verseRanges];
+            $verseRanges = $this->parseVerses($versesPart, $bookName, $chapter);
+            
+            return [$bookName, $chapter, $verseRanges];
         }
         
         throw new \Exception('Invalid format. Please use format like "John 3:16" or "John 3:16-18".');
     }
 
-    protected function findBook($input)
-    {
-        $input = trim($input);
-        
-        foreach ($this->booksOfTheBible as $book) {
-            if (strcasecmp($book, $input) === 0) {
-                return $book;
-            }
-        }
-        
-        return null;
-    }
-
-    protected function suggestBook($input)
-    {
-        $input = strtolower(trim($input));
-        $bestMatch = null;
-        $bestDistance = PHP_INT_MAX;
-        
-        foreach ($this->booksOfTheBible as $book) {
-            $distance = levenshtein($input, strtolower($book));
-            if ($distance < $bestDistance && $distance <= 3) {
-                $bestDistance = $distance;
-                $bestMatch = $book;
-            }
-        }
-        
-        return $bestMatch;
-    }
-
-    protected function parseVerses($versesPart)
+    protected function parseVerses($versesPart, $book, $chapter)
     {
         $ranges = explode(',', $versesPart);
         $verseRanges = [];
+        $maxVerse = BibleHelper::getMaxVerse($book, $chapter);
         
         foreach ($ranges as $range) {
             $range = trim($range);
@@ -195,12 +153,26 @@ class UnifiedVersePicker extends Component
                     throw new \Exception('Invalid verse range.');
                 }
                 
+                // Validate verses exist
+                if ($start > $maxVerse) {
+                    throw new \Exception("Verse $start does not exist in $book $chapter. Maximum verse is $maxVerse.");
+                }
+                if ($end > $maxVerse) {
+                    throw new \Exception("Verse $end does not exist in $book $chapter. Maximum verse is $maxVerse.");
+                }
+                
                 $verseRanges[] = [$start, $end];
             } else {
                 $verse = (int)$range;
                 if ($verse <= 0) {
                     throw new \Exception('Invalid verse number.');
                 }
+                
+                // Validate verse exists
+                if ($verse > $maxVerse) {
+                    throw new \Exception("Verse $verse does not exist in $book $chapter. Maximum verse is $maxVerse.");
+                }
+                
                 $verseRanges[] = [$verse, $verse];
             }
         }

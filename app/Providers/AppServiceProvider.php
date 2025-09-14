@@ -31,8 +31,8 @@ class AppServiceProvider extends ServiceProvider
         // Prohibit destructive commands on production
         DB::prohibitDestructiveCommands(
             // $this->app->isProduction()
-            // true
-            false
+            true
+            // false
         );
     }
 }

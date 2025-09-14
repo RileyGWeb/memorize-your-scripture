@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\MemorizationToolController;
 use App\Http\Controllers\MemorizationController;
 use App\Http\Controllers\MemoryBankController;
+use App\Http\Controllers\RandomVerseController;
 
 // -- Site Routes --
 // about page

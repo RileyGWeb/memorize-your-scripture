@@ -41,6 +41,9 @@
         <x-content-card-button href="/quiz" text="Get quizzed" icon="academic-cap" iconSize="lg" />
     </x-content-card>
 
+    <!-- Random Verse Card -->
+    <livewire:random-verse />
+
     <!-- Memorize Later List -->
     <livewire:memorize-later-list />
 
