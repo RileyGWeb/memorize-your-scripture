@@ -3,11 +3,15 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\MemorizeLater;
 use Illuminate\Support\Str;
 
 class MemorizeLaterList extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'simple-bootstrap';
     public function selectVerse($verseId)
     {
         $verse = MemorizeLater::find($verseId);
@@ -95,7 +99,7 @@ class MemorizeLaterList extends Component
         $verses = auth()->check() 
             ? MemorizeLater::where('user_id', auth()->id())
                 ->orderBy('added_at', 'desc')
-                ->get()
+                ->paginate(6)
             : collect();
 
         return view('livewire.memorize-later-list', [

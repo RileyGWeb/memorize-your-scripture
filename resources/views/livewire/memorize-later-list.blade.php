@@ -9,25 +9,27 @@
             <div class="grid grid-cols-2">
                 @foreach($verses as $verse)
                     <div class="group cursor-pointer border-r border-b border-stroke last:border-r-0 {{ $loop->index % 2 == 0 ? '' : 'border-r-0' }} {{ $loop->index < 2 ? 'border-t' : '' }}" wire:click="selectVerse({{ $verse->id }})">
-                        <div class="bg-bg hover:bg-gray-100 hover:shadow-md p-3 transition-colors duration-200 relative">
+                        <div class="bg-bg hover:bg-gray-100 hover:shadow-md p-3 transition-colors duration-200 relative min-h-[5.5rem] flex flex-col">
                             <!-- Verse Reference -->
                             <div class="font-semibold text-gray-800 text-sm mb-1">
                                 {{ $this->formatVerseReference($verse) }}
                             </div>
 
                             <!-- Note Preview -->
-                            @if($verse->note)
-                                <div class="text-xs text-gray-600 mb-2">
-                                    <span class="font-medium">Note - {{ $this->formatRelativeDate($verse->added_at) }}</span>
-                                </div>
-                                <div class="text-xs text-gray-700">
-                                    {{ $this->formatNotePreview($verse->note) }}
-                                </div>
-                            @else
-                                <div class="text-xs text-gray-500">
-                                    Added {{ $this->formatRelativeDate($verse->added_at) }}
-                                </div>
-                            @endif
+                            <div class="flex-grow">
+                                @if($verse->note)
+                                    <div class="text-xs text-gray-600 mb-2">
+                                        <span class="font-medium">Note - {{ $this->formatRelativeDate($verse->added_at) }}</span>
+                                    </div>
+                                    <div class="text-xs text-gray-700 h-[32px]">
+                                        {{ $this->formatNotePreview($verse->note) }}
+                                    </div>
+                                @else
+                                    <div class="text-xs text-gray-500">
+                                        Added {{ $this->formatRelativeDate($verse->added_at) }}
+                                    </div>
+                                @endif
+                            </div>
 
                             <!-- Click indicator - always show -->
                             <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -42,19 +44,35 @@
                 @if($verses->count() % 2 == 1)
                     <!-- Placeholder for odd number of items -->
                     <div class="border-b border-stroke {{ $verses->count() < 2 ? 'border-t' : '' }}">
-                        <div class="p-3 h-full bg-bg"></div>
+                        <div class="p-3 h-full bg-bg min-h-[5.5rem]"></div>
                     </div>
                 @endif
             </div>
 
             @if($verses->count() > 0)
-                <div class="p-3">
-                    <p class="text-sm text-blue-800">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Click a verse to start memorizing it!
-                    </p>
+                <div class="p-3 border-t border-stroke">
+                    <div class="flex justify-between items-center">
+                        <!-- Pagination -->
+                        @if($verses->hasPages())
+                            <div class="flex items-center gap-2 justify-between w-full">
+                                @if($verses->onFirstPage())
+                                    <span class="px-3 py-1 text-gray-400 text-sm">← Previous</span>
+                                @else
+                                    <button wire:click="previousPage" class="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm transition-colors">← Previous</button>
+                                @endif
+                                
+                                <span class="text-sm text-gray-600">
+                                    {{ $verses->firstItem() }}-{{ $verses->lastItem() }} of {{ $verses->total() }}
+                                </span>
+                                
+                                @if($verses->hasMorePages())
+                                    <button wire:click="nextPage" class="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm transition-colors">Next →</button>
+                                @else
+                                    <span class="px-3 py-1 text-gray-400 text-sm">Next →</span>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
                 </div>
             @endif
         </div>

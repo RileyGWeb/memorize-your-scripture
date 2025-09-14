@@ -159,6 +159,41 @@ class RandomVerse extends Component
         }
     }
 
+    public function memorizeNow()
+    {
+        if (!$this->verseData) {
+            $this->error = 'No verse selected to memorize.';
+            return;
+        }
+
+        try {
+            // Set up session data that the memorization display expects
+            $verseSelection = [
+                'book' => $this->verseData['book'],
+                'chapter' => $this->verseData['chapter'],
+                'verseRanges' => [[$this->verseData['verse'], $this->verseData['verse']]],
+                'bible_translation' => config('bible.default', 'de4e12af7f28f599-02') // Add the default translation
+            ];
+
+            $fetchedVerseText = [
+                'data' => [[
+                    'content' => $this->verseData['text'],
+                    'reference' => $this->verseData['reference']
+                ]]
+            ];
+
+            session()->put('verseSelection', $verseSelection);
+            session()->put('fetchedVerseText', $fetchedVerseText);
+
+            // Use Livewire's navigate functionality for faster navigation
+            return $this->redirect('/memorization-tool/display', navigate: true);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error in memorizeNow: ' . $e->getMessage());
+            $this->error = 'Error setting up memorization: ' . $e->getMessage();
+        }
+    }
+
     public function render()
     {
         return view('livewire.random-verse');

@@ -30,15 +30,15 @@
     </x-content-card>
 
     <x-content-card>
-        <x-content-card-button href="/memorization-tool" text="Memorize scripture" icon="arrow-narrow-right" iconSize="lg" />
+        <x-content-card-button href="/memorization-tool" text="Memorize scripture" icon="arrow-narrow-right" iconSize="lg" wire:navigate />
 
         <x-divider />
 
-        <x-content-card-button href="/bank" text="Your memory bank" icon="bank" iconSize="md" />
+        <x-content-card-button href="/bank" text="Your memory bank" icon="bank" iconSize="md" wire:navigate />
 
         <x-divider />
 
-        <x-content-card-button href="/quiz" text="Get quizzed" icon="academic-cap" iconSize="lg" />
+        <x-content-card-button href="/quiz" text="Get quizzed" icon="academic-cap" iconSize="lg" wire:navigate />
     </x-content-card>
 
     <!-- Random Verse Card -->

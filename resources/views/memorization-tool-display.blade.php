@@ -1,4 +1,11 @@
 <x-layouts.app>
+    {{-- Debug information --}}
+    @if(session('memorize_debug'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            Debug: {{ session('memorize_debug') }}
+        </div>
+    @endif
+    
     <div x-data="memTool({
             segments: @js($segments),
             reference: @js($reference),
@@ -188,7 +195,7 @@
                         <template x-if="shouldShowIncreaseDifficultyButton()">
                             <x-button @click="openDifficultyModal()" class="bg-blue-600 hover:bg-blue-700">Increase Difficulty</x-button>
                         </template>
-                        <x-button href="/">Back Home</x-button>
+                        <x-button href="/" wire:navigate>Back Home</x-button>
                     </div>
                 </div>
             </template>

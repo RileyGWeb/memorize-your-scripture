@@ -5,4 +5,6 @@
 ### Check off items as you complete them.
 ### Do not stop iterating until all tests are complete!
 
-[ ] 
+[X] Can you implement Livewire Nav directive? Do it on all buttons that navigate the user to any page. Please fetch this webpage for documentation to ensure accuracy in your code.
+
+https://livewire.laravel.com/docs/navigate

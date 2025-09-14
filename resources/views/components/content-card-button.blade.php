@@ -21,7 +21,7 @@
 
 <a 
     href="{{ $href }}"
-    class="flex items-center justify-center w-full py-2.5 relative hover:bg-gray-50 active:bg-gray-100 gap-2"
+    {{ $attributes->merge(['class' => 'flex items-center justify-center w-full py-2.5 relative hover:bg-gray-50 active:bg-gray-100 gap-2']) }}
 >
     <p class="font-bold">{{ $text }}</p>
     <x-icon :icon="$icon" class="{{ $iconClass }}" color="#000" />

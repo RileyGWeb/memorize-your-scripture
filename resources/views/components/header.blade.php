@@ -9,7 +9,7 @@
         <div class="flex justify-between items-center h-12">
 
             <div class="flex items-center space-x-4">
-                <a href="/" class="flex items-center">
+                <a href="/" class="flex items-center" wire:navigate>
                     <img src="{{ asset('images/icons/bible.png') }}" alt="logo" class="w-6 h-6" />
                     <div class="flex flex-col leading-none ml-1">
                         <span class="font-black tracking-widest text-xs -mb-1">MEM</span>
@@ -41,7 +41,7 @@
                             class="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow py-2 z-50"
                             x-cloak
                         >
-                            <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" wire:navigate>
                                 {{ __('Profile') }}
                             </a>
                             <div class="border-t border-gray-200 my-1"></div>

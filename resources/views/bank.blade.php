@@ -4,7 +4,7 @@
         <x-content-card>
             <x-content-card-title title="Your Memory Bank" subtitle="See everything you've memorized. Search by reference (John 3:16) or by verse text (For God so loved the world...)" />
             <x-divider />
-            <x-content-card-button href="/" text="Back home" icon="arrow-narrow-left" iconSize="lg" />
+            <x-content-card-button href="/" text="Back home" icon="arrow-narrow-left" iconSize="lg" wire:navigate />
             <x-divider />
         </x-content-card>
 
@@ -150,6 +150,7 @@
                 fetch(`{{ route('memory-bank.fetch-verse') }}?` + new URLSearchParams({
                     book: item.book,
                     chapter: item.chapter,
+                    bible_translation: item.bible_translation || 'de4e12af7f28f599-02',
                     ...verses.reduce((acc, v, i) => {
                         acc[`verses[${i}]`] = v;
                         return acc;

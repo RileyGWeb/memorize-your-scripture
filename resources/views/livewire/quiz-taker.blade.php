@@ -54,7 +54,7 @@
 
         <!-- Back Button Card -->
         <x-content-card>
-            <x-content-card-button href="/" text="Back to Home" icon="arrow-narrow-left" iconSize="lg" />
+            <x-content-card-button href="/" text="Back to Home" icon="arrow-narrow-left" iconSize="lg" wire:navigate />
         </x-content-card>
 
         <div class="bg-bg rounded-xl shadow-lg mt-4 border border-gray-100 p-6 mb-4">
@@ -158,7 +158,7 @@
     @else
         <!-- Back Button Card for Completion -->
         <div class="bg-bg rounded-xl shadow-lg border border-gray-100 p-4 mb-4">
-            <a href="/" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+            <a href="/" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors" wire:navigate>
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
