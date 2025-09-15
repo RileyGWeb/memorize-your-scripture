@@ -7,4 +7,6 @@
 
 [X] Can you implement Livewire Nav directive? Do it on all buttons that navigate the user to any page. Please fetch this webpage for documentation to ensure accuracy in your code.
 
+[X] Add lazy loading to all Livewire components to improve page load performance.
+
 https://livewire.laravel.com/docs/navigate

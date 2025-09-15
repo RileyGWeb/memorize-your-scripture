@@ -319,7 +319,7 @@
                         <p class="text-gray-600">Track all system activities and user actions with advanced filtering and pagination</p>
                     </div>
                     
-                    @livewire('audit-log-table')
+                    @livewire('audit-log-table', [], key('audit-log-table'), lazy: true)
                 </div>
             </div>
         </div>

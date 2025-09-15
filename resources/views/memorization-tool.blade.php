@@ -23,5 +23,17 @@
     <livewire:random-verse />
 
     <!-- Memorize Later List for verse selection -->
-    <livewire:memorize-later-list />
+    <livewire:memorize-later-list lazy>
+        <div class="w-full">
+            <div class="bg-bg rounded-xl shadow-sm border border-gray-200">
+                <div class="mb-4 p-3 pb-0">
+                    <h3 class="font-bold text-lg text-gray-800">Memorize Later...</h3>
+                    <p class="text-gray-600 text-sm">Grab a verse you've added to Memorize Later!</p>
+                </div>
+                <div class="flex items-center justify-center py-8">
+                    <div class="animate-pulse text-gray-500">Loading your saved verses...</div>
+                </div>
+            </div>
+        </div>
+    </livewire:memorize-later-list>
 </x-layouts.app>

@@ -15,6 +15,13 @@ class RandomVerse extends Component
     public $error = null;
     public $successMessage = null;
 
+    public function mount()
+    {
+        // For lazy loaded components, we might want to delay this slightly
+        // or handle it differently, but for now let's auto-load
+        $this->getRandomVerse();
+    }
+
     public function getRandomVerse()
     {
         $this->loading = true;
@@ -83,14 +90,13 @@ class RandomVerse extends Component
                 return;
             }
 
-            // Use the passages endpoint instead of search
+            // Use the passages endpoint like other components
             $response = \Http::timeout(10)
                 ->withHeaders([
                     'api-key' => $apiKey
                 ])
-                ->get('https://api.scripture.api.bible/v1/bibles/de4e12af7f28f599-02/search', [
-                    'query' => $verseReference,
-                    'limit' => 1
+                ->get('https://api.scripture.api.bible/v1/bibles/de4e12af7f28f599-02/passages', [
+                    'reference' => $verseReference
                 ]);
 
             \Log::info('API Response status: ' . $response->status());
@@ -99,9 +105,9 @@ class RandomVerse extends Component
                 $data = $response->json();
                 \Log::info('API Response data structure: ' . json_encode(array_keys($data)));
                 
-                // Check if we have passages data
-                if (!empty($data['data']['passages'])) {
-                    $passage = $data['data']['passages'][0];
+                // Check if we have data - it should be an array of passages
+                if (!empty($data['data']) && is_array($data['data'])) {
+                    $passage = $data['data'][0]; // Get the first passage
                     
                     // Parse the verse reference to extract book, chapter, verse
                     preg_match('/^(.+?)\s+(\d+):(\d+)/', $verseReference, $matches);
