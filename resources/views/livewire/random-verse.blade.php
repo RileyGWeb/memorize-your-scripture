@@ -68,7 +68,7 @@
                 </style>
 
                 <!-- Action Buttons -->
-                <div class="grid grid-cols-1 @auth md:grid-cols-3 @else md:grid-cols-2 @endauth gap-3">
+                <div class="grid grid-cols-1 @auth md:grid-cols-4 @else md:grid-cols-3 @endauth gap-3">
                     <button wire:click="memorizeNow"
                             wire:loading.attr="disabled"
                             wire:target="memorizeNow"
@@ -91,6 +91,11 @@
                             class="flex items-center justify-center py-2.5 relative hover:bg-gray-50 active:bg-gray-100 gap-2 font-bold text-text transition-colors duration-200 border border-stroke rounded-lg">
                         <span>Get Another</span>
                         <x-icon icon="refresh" class="w-4 h-4" color="#292D32" />
+                    </button>
+                    <button wire:click="clearVerse" 
+                            class="flex items-center justify-center py-2.5 relative hover:bg-red-50 active:bg-red-100 gap-2 font-bold text-red-600 transition-colors duration-200 border border-red-200 rounded-lg">
+                        <span>Clear</span>
+                        <x-icon icon="x" class="w-4 h-4" color="#dc2626" />
                     </button>
                 </div>
             </div>

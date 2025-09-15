@@ -17,9 +17,20 @@ class RandomVerse extends Component
 
     public function mount()
     {
-        // For lazy loaded components, we might want to delay this slightly
-        // or handle it differently, but for now let's auto-load
-        $this->getRandomVerse();
+        // Clear any existing verse data on mount (page refresh or navigation)
+        // This ensures a clean state when the user returns to this page
+        $this->clearVerse();
+        
+        // Don't auto-load a verse - let the user choose when to get one
+        // This gives them a clean slate each time they visit the page
+    }
+
+    public function clearVerse()
+    {
+        $this->verseData = null;
+        $this->error = null;
+        $this->successMessage = null;
+        $this->loading = false;
     }
 
     public function getRandomVerse()
