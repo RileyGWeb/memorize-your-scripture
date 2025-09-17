@@ -54,20 +54,20 @@
             <div class="space-y-4">
                 <button 
                     @click="loginModal = true" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm hover:shadow-md"
+                    class="w-full inline-flex items-center px-4 py-1.5 text-center justify-center rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-150 bg-transparent border border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white focus:bg-gray-700 active:bg-gray-900"
                 >
-                    Log In
+                    Sign in
                 </button>
-                <div class="flex items-center">
+                <div class="flex items-center my-4">
                     <div class="flex-1 border-t border-gray-300"></div>
-                    <span class="px-3 text-gray-500 text-sm">or</span>
+                    <span class="px-3 text-gray-500 text-sm font-medium">or</span>
                     <div class="flex-1 border-t border-gray-300"></div>
                 </div>
                 <button 
                     @click="registerModal = true" 
-                    class="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-all duration-200 border border-gray-300"
+                    class="w-full inline-flex items-center px-4 py-1.5 text-center justify-center rounded-md font-semibold text-xs uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-150 bg-gray-800 border border-transparent text-white hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900"
                 >
-                    Create Account
+                    Register
                 </button>
             </div>
         </div>
