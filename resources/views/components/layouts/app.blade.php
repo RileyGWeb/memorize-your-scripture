@@ -160,8 +160,10 @@
         </div>
         
         <!-- PWA Install Prompt -->
-        @livewire('install-prompt')
-        
+        @auth
+            @livewire('install-prompt')
+        @endauth
+
         @livewireScripts
         
         <!-- PWA Update Prompt -->

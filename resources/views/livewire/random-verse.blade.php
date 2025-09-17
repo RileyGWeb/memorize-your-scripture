@@ -31,7 +31,7 @@
             <div class="flex justify-center">
                 <button wire:click="getRandomVerse" 
                         wire:loading.attr="disabled"
-                        class="flex items-center justify-center w-full py-2.5 relative hover:bg-gray-50 active:bg-gray-100 gap-2 font-bold disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="flex flex-row items-center justify-center w-full py-2.5 relative hover:bg-gray-50 active:bg-gray-100 gap-2 font-bold disabled:opacity-50 disabled:cursor-not-allowed">
                     <span wire:loading.remove wire:target="getRandomVerse">Get Random Verse</span>
                     <span wire:loading wire:target="getRandomVerse" class="flex items-center gap-2">
                         <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@
                 </style>
 
                 <!-- Action Buttons -->
-                <div class="grid grid-cols-1 @auth md:grid-cols-4 @else md:grid-cols-3 @endauth gap-3">
+                <div class="flex flex-col gap-3">
                     <button wire:click="memorizeNow"
                             wire:loading.attr="disabled"
                             wire:target="memorizeNow"
@@ -84,13 +84,13 @@
                                 class="flex items-center justify-center py-2.5 relative hover:bg-gray-50 active:bg-gray-100 gap-2 font-bold text-text transition-colors duration-200 border border-stroke rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
                             <span wire:loading.remove wire:target="addToMemorizeLater">Memorize Later</span>
                             <span wire:loading wire:target="addToMemorizeLater">Adding...</span>
-                            <x-icon icon="clock" class="w-4 h-4" color="#292D32" />
+                            <x-icon icon="arrow-narrow-right" class="w-4 h-4" color="#292D32" />
                         </button>
                     @endauth
                     <button wire:click="getRandomVerse" 
                             class="flex items-center justify-center py-2.5 relative hover:bg-gray-50 active:bg-gray-100 gap-2 font-bold text-text transition-colors duration-200 border border-stroke rounded-lg">
                         <span>Get Another</span>
-                        <x-icon icon="refresh" class="w-4 h-4" color="#292D32" />
+                        <x-icon icon="arrow-narrow-right" class="w-4 h-4" color="#292D32" />
                     </button>
                     <button wire:click="clearVerse" 
                             class="flex items-center justify-center py-2.5 relative hover:bg-red-50 active:bg-red-100 gap-2 font-bold text-red-600 transition-colors duration-200 border border-red-200 rounded-lg">

@@ -22,18 +22,21 @@ class InstallPromptTest extends TestCase
     }
 
     /** @test */
-    public function install_prompt_component_is_present_on_guest_pages()
+    public function install_prompt_component_is_not_present_on_guest_pages()
     {
         $response = $this->get('/');
         
         $response->assertStatus(200);
-        $response->assertSeeLivewire('install-prompt');
+        $response->assertDontSee('Install Scripture App');
+        $response->assertDontSee('install-button', false);
     }
 
     /** @test */
-    public function install_prompt_contains_install_button()
+    public function install_prompt_contains_install_button_for_authenticated_users()
     {
-        $response = $this->get('/');
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->get('/');
         
         $response->assertStatus(200);
         $response->assertSee('install-button', false);
@@ -41,18 +44,22 @@ class InstallPromptTest extends TestCase
     }
 
     /** @test */
-    public function install_prompt_contains_floating_button()
+    public function install_prompt_contains_floating_button_for_authenticated_users()
     {
-        $response = $this->get('/');
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->get('/');
         
         $response->assertStatus(200);
         $response->assertSee('floating-install-button', false);
     }
 
     /** @test */
-    public function install_prompt_has_proper_styling_classes()
+    public function install_prompt_has_proper_styling_classes_for_authenticated_users()
     {
-        $response = $this->get('/');
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->get('/');
         
         $response->assertStatus(200);
         $response->assertSee('bg-white');
@@ -61,9 +68,11 @@ class InstallPromptTest extends TestCase
     }
 
     /** @test */
-    public function install_prompt_includes_ios_detection_script()
+    public function install_prompt_includes_ios_detection_script_for_authenticated_users()
     {
-        $response = $this->get('/');
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->get('/');
         
         $response->assertStatus(200);
         $response->assertSee('beforeinstallprompt', false);
