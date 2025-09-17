@@ -55,9 +55,9 @@ class InstallPromptTest extends TestCase
         $response = $this->get('/');
         
         $response->assertStatus(200);
-        $response->assertSee('bg-indigo-600');
+        $response->assertSee('bg-white');
         $response->assertSee('fixed bottom-4');
-        $response->assertSee('rounded-lg shadow-lg');
+        $response->assertSee('rounded-lg shadow-xl');
     }
 
     /** @test */

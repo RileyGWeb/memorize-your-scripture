@@ -1,6 +1,6 @@
 <div>
     <!-- Install Prompt -->
-    <div id="install-prompt" class="hidden fixed bottom-4 left-4 right-4 z-40 bg-indigo-600 border border-gray-200 rounded-lg shadow-lg p-4 mx-auto max-w-sm">
+    <div id="install-prompt" class="hidden fixed bottom-4 left-4 right-4 z-[60] bg-white border border-gray-300 rounded-lg shadow-xl p-4 mx-auto max-w-sm transform transition-all duration-300 safe-bottom">
         <div class="flex items-start space-x-3">
             <div class="flex-shrink-0">
                 <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
@@ -16,17 +16,17 @@
         </div>
         
         <div class="flex space-x-2 mt-3">
-            <button id="install-button" class="flex-1 bg-indigo-600 text-white text-sm py-2 px-3 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition duration-150">
+            <button id="install-button" class="flex-1 bg-indigo-600 text-white text-sm py-2 px-3 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition duration-150 font-medium">
                 Install
             </button>
-            <button id="dismiss-install" class="flex-shrink-0 text-gray-500 text-sm py-2 px-3 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 transition duration-150">
+            <button id="dismiss-install" class="flex-shrink-0 text-gray-600 text-sm py-2 px-3 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 transition duration-150 border border-gray-300">
                 Later
             </button>
         </div>
     </div>
 
     <!-- Floating Install Button (when prompt is not shown) -->
-    <button id="floating-install-button" class="hidden fixed bottom-6 right-6 z-40 bg-indigo-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 transform hover:scale-105">
+    <button id="floating-install-button" class="hidden fixed bottom-6 right-6 z-[60] bg-indigo-600 text-white w-14 h-14 rounded-full shadow-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 transform hover:scale-105 safe-bottom">
         <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
@@ -110,26 +110,49 @@
 
     function showInstallPrompt() {
         console.log('showInstallPrompt called');
-        document.getElementById('install-prompt').classList.remove('hidden');
-        installPromptShown = true;
+        const prompt = document.getElementById('install-prompt');
+        if (prompt) {
+            prompt.classList.remove('hidden');
+            // Add animation class for better UX
+            prompt.style.animation = 'slideUp 0.3s ease-out';
+            installPromptShown = true;
+        }
     }
 
     function hideInstallPrompt() {
         console.log('hideInstallPrompt called');
-        document.getElementById('install-prompt').classList.add('hidden');
-        installPromptShown = false;
+        const prompt = document.getElementById('install-prompt');
+        if (prompt) {
+            prompt.style.animation = 'slideDown 0.3s ease-in';
+            setTimeout(() => {
+                prompt.classList.add('hidden');
+                prompt.style.animation = '';
+            }, 300);
+            installPromptShown = false;
+        }
     }
 
     function showFloatingButton() {
         console.log('showFloatingButton called, deferredPrompt:', !!deferredPrompt);
         if (!installPromptShown && deferredPrompt && !localStorage.getItem('pwa-installed')) {
-            document.getElementById('floating-install-button').classList.remove('hidden');
+            const button = document.getElementById('floating-install-button');
+            if (button) {
+                button.classList.remove('hidden');
+                button.style.animation = 'fadeIn 0.3s ease-out';
+            }
         }
     }
 
     function hideFloatingButton() {
         console.log('hideFloatingButton called');
-        document.getElementById('floating-install-button').classList.add('hidden');
+        const button = document.getElementById('floating-install-button');
+        if (button) {
+            button.style.animation = 'fadeOut 0.3s ease-in';
+            setTimeout(() => {
+                button.classList.add('hidden');
+                button.style.animation = '';
+            }, 300);
+        }
     }
 
     // For iOS Safari - show a different prompt since beforeinstallprompt doesn't work
@@ -141,16 +164,46 @@
         return (window.navigator.standalone === true);
     }
 
+    // Check for small screens that might have issues with positioning
+    function isSmallScreen() {
+        return window.innerWidth < 640 || window.innerHeight < 700;
+    }
+
+    // Adjust positioning for small screens
+    function adjustForSmallScreen() {
+        const prompt = document.getElementById('install-prompt');
+        const floatingButton = document.getElementById('floating-install-button');
+        
+        if (isSmallScreen()) {
+            if (prompt) {
+                prompt.classList.add('mx-2');
+                prompt.style.maxWidth = 'calc(100vw - 2rem)';
+            }
+            if (floatingButton) {
+                floatingButton.style.bottom = 'calc(1rem + env(safe-area-inset-bottom, 0))';
+            }
+        }
+    }
+
+    // Listen for resize events to adjust positioning
+    window.addEventListener('resize', adjustForSmallScreen);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(adjustForSmallScreen, 100);
+    });
+
+    // Initial adjustment
+    document.addEventListener('DOMContentLoaded', adjustForSmallScreen);
+
     // Show iOS-specific install instructions
     if (isiOS() && !isInStandaloneMode() && !localStorage.getItem('ios-install-dismissed')) {
         setTimeout(() => {
             const iosPrompt = document.createElement('div');
             iosPrompt.id = 'ios-install-prompt';
-            iosPrompt.className = 'fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white p-3 text-center text-sm';
+            iosPrompt.className = 'fixed top-20 left-4 right-4 z-[60] bg-blue-600 text-white p-3 rounded-lg shadow-xl text-sm mx-auto max-w-sm';
             iosPrompt.innerHTML = `
-                <div class="max-w-sm mx-auto">
+                <div class="flex items-center justify-between">
                     <span>📱 To install: tap Share button, then "Add to Home Screen"</span>
-                    <button onclick="this.parentElement.parentElement.style.display='none'; localStorage.setItem('ios-install-dismissed', 'true');" class="ml-2 text-blue-200 hover:text-white">✕</button>
+                    <button onclick="this.parentElement.parentElement.style.display='none'; localStorage.setItem('ios-install-dismissed', 'true');" class="ml-2 text-blue-200 hover:text-white text-lg leading-none">&times;</button>
                 </div>
             `;
             document.body.appendChild(iosPrompt);
