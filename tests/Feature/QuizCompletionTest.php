@@ -188,4 +188,46 @@ class QuizCompletionTest extends TestCase
         $this->assertEquals(2, $quizData['currentIndex']);
         $this->assertCount(2, $quizData['results']);
     }
+
+    /** @test */
+    public function difficulty_selector_is_hidden_during_quiz()
+    {
+        // Create memory bank entries for the quiz
+        $memoryBank1 = MemoryBank::factory()->create([
+            'user_id' => $this->user->id,
+            'book' => 'John',
+            'chapter' => 3,
+            'verses' => '[[16, 17]]'
+        ]);
+
+        // Set up quiz session data
+        session([
+            'dailyQuiz' => [
+                'verses' => [$memoryBank1],
+                'currentIndex' => 0,
+                'totalQuestions' => 1,
+                'difficulty' => 'easy',
+                'results' => [],
+                'startedAt' => now()
+            ]
+        ]);
+
+        $this->actingAs($this->user);
+
+        $response = $this->get('/daily-quiz?quiz_mode=1');
+        
+        $response->assertStatus(200);
+        
+        // Check that the difficulty selector UI elements are hidden
+        // These should not appear when in quiz mode
+        $response->assertDontSee('id="easy"')
+            ->assertDontSee('id="normal"')
+            ->assertDontSee('id="strict"')
+            ->assertDontSee('for="easy"')
+            ->assertDontSee('for="normal"')
+            ->assertDontSee('for="strict"');
+        
+        // Check that quizMode is set to true in the JavaScript
+        $response->assertSee('quizMode: true');
+    }
 }

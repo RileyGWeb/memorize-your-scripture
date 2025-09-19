@@ -66,6 +66,7 @@
             </template>
             <x-divider />
             <div class="flex items-center justify-center h-20">
+            @if(!isset($quizMode) || !$quizMode)
                 <div class="flex items-center justify-center h-full w-full">
                     <form class="flex w-full h-full">
                         <div class="relative h-full w-full" :class="{ 'w-full': hidden && difficulty === 'easy' }" x-show="(!hidden) || (difficulty === 'easy')">
@@ -91,6 +92,12 @@
                         </div>
                     </form>
                 </div>
+            @else
+                <div class="flex items-center justify-center h-full w-full flex-col opacity-50">
+                    <span class="font-bold">Quiz Mode</span>
+                    <span class="text-base">Difficulty: {{ $quizData['difficulty'] ?? 'easy' }}</span>
+                </div>
+            @endif
                 <template x-if="hidden">
                     <div class="flex items-center justify-center">
                         <div class="relative flex items-center justify-center border-r border-stroke">
@@ -203,9 +210,11 @@
                         @else
                             <!-- Regular Mode Buttons -->
                             <x-button @click="resetAll()">Do Another</x-button>
+                            @if(!isset($quizMode) || !$quizMode)
                             <template x-if="shouldShowIncreaseDifficultyButton()">
                                 <x-button @click="openDifficultyModal()" class="bg-blue-600 hover:bg-blue-700">Increase Difficulty</x-button>
                             </template>
+                            @endif
                             <x-button href="/" wire:navigate>Back Home</x-button>
                         @endif
                     </div>
