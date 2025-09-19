@@ -141,12 +141,26 @@ class MemorizationController extends Controller
             return [];
         }
         
-        foreach ($verseRanges as $verse) {
-            $verses[] = [
-                'book' => $memoryBankEntry['book'],
-                'chapter' => $memoryBankEntry['chapter'],
-                'verse' => $verse,
-            ];
+        // Handle verse ranges like [[1, 3]] to generate individual verses [1, 2, 3]
+        foreach ($verseRanges as $range) {
+            if (is_array($range) && count($range) == 2) {
+                // Range format like [1, 3]
+                [$start, $end] = $range;
+                for ($verse = $start; $verse <= $end; $verse++) {
+                    $verses[] = [
+                        'book' => $memoryBankEntry['book'],
+                        'chapter' => $memoryBankEntry['chapter'],
+                        'verse' => $verse,
+                    ];
+                }
+            } elseif (is_numeric($range)) {
+                // Single verse format like 16
+                $verses[] = [
+                    'book' => $memoryBankEntry['book'],
+                    'chapter' => $memoryBankEntry['chapter'],
+                    'verse' => $range,
+                ];
+            }
         }
         
         return $verses;

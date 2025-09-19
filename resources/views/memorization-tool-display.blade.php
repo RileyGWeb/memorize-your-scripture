@@ -191,11 +191,23 @@
                     </div>
                     @endif
                     <div class="flex gap-2 w-full items-stretch justify-center flex-col">
-                        <x-button @click="resetAll()">Do Another</x-button>
-                        <template x-if="shouldShowIncreaseDifficultyButton()">
-                            <x-button @click="openDifficultyModal()" class="bg-blue-600 hover:bg-blue-700">Increase Difficulty</x-button>
-                        </template>
-                        <x-button href="/" wire:navigate>Back Home</x-button>
+                        @if(isset($quizMode) && $quizMode)
+                            <!-- Quiz Mode Buttons -->
+                            <template x-if="quizNextData && !quizNextData.quiz_complete">
+                                <x-button @click="nextQuizVerse()" class="bg-green-600 hover:bg-green-700">Next Verse</x-button>
+                            </template>
+                            <template x-if="quizNextData && quizNextData.quiz_complete">
+                                <x-button @click="nextQuizVerse()" class="bg-blue-600 hover:bg-blue-700">View Results</x-button>
+                            </template>
+                            <x-button href="/daily-quiz" wire:navigate>Exit Quiz</x-button>
+                        @else
+                            <!-- Regular Mode Buttons -->
+                            <x-button @click="resetAll()">Do Another</x-button>
+                            <template x-if="shouldShowIncreaseDifficultyButton()">
+                                <x-button @click="openDifficultyModal()" class="bg-blue-600 hover:bg-blue-700">Increase Difficulty</x-button>
+                            </template>
+                            <x-button href="/" wire:navigate>Back Home</x-button>
+                        @endif
                     </div>
                 </div>
             </template>
@@ -258,6 +270,7 @@
                 bibleTranslation: bibleTranslation || 'NIV',
                 quizMode: quizMode || false,
                 quizData: quizData || null,
+                quizNextData: null,
                 difficulty: 'easy',
                 hidden: false,
                 segmentStates: [],
@@ -327,25 +340,50 @@
                         // Save to memory bank if not already saved
                         if (!this.saved) {
                             this.saved = true;
-                            fetch("{{ route('memorization-tool.save') }}", {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                                },
-                                body: JSON.stringify({
-                                    book: this.reference.split(" ")[0],
-                                    chapter: parseInt(this.reference.split(" ")[1].split(":")[0]),
-                                    verses: this.segments.map(seg => seg.verse),
-                                    difficulty: this.difficulty,
-                                    accuracy_score: this.overallAccuracy,
-                                    bible_translation: this.bibleTranslation,
-                                    user_text: this.userTypedText
+                            
+                            // Handle quiz mode vs regular memorization
+                            if (this.quizMode) {
+                                // For quiz mode, call the quiz next endpoint
+                                fetch("{{ route('daily-quiz.next') }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                                    },
+                                    body: JSON.stringify({
+                                        score: this.overallAccuracy,
+                                        difficulty: this.difficulty,
+                                        user_text: this.userTypedText
+                                    })
                                 })
-                            })
-                            .then(response => response.json())
-                            .then(data => console.log('Memory saved:', data))
-                            .catch(err => console.error(err));
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Quiz progress saved:', data);
+                                    this.quizNextData = data; // Store response for next button
+                                })
+                                .catch(err => console.error(err));
+                            } else {
+                                // For regular memorization, save to memory bank
+                                fetch("{{ route('memorization-tool.save') }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                                    },
+                                    body: JSON.stringify({
+                                        book: this.reference.split(" ")[0],
+                                        chapter: parseInt(this.reference.split(" ")[1].split(":")[0]),
+                                        verses: this.segments.map(seg => seg.verse),
+                                        difficulty: this.difficulty,
+                                        accuracy_score: this.overallAccuracy,
+                                        bible_translation: this.bibleTranslation,
+                                        user_text: this.userTypedText
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => console.log('Memory saved:', data))
+                                .catch(err => console.error(err));
+                            }
                         }
                         
                         // Add a more visible celebration effect
@@ -391,6 +429,16 @@
                     this.segmentStates = this.segments.map(() => ({ typedText: '', accuracy: 0 }));
                     this.showCongrats = false;
                     this.saved = false;
+                },
+                
+                nextQuizVerse() {
+                    if (this.quizNextData) {
+                        if (this.quizNextData.quiz_complete) {
+                            window.location.href = this.quizNextData.redirect_url;
+                        } else {
+                            window.location.href = this.quizNextData.redirect_url;
+                        }
+                    }
                 },
                 async fetchCompletedDifficulties() {
                     try {

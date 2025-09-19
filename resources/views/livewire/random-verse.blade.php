@@ -6,7 +6,7 @@
     <div class="">
         <!-- Toggle for Random Type -->
         <div class="border-b border-stroke">
-            <ul class="grid items-stretch w-full md:grid-cols-2">
+            <ul class="grid items-stretch w-full grid-cols-2">
                 <li>
                     <input type="radio" id="random-popular" wire:model.live="randomType" value="popular" class="hidden peer" />
                     <label for="random-popular" class="inline-flex items-center justify-between w-full px-5 py-2.5 text-textLight bg-bg border-r border-stroke cursor-pointer hover:text-text hover:bg-white peer-checked:text-blue peer-checked:bg-white transition-all duration-200">                           

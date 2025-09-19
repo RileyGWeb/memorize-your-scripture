@@ -13,6 +13,7 @@
             :showDifficulty="true"
             :difficulty="$difficulty"
             :quizTypeLabel="$quizTypeLabel"
+            :showQuizTypeNavigation="true"
             :showActionButtons="true"
             backUrl="/daily-quiz"
             componentRef="setup"

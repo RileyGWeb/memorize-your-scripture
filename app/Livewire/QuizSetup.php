@@ -13,6 +13,8 @@ class QuizSetup extends Component
     public $difficulty = 'easy';
     public $quizType;
     public $quizTypeLabel;
+    
+    protected $quizTypes = ['random', 'recent', 'longest', 'shortest', 'all'];
 
     public function mount()
     {
@@ -59,6 +61,28 @@ class QuizSetup extends Component
         $this->updateQuizVerses();
     }
 
+    public function previousQuizType()
+    {
+        $currentIndex = array_search($this->quizType, $this->quizTypes);
+        if ($currentIndex !== false) {
+            $newIndex = ($currentIndex - 1 + count($this->quizTypes)) % count($this->quizTypes);
+            $this->quizType = $this->quizTypes[$newIndex];
+            $this->quizTypeLabel = $this->getQuizTypeLabel($this->quizType);
+            $this->updateQuizTypeAndVerses();
+        }
+    }
+
+    public function nextQuizType()
+    {
+        $currentIndex = array_search($this->quizType, $this->quizTypes);
+        if ($currentIndex !== false) {
+            $newIndex = ($currentIndex + 1) % count($this->quizTypes);
+            $this->quizType = $this->quizTypes[$newIndex];
+            $this->quizTypeLabel = $this->getQuizTypeLabel($this->quizType);
+            $this->updateQuizTypeAndVerses();
+        }
+    }
+
     public function startQuiz()
     {
         if (!Auth::check()) {
@@ -90,6 +114,16 @@ class QuizSetup extends Component
     {
         // Re-fetch verses with new count
         $verses = $this->getVersesForQuizType($this->quizType);
+        $this->quizSetup['verses'] = $verses->toArray();
+        $this->quizSetup['numberOfQuestions'] = $this->numberOfQuestions;
+        session()->put('quizSetup', $this->quizSetup);
+    }
+
+    protected function updateQuizTypeAndVerses()
+    {
+        // Update quiz type and re-fetch verses
+        $verses = $this->getVersesForQuizType($this->quizType);
+        $this->quizSetup['type'] = $this->quizType;
         $this->quizSetup['verses'] = $verses->toArray();
         $this->quizSetup['numberOfQuestions'] = $this->numberOfQuestions;
         session()->put('quizSetup', $this->quizSetup);

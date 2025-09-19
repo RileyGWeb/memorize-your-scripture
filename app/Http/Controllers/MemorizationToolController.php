@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\MemoryBank;
+use App\Models\MemorizeLater;
 
 class MemorizationToolController extends Controller
 {
@@ -148,6 +149,9 @@ class MemorizationToolController extends Controller
             auth()->user()->markAsVerified();
         }
 
+        // Remove the memorized verses from the "Memorize Later" list
+        $this->removeFromMemorizeLater($validated['book'], $validated['chapter'], $validated['verses']);
+
         return response()->json([
             'message' => 'Saved to memory bank.',
             'record'  => $record,
@@ -198,5 +202,33 @@ class MemorizationToolController extends Controller
             ->toArray();
             
         return response()->json(['difficulties' => $completedDifficulties]);
+    }
+
+    /**
+     * Remove memorized verses from the "Memorize Later" list
+     */
+    protected function removeFromMemorizeLater(string $book, int $chapter, array $memorizedVerses): void
+    {
+        // Find all "Memorize Later" entries for this user that match the book and chapter
+        $memorizeLaterEntries = \App\Models\MemorizeLater::where('user_id', auth()->id())
+            ->where('book', $book)
+            ->where('chapter', $chapter)
+            ->get();
+
+        foreach ($memorizeLaterEntries as $entry) {
+            $entryVerses = $entry->verses;
+            
+            // Remove memorized verses from this entry
+            $remainingVerses = array_diff($entryVerses, $memorizedVerses);
+            
+            if (empty($remainingVerses)) {
+                // If no verses remain, delete the entire entry
+                $entry->delete();
+            } else {
+                // If some verses remain, update the entry
+                $entry->verses = array_values($remainingVerses); // Re-index array
+                $entry->save();
+            }
+        }
     }
 }
