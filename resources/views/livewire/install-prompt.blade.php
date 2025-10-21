@@ -193,21 +193,5 @@
 
     // Initial adjustment
     document.addEventListener('DOMContentLoaded', adjustForSmallScreen);
-
-    // Show iOS-specific install instructions
-    if (isiOS() && !isInStandaloneMode() && !localStorage.getItem('ios-install-dismissed')) {
-        setTimeout(() => {
-            const iosPrompt = document.createElement('div');
-            iosPrompt.id = 'ios-install-prompt';
-            iosPrompt.className = 'fixed top-20 left-4 right-4 z-[60] bg-blue-600 text-white p-3 rounded-lg shadow-xl text-sm mx-auto max-w-sm';
-            iosPrompt.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span>📱 To install: tap Share button, then "Add to Home Screen"</span>
-                    <button onclick="this.parentElement.parentElement.style.display='none'; localStorage.setItem('ios-install-dismissed', 'true');" class="ml-2 text-blue-200 hover:text-white text-lg leading-none">&times;</button>
-                </div>
-            `;
-            document.body.appendChild(iosPrompt);
-        }, 2000);
-    }
     </script>
 </div>
