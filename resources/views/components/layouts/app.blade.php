@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ 
-    loginModal: {{ ($errors->any() && old('email') && !old('name')) ? 'true' : 'false' }}, 
-    registerModal: {{ ($errors->any() && old('name')) ? 'true' : 'false' }} 
+    loginModal: {{ (request()->has('login') || ($errors->any() && old('email') && !old('name'))) ? 'true' : 'false' }}, 
+    registerModal: {{ (request()->has('register') || ($errors->any() && old('name'))) ? 'true' : 'false' }} 
 }">
     <head>
         <meta charset="utf-8">

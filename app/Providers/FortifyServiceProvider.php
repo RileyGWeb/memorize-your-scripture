@@ -35,6 +35,16 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
+        // Redirect /login to homepage with login modal open
+        Fortify::loginView(function () {
+            return redirect()->route('home', ['login' => true]);
+        });
+
+        // Redirect /register to homepage with register modal open
+        Fortify::registerView(function () {
+            return redirect()->route('home', ['register' => true]);
+        });
+
         // Customize password reset response to auto-login and redirect to home
         $this->app->instance(PasswordResetResponse::class, new class implements PasswordResetResponse {
             public function toResponse($request)
