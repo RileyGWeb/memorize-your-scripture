@@ -28,11 +28,11 @@
 
                 <x-section-border />
             @endif
-
+{{--
             <div class="mt-10 sm:mt-0">
                 <livewire:profile.update-background-image-form lazy />
             </div>
-
+--}}
             @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
                 <x-section-border />
 
