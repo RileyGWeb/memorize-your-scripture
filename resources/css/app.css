@@ -85,9 +85,23 @@ p {
 }
 
 /* Capacitor App Styles - Mobile-specific adjustments */
+.capacitor-app body {
+    /* Fix viewport height for mobile app - no scrolling */
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    padding-bottom: 0 !important;
+}
+
 .capacitor-app main {
     /* Add extra top padding for mobile app */
     padding-top: max(4rem, calc(1rem + env(safe-area-inset-top)));
+    /* Make main scrollable with proper height */
+    height: calc(100vh - env(safe-area-inset-top) - 64px); /* 64px for header */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 60px; /* Space for footer */
 }
 
 .capacitor-ios main {
