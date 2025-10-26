@@ -83,3 +83,24 @@ p {
         transform: scale(0.8);
     }
 }
+
+/* Capacitor App Styles - Mobile-specific adjustments */
+.capacitor-app main {
+    /* Add extra top padding for mobile app */
+    padding-top: max(4rem, calc(1rem + env(safe-area-inset-top)));
+}
+
+.capacitor-ios main {
+    /* iOS-specific adjustments for notch/Dynamic Island */
+    padding-top: max(4.5rem, calc(1.5rem + env(safe-area-inset-top)));
+}
+
+/* Ensure footer respects safe areas on mobile */
+.capacitor-app footer {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* Hide web-only elements in mobile app if needed */
+.capacitor-app .web-only {
+    display: none;
+}
