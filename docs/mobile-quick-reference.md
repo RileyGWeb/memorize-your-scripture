@@ -54,8 +54,8 @@ npm run dev
 ## Troubleshooting
 
 **If mobile app won't load:**
-1. Ensure Laravel server is running: `php artisan serve`
-2. Check server is on localhost:8000
+1. Ensure Laravel server is running: `php artisan serve --port=7777`
+2. Check server is on localhost:7777
 3. Sync changes: `npx cap sync ios`
 
 **If Xcode errors:**

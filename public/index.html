@@ -72,7 +72,7 @@
             const appFrame = document.getElementById('app-frame');
             
             // Try to load the Laravel app
-            const serverUrl = 'http://localhost:8000';
+            const serverUrl = 'http://localhost:7777';
             
             // Test if server is available
             fetch(serverUrl)
@@ -96,7 +96,7 @@
                 loading.innerHTML = `
                     <div>Scripture Memorizer</div>
                     <p>Unable to connect to server.</p>
-                    <p>Please ensure the Laravel server is running on localhost:8000</p>
+                    <p>Please ensure the Laravel server is running on localhost:7777</p>
                     <button onclick="location.reload()">Retry</button>
                 `;
             }

@@ -8,11 +8,11 @@ echo "=========================================="
 echo ""
 
 # Check if Laravel server is already running
-if lsof -Pi :8000 -sTCP:LISTEN -t >/dev/null ; then
-    echo "✅ Laravel server already running on port 8000"
+if lsof -Pi :7777 -sTCP:LISTEN -t >/dev/null ; then
+    echo "✅ Laravel server already running on port 7777"
 else
-    echo "🔧 Starting Laravel server on port 8000..."
-    php artisan serve &
+    echo "🔧 Starting Laravel server on port 7777..."
+    php artisan serve --port=7777 &
     LARAVEL_PID=$!
     echo "✅ Laravel server started (PID: $LARAVEL_PID)"
 fi

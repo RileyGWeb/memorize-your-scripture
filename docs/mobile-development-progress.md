@@ -79,7 +79,7 @@ npx cap open ios
 Capacitor is a tool that wraps web apps (HTML/CSS/JS) into native mobile apps. It creates a native iOS/Android shell that contains a WebView (essentially a browser) that loads your web app.
 
 ### How Does This Work With Laravel?
-1. **Development**: Your Laravel app runs on `localhost:8000`
+1. **Development**: Your Laravel app runs on `localhost:7777`
 2. **Mobile App**: Contains a WebView that loads your Laravel app
 3. **Communication**: The mobile app can access device features (camera, notifications, etc.) and pass data to your Laravel app
 4. **Distribution**: The whole package gets submitted to App Store as a native app
@@ -111,7 +111,7 @@ Your mobile app now works like this:
 ```
 iOS App Shell (Native)
 └── WebView (Displays Laravel App)
-    └── Your Laravel App (localhost:8000)
+    └── Your Laravel App (localhost:7777)
         ├── Authentication (Jetstream)
         ├── Scripture Memorization Features
         ├── Livewire Components
