@@ -42,7 +42,7 @@
                             <p class="p-2 border-r border-stroke h-full whitespace-nowrap">Type in your verse(s):</p>
                             <input type="text" wire:model.live="verse" class="text-base bg-transparent border-none text-center w-full focus:ring-0" placeholder="John 3:16-18">
                         </div>
-                        <div class="flex items-center border-b border-stroke">
+                        <div class="flex items-center">
                             <div class="flex flex-col items-center p-2 border-r border-stroke h-full">
                                 <p class="flex-shrink">Your Selection</p>
                             </div>

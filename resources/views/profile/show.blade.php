@@ -1,45 +1,37 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+<x-layouts.app>
+    <x-content-card>
+        <x-content-card-title 
+            title="Profile" 
+            subtitle="Manage your account settings and preferences." 
+        />
+    </x-content-card>
 
-    <div>
-        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            @if (Laravel\Fortify\Features::canUpdateProfileInformation())
-                <livewire:profile.update-profile-information-form lazy />
+    @if (Laravel\Fortify\Features::canUpdateProfileInformation())
+        <x-content-card>
+            <livewire:profile.update-profile-information-form lazy />
+        </x-content-card>
+    @endif
 
-                <x-section-border />
-            @endif
+    @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
+        <x-content-card>
+            <livewire:profile.update-password-form lazy />
+        </x-content-card>
+    @endif
 
-            @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
-                <div class="mt-10 sm:mt-0">
-                    <livewire:profile.update-password-form lazy />
-                </div>
+    @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+        <x-content-card>
+            <livewire:profile.two-factor-authentication-form lazy />
+        </x-content-card>
+    @endif
 
-                <x-section-border />
-            @endif
+    {{-- Background Image - Coming Soon --}}
+    <x-content-card>
+        <livewire:profile.update-background-image-form lazy />
+    </x-content-card>
 
-            @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
-                <div class="mt-10 sm:mt-0">
-                    <livewire:profile.two-factor-authentication-form lazy />
-                </div>
-
-                <x-section-border />
-            @endif
-{{--
-            <div class="mt-10 sm:mt-0">
-                <livewire:profile.update-background-image-form lazy />
-            </div>
---}}
-            @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-                <x-section-border />
-
-                <div class="mt-10 sm:mt-0">
-                    <livewire:profile.delete-user-form lazy />
-                </div>
-            @endif
-        </div>
-    </div>
-</x-app-layout>
+    @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+        <x-content-card>
+            <livewire:profile.delete-user-form lazy />
+        </x-content-card>
+    @endif
+</x-layouts.app>
