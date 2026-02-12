@@ -1,0 +1,18 @@
+{
+	"appId": "org.memorizeyourscripture.www",
+	"appName": "Memorize Your Scripture",
+	"webDir": "public",
+	"server": {
+		"androidScheme": "https"
+	},
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		}
+	},
+	"ios": {
+		"contentInset": "automatic",
+		"backgroundColor": "#ffffff"
+	},
+	"packageClassList": []
+}

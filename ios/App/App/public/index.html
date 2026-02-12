@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <title>Memorize Your Scripture</title>
+    
+    <!-- Vite assets -->
+    <link rel="stylesheet" href="/build/assets/app-CWn5UX1z.css">
+    
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+        }
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .app-frame {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Loading Scripture Memorizer...</div>
+        </div>
+        
+        <iframe id="app-frame" class="app-frame" src="about:blank"></iframe>
+    </div>
+    
+    <script src="/build/assets/app-CfgId_cD.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loading = document.getElementById('loading');
+            const appFrame = document.getElementById('app-frame');
+            
+            // Try to load the Laravel app
+            const serverUrl = 'http://localhost:7777';
+            
+            // Test if server is available
+            fetch(serverUrl)
+                .then(response => {
+                    if (response.ok) {
+                        // Server is available, load in iframe
+                        appFrame.src = serverUrl;
+                        appFrame.onload = function() {
+                            loading.style.display = 'none';
+                            appFrame.style.display = 'block';
+                        };
+                    } else {
+                        showOfflineMessage();
+                    }
+                })
+                .catch(() => {
+                    showOfflineMessage();
+                });
+            
+            function showOfflineMessage() {
+                loading.innerHTML = `
+                    <div>Scripture Memorizer</div>
+                    <p>Unable to connect to server.</p>
+                    <p>Please ensure the Laravel server is running on localhost:7777</p>
+                    <button onclick="location.reload()">Retry</button>
+                `;
+            }
+            
+            // Handle iframe errors
+            appFrame.onerror = showOfflineMessage;
+        });
+    </script>
+</body>
+</html>
