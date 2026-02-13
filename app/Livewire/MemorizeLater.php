@@ -208,6 +208,11 @@ class MemorizeLater extends Component
     {
         $input = trim($input);
         
+        // Check for cross-chapter selection (e.g., "John 3:16, 4:6")
+        if (preg_match('/\d+:\d+.*,.*\d+:\d+/', $input)) {
+            throw new \Exception('Multiple chapters are not supported. Please select verses from a single chapter at a time.');
+        }
+        
         // Updated regex to handle optional comma and space after chapter:verse
         if (preg_match('/^(.+?)\s+(\d+):(.+)$/', $input, $matches)) {
             $bookName = trim($matches[1]);
@@ -380,28 +385,43 @@ class MemorizeLater extends Component
             }
 
             $bibleId = config('bible.default_id', '9879dbb7cfe39e4d-02');
-            $reference = $this->formatReferenceForApi();
             
-            $response = Http::timeout(10)
-                ->withHeaders([
-                    'api-key' => $apiKey
-                ])
-                ->get("https://api.scripture.api.bible/v1/bibles/{$bibleId}/passages", [
-                    'reference' => $reference
-                ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                
-                if (!empty($data['data']) && is_array($data['data']) && isset($data['data'][0]['content'])) {
-                    $content = $data['data'][0]['content'];
-                    
-                    // Convert verse number spans to superscript
-                    $content = preg_replace('/<span[^>]*class="v"[^>]*>(\d+)<\/span>/', '<sup>$1</sup>', $content);
-                    
-                    // Strip all other HTML tags but keep superscript
-                    $this->verseText = strip_tags($content, '<sup>');
+            // For comma-separated verses, we need to fetch each range separately
+            $allVerseTexts = [];
+            
+            foreach ($this->verseRanges as $range) {
+                if ($range[0] === $range[1]) {
+                    $reference = $this->book . ' ' . $this->chapter . ':' . $range[0];
+                } else {
+                    $reference = $this->book . ' ' . $this->chapter . ':' . $range[0] . '-' . $range[1];
                 }
+                
+                $response = Http::timeout(10)
+                    ->withHeaders([
+                        'api-key' => $apiKey
+                    ])
+                    ->get("https://api.scripture.api.bible/v1/bibles/{$bibleId}/passages", [
+                        'reference' => $reference
+                    ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    
+                    if (!empty($data['data']) && is_array($data['data']) && isset($data['data'][0]['content'])) {
+                        $content = $data['data'][0]['content'];
+                        
+                        // Convert verse number spans to superscript
+                        $content = preg_replace('/<span[^>]*class="v"[^>]*>(\d+)<\/span>/', '<sup>$1</sup>', $content);
+                        
+                        // Strip all other HTML tags but keep superscript
+                        $allVerseTexts[] = strip_tags($content, '<sup>');
+                    }
+                }
+            }
+            
+            // Combine all verse texts with a space
+            if (!empty($allVerseTexts)) {
+                $this->verseText = implode(' ', $allVerseTexts);
             }
         } catch (\Exception $e) {
             // If there's an error fetching the text, just log it and continue
