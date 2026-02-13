@@ -78,7 +78,7 @@
                         @elseif($verseText)
                         <div class="p-4 bg-blue-50" wire:key="verse-text-{{ md5($verseText) }}">
                             <p class="text-sm font-semibold text-gray-700 mb-2">{{ $this->formattedReference }}</p>
-                            <p class="text-gray-800 leading-relaxed">{{ $verseText }}</p>
+                            <p class="text-gray-800 leading-relaxed">{!! $verseText !!}</p>
                         </div>
                         @endif
                     </div>

@@ -35,8 +35,6 @@ class MemorizeLater extends Component
 
     public function updatedVerse($value)
     {
-        \Log::info('updatedVerse called', ['value' => $value]);
-        
         $this->errorMessage = '';
         $this->suggestedBook = '';
         $this->book = '';
@@ -45,27 +43,20 @@ class MemorizeLater extends Component
         $this->verseText = '';
     
         if (trim($value) === '') {
-            \Log::info('Empty value, returning');
             return;
         }
     
         try {
-            \Log::info('Parsing input');
             [$book, $chapter, $verseRanges] = $this->parseInput($value);
     
             $this->book = $book;
             $this->chapter = $chapter;
             $this->verseRanges = $verseRanges;
             
-            \Log::info('About to fetch verse text', ['book' => $book, 'chapter' => $chapter]);
-            
             // Fetch the verse text from the API
             $this->fetchVerseText();
-            
-            \Log::info('After fetchVerseText', ['verseText' => $this->verseText]);
     
         } catch (\Exception $e) {
-            \Log::error('Exception in updatedVerse', ['error' => $e->getMessage()]);
             $this->errorMessage = $e->getMessage();
             $this->suggestedBook = '';
             
@@ -385,15 +376,11 @@ class MemorizeLater extends Component
         try {
             $apiKey = config('services.bible.api_key');
             if (!$apiKey) {
-                // If no API key is configured, skip fetching text
-                \Log::info('No API key configured for verse text');
                 return;
             }
 
             $bibleId = config('bible.default_id', '9879dbb7cfe39e4d-02');
             $reference = $this->formatReferenceForApi();
-            
-            \Log::info('Fetching verse text', ['reference' => $reference, 'bibleId' => $bibleId]);
             
             $response = Http::timeout(10)
                 ->withHeaders([
@@ -403,20 +390,18 @@ class MemorizeLater extends Component
                     'reference' => $reference
                 ]);
 
-            \Log::info('API Response', ['status' => $response->status(), 'body' => $response->body()]);
-
             if ($response->successful()) {
                 $data = $response->json();
                 
                 if (!empty($data['data']) && is_array($data['data']) && isset($data['data'][0]['content'])) {
-                    // Strip HTML tags and clean up the text
-                    $this->verseText = strip_tags($data['data'][0]['content']);
-                    \Log::info('Verse text set', ['text' => $this->verseText]);
-                } else {
-                    \Log::warning('No content in API response', ['data' => $data]);
+                    $content = $data['data'][0]['content'];
+                    
+                    // Convert verse number spans to superscript
+                    $content = preg_replace('/<span[^>]*class="v"[^>]*>(\d+)<\/span>/', '<sup>$1</sup>', $content);
+                    
+                    // Strip all other HTML tags but keep superscript
+                    $this->verseText = strip_tags($content, '<sup>');
                 }
-            } else {
-                \Log::warning('API request failed', ['status' => $response->status()]);
             }
         } catch (\Exception $e) {
             // If there's an error fetching the text, just log it and continue
