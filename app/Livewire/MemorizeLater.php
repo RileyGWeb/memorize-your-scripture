@@ -20,12 +20,13 @@ class MemorizeLater extends Component
     public $verseRanges = [];
     public $errorMessage = '';
     public $suggestedBook = '';
+    public $verseText = '';
 
     public function toggleExpanded()
     {
         $this->isExpanded = !$this->isExpanded;
         if (!$this->isExpanded) {
-            $this->reset(['verse', 'note', 'successMessage', 'book', 'chapter', 'verseRanges', 'errorMessage', 'suggestedBook']);
+            $this->reset(['verse', 'note', 'successMessage', 'book', 'chapter', 'verseRanges', 'errorMessage', 'suggestedBook', 'verseText']);
         } else {
             // Clear success message when expanding to show fresh form
             $this->successMessage = '';
@@ -34,24 +35,37 @@ class MemorizeLater extends Component
 
     public function updatedVerse($value)
     {
+        \Log::info('updatedVerse called', ['value' => $value]);
+        
         $this->errorMessage = '';
         $this->suggestedBook = '';
         $this->book = '';
         $this->chapter = '';
         $this->verseRanges = [];
+        $this->verseText = '';
     
         if (trim($value) === '') {
+            \Log::info('Empty value, returning');
             return;
         }
     
         try {
+            \Log::info('Parsing input');
             [$book, $chapter, $verseRanges] = $this->parseInput($value);
     
             $this->book = $book;
             $this->chapter = $chapter;
             $this->verseRanges = $verseRanges;
+            
+            \Log::info('About to fetch verse text', ['book' => $book, 'chapter' => $chapter]);
+            
+            // Fetch the verse text from the API
+            $this->fetchVerseText();
+            
+            \Log::info('After fetchVerseText', ['verseText' => $this->verseText]);
     
         } catch (\Exception $e) {
+            \Log::error('Exception in updatedVerse', ['error' => $e->getMessage()]);
             $this->errorMessage = $e->getMessage();
             $this->suggestedBook = '';
             
@@ -128,7 +142,7 @@ class MemorizeLater extends Component
             ]);
 
             $this->successMessage = 'Verse saved successfully!';
-            $this->reset(['verse', 'note', 'book', 'chapter', 'verseRanges', 'errorMessage', 'suggestedBook']);
+            $this->reset(['verse', 'note', 'book', 'chapter', 'verseRanges', 'errorMessage', 'suggestedBook', 'verseText']);
             $this->isExpanded = false; // Close the dropdown
         } catch (\Exception $e) {
             $this->addError('verse', 'Failed to save verse. Please try again.');
@@ -340,6 +354,77 @@ class MemorizeLater extends Component
         }
         
         return $this->book . ' ' . $this->chapter . ':' . implode(',', $formattedRanges);
+    }
+    
+    /**
+     * Get formatted verse reference for display
+     */
+    public function getFormattedReferenceProperty()
+    {
+        if (!$this->book || !$this->chapter || empty($this->verseRanges)) {
+            return '';
+        }
+        
+        $formattedRanges = [];
+        foreach ($this->verseRanges as $range) {
+            if ($range[0] === $range[1]) {
+                $formattedRanges[] = $range[0];
+            } else {
+                $formattedRanges[] = $range[0] . '-' . $range[1];
+            }
+        }
+        
+        return $this->book . ' ' . $this->chapter . ':' . implode(', ', $formattedRanges);
+    }
+    
+    /**
+     * Fetch the verse text from the Bible API
+     */
+    private function fetchVerseText()
+    {
+        try {
+            $apiKey = config('services.bible.api_key');
+            if (!$apiKey) {
+                // If no API key is configured, skip fetching text
+                \Log::info('No API key configured for verse text');
+                return;
+            }
+
+            $bibleId = config('bible.default_id', '9879dbb7cfe39e4d-02');
+            $reference = $this->formatReferenceForApi();
+            
+            \Log::info('Fetching verse text', ['reference' => $reference, 'bibleId' => $bibleId]);
+            
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'api-key' => $apiKey
+                ])
+                ->get("https://api.scripture.api.bible/v1/bibles/{$bibleId}/passages", [
+                    'reference' => $reference
+                ]);
+
+            \Log::info('API Response', ['status' => $response->status(), 'body' => $response->body()]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                
+                if (!empty($data['data']) && is_array($data['data']) && isset($data['data'][0]['content'])) {
+                    // Strip HTML tags and clean up the text
+                    $this->verseText = strip_tags($data['data'][0]['content']);
+                    \Log::info('Verse text set', ['text' => $this->verseText]);
+                } else {
+                    \Log::warning('No content in API response', ['data' => $data]);
+                }
+            } else {
+                \Log::warning('API request failed', ['status' => $response->status()]);
+            }
+        } catch (\Exception $e) {
+            // If there's an error fetching the text, just log it and continue
+            \Log::warning('Failed to fetch verse text', [
+                'error' => $e->getMessage(),
+                'reference' => $this->formatReferenceForApi()
+            ]);
+        }
     }
 
     public function render()
