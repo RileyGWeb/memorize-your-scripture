@@ -74,12 +74,15 @@ class MemoryBankController extends Controller
         $data     = $response->json();
         $fullText = '';
         foreach ($data['data'] as $passage) {
-            $fullText .= ($passage['content'] ?? '');
+            $content = $passage['content'] ?? '';
+            // Convert verse number spans to superscript
+            $content = preg_replace('/<span[^>]*class="v"[^>]*>(\d+)<\/span>/', '<sup>$1</sup>', $content);
+            $fullText .= $content;
         }
     
         return response()->json([
             'reference'         => $reference,
-            'verse_text'        => strip_tags($fullText),
+            'verse_text'        => strip_tags($fullText, '<sup>'),
             'bible_translation' => $bibleId,      // so your modal can show which version
         ]);
     }    

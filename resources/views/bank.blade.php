@@ -71,7 +71,7 @@
                 </div>
                 <div class="leading-relaxed text-gray-800 border-t pt-4">
                     <p>Full verse:</p>
-                    <p x-text="$store.mb.selectedItemText"></p>
+                    <p x-html="$store.mb.selectedItemText"></p>
                 </div>
                 <div class="leading-relaxed text-sm text-gray-700 mt-2">
                     <p>You typed:</p>
@@ -141,7 +141,7 @@
                 const ref = this.formatReference(item.book, item.chapter, item.verses);
                 this.$store.mb.selectedItemRef = ref;
                 this.$store.mb.selectedItemDifficulty = item.difficulty;
-                this.$store.mb.selectedItemVersion = item.bible_translation;
+                this.$store.mb.selectedItemVersion = this.getTranslationName(item.bible_translation);
                 this.$store.mb.selectedItemDate = this.formatDate(item.memorized_at);
                 this.$store.mb.selectedUserText = item.user_text;
                 this.$store.mb.selectedItemText = 'Loading verse...';
@@ -201,6 +201,43 @@
                 if (!dateStr) return '';
                 const d = new Date(dateStr);
                 return d.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+            },
+
+            getTranslationName(translationId) {
+                const translations = {
+                    "06125adad2d5898a-01": "American Standard Version",
+                    "179568874c45066f-01": "Berean Study Bible",
+                    "55212e3cf5d04d49-01": "Bible in Basic English",
+                    "65eec8e0b60e656b-01": "Free Bible Version",
+                    "c315fa9f71d4af3a-01": "Geneva Bible",
+                    "bf8f1c7f3f9045a5-01": "JPS TaNaKH 1917",
+                    "de4e12af7f28f599-01": "King James Version",
+                    "de4e12af7f28f599-02": "King James Version (Alt)",
+                    "01b29f4b342acc35-01": "Literal Standard Version",
+                    "40072c4a5aba4022-01": "Revised Version 1885",
+                    "ec290b5045ff54a5-01": "Targum Onkelos Etheridge",
+                    "2f0fd81d7b85b923-01": "Family 35 NT",
+                    "c89622d31b60c444-02": "Orthodox Jewish Bible",
+                    "32339cf2f720ff8e-01": "Text-Critical English NT",
+                    "66c22495370cdfc0-01": "Translation for Translators",
+                    "9879dbb7cfe39e4d-01": "World English Bible",
+                    "9879dbb7cfe39e4d-02": "World English Bible",
+                    "9879dbb7cfe39e4d-03": "World English Bible",
+                    "9879dbb7cfe39e4d-04": "World English Bible",
+                    "7142879509583d59-01": "WEB British Edition",
+                    "7142879509583d59-02": "WEB British Edition",
+                    "7142879509583d59-03": "WEB British Edition",
+                    "7142879509583d59-04": "WEB British Edition",
+                    "72f4e6dc683324df-01": "WEB Updated",
+                    "72f4e6dc683324df-02": "WEB Updated",
+                    "72f4e6dc683324df-03": "WEB Updated",
+                    "32664dc3288a28df-01": "WEB American English",
+                    "32664dc3288a28df-02": "WEB American English",
+                    "32664dc3288a28df-03": "WEB American English",
+                    "f72b840c855f362c-04": "World Messianic Bible",
+                    "04da588535d2f823-04": "World Messianic Bible British"
+                };
+                return translations[translationId] || translationId;
             },
 
             shareItem() {
