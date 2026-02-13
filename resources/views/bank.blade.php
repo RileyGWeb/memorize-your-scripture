@@ -92,6 +92,8 @@
             selectedItemRef: '',
             selectedItemDifficulty: '',
             selectedItemDate: '',
+            selectedItemVersion: '',
+            selectedUserText: '',
             selectedItemText: '',
         });
     });
