@@ -86,8 +86,9 @@ p {
 
 /* Capacitor App Specific Styles - Handle Safe Areas for Notch */
 html.capacitor-app nav {
-    padding-top: env(safe-area-inset-top);
-    min-height: calc(3rem + env(safe-area-inset-top));
+    height: 3rem;
+    padding-top: env(safe-area-inset-top, 0px);
+    box-sizing: content-box;
 }
 
 html.capacitor-app main {
