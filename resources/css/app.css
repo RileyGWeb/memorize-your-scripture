@@ -83,3 +83,17 @@ p {
         transform: scale(0.8);
     }
 }
+
+/* Capacitor App Specific Styles - Handle Safe Areas for Notch */
+html.capacitor-app nav {
+    padding-top: env(safe-area-inset-top);
+    min-height: calc(3rem + env(safe-area-inset-top));
+}
+
+html.capacitor-app main {
+    margin-top: calc(3rem + env(safe-area-inset-top));
+}
+
+html.capacitor-app footer {
+    padding-left: calc(env(safe-area-inset-left, 0px) + 1rem);
+}

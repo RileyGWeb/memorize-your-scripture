@@ -3,16 +3,13 @@
 	"appName": "Memorize Your Scripture",
 	"webDir": "public",
 	"server": {
-		"androidScheme": "https"
+		"url": "http://localhost:8000",
+		"cleartext": true
 	},
-	"plugins": {
-		"CapacitorHttp": {
-			"enabled": true
-		}
-	},
-	"ios": {
-		"contentInset": "automatic",
-		"backgroundColor": "#ffffff"
-	},
-	"packageClassList": []
+	"packageClassList": [
+		"AppPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"StatusBarPlugin"
+	]
 }

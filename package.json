@@ -18,6 +18,14 @@
         "vite-plugin-pwa": "^1.0.3"
     },
     "dependencies": {
+        "@capacitor/android": "^8.1.0",
+        "@capacitor/app": "^8.0.1",
+        "@capacitor/cli": "^8.1.0",
+        "@capacitor/core": "^8.1.0",
+        "@capacitor/haptics": "^8.0.0",
+        "@capacitor/ios": "^8.1.0",
+        "@capacitor/keyboard": "^8.0.0",
+        "@capacitor/status-bar": "^8.0.1",
         "chart.js": "^4.5.0"
     }
 }
