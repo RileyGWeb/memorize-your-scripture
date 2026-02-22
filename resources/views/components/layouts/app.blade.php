@@ -15,7 +15,6 @@
         <link rel="manifest" href="/manifest.webmanifest">
         <meta name="theme-color" content="#111827">
         <meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <meta name="apple-mobile-web-app-title" content="Scripture Memorizer">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -32,8 +31,8 @@
 
         <div id="overlay" class="fixed inset-0 bg-black/20 z-5"></div>
 
-        <footer class="fixed bottom-0 left-0 w-full bg-white shadow-md py-2 px-4 flex justify-between items-center z-[51] border-t border-stroke">
-            <div class="text-sm text-gray-600">
+        <footer class="fixed bottom-0 left-0 w-full bg-white shadow-md py-2 px-4 flex justify-center items-center z-[51] border-t border-stroke">
+            <div class="text-sm text-gray-600 text-center">
                 <a href="{{ route('about') }}" class="hover:underline" wire:navigate>About</a>
                 <span class="mx-2">|</span>
                 <a href="{{ route('privacy-policy') }}" class="hover:underline">Privacy Policy</a>
