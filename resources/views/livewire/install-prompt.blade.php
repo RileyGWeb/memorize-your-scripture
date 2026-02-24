@@ -3,7 +3,7 @@
     <div id="install-prompt" class="hidden fixed bottom-4 left-4 right-4 z-[60] bg-white border border-gray-300 rounded-lg shadow-xl p-4 mx-auto max-w-sm transform transition-all duration-300 safe-bottom">
         <div class="flex items-start space-x-3">
             <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                     </svg>
@@ -16,17 +16,17 @@
         </div>
         
         <div class="flex space-x-2 mt-3">
-            <button id="install-button" class="flex-1 bg-indigo-600 text-white text-sm py-2 px-3 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition duration-150 font-medium">
+            <button id="install-button" class="flex-1 bg-gray-800 border border-transparent text-white text-sm py-2 px-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition duration-150 font-semibold uppercase tracking-widest">
                 Install
             </button>
-            <button id="dismiss-install" class="flex-shrink-0 text-gray-600 text-sm py-2 px-3 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1 transition duration-150 border border-gray-300">
+            <button id="dismiss-install" class="flex-shrink-0 bg-transparent border border-gray-800 text-gray-800 text-sm py-2 px-3 rounded-md hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition duration-150 font-semibold uppercase tracking-widest">
                 Later
             </button>
         </div>
     </div>
 
     <!-- Floating Install Button (when prompt is not shown) -->
-    <button id="floating-install-button" class="hidden fixed bottom-6 right-6 z-[60] bg-indigo-600 text-white w-14 h-14 rounded-full shadow-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 transform hover:scale-105 safe-bottom">
+    <button id="floating-install-button" class="hidden fixed bottom-6 right-6 z-[60] bg-gray-800 text-white w-14 h-14 rounded-full shadow-xl hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 transform hover:scale-105 safe-bottom">
         <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>

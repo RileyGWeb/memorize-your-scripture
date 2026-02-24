@@ -1,4 +1,3 @@
-<div class="w-full">
 @auth
     @if($this->getMemoryBankCount() > 0)
         <x-content-card>
@@ -73,4 +72,3 @@
         </div>
     </x-content-card>
 @endguest
-</div>

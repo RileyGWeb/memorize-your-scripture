@@ -85,19 +85,24 @@ p {
 }
 
 /* Capacitor App Specific Styles - Handle Safe Areas for Notch */
-html.capacitor-app nav {
-    height: 3rem;
+html.capacitor-app nav,
+body.capacitor-app nav {
+    @apply bg-bg;
     padding-top: env(safe-area-inset-top, 0px);
-    box-sizing: content-box;
+    height: calc(3rem + env(safe-area-inset-top, 0px));
+    box-sizing: border-box;
 }
 
-html.capacitor-app main {
-    margin-top: calc(3rem + env(safe-area-inset-top));
+html.capacitor-app main,
+body.capacitor-app main {
+    margin-top: env(safe-area-inset-top, 0px);
 }
 
-html.capacitor-app footer {
+html.capacitor-app footer,
+body.capacitor-app footer {
     padding-left: calc(env(safe-area-inset-left, 0px) + 1rem);
     padding-right: calc(env(safe-area-inset-right, 0px) + 1rem);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     justify-content: center;
     text-align: center;
 }

@@ -21,6 +21,8 @@
         
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
+
+        {{-- this is the real layout --}}
     </head>
     <body class="font-sans antialiased bg-no-repeat bg-center bg-cover min-h-screen pb-48" 
           style="background-image: url({{ asset('images/sunrise.webp') }});">
