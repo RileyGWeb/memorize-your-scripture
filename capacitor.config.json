@@ -1,9 +1,5 @@
 {
   "appId": "org.memorizeyourscripture.www",
   "appName": "Memorize Your Scripture",
-  "webDir": "public",
-  "server": {
-    "url": "http://localhost:8000",
-    "cleartext": true
-  }
+  "webDir": "public"
 }
